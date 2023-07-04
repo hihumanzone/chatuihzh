@@ -2,6 +2,7 @@
 - Supports custom API endpoint
 - Supports various markdown formats
 - Supports custom system prompt
+
   Not much really..
 
 ## Screenshot:
