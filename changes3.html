@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Chat with GPT Models">
+  <meta name="keywords" content="Chat, OpenAI, GPT, AI">
+  <title>Chat with GPT Models</title>
+</head>
+  <style>
+/* General page styling */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #001209;
+  color: #f0f0f0;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 26px;
+  border-bottom: 2px solid white;
+  color: white;
+  cursor: pointer;
+}
+
+/* Chat container styling */
+#chat-container {
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  max-width: 600px;
+  min-width: 300px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #000;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Chat history styling */
+#chat-history {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: 300px;
+  padding: 10px;
+  border: 1px solid #666362;
+  border-radius: 5px;
+  background-color: #222;
+}
+
+/* Input field styling */
+#api-key-input,
+#api-endpoint-input,
+#system-role-input,
+#message-input {
+  margin-top: 10px;
+  width: 96.5%;
+  padding: 5px;
+  border: 1px solid #888;
+  border-radius: 5px;
+  outline: none;
+  background-color: #444;
+  color: #f0f0f0;
+  resize: none; /* Disable textarea resizing by the user */
+}
+
+/* Send button styling */
+#send-button {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #006D00;
+  color: #fff;
+  border: 0.8px solid #B6B6B4;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+/* Message styling */
+.message {
+  margin: 5px 0;
+  max-width: 70%;
+  word-wrap: break-word;
+  white-space: pre-wrap; /* Preserve line breaks */
+}
+
+.message.user {
+  align-self: flex-end;
+  background-color: #005013;
+  color: #f0f0f0;
+  padding: 5px 10px;
+  border-radius: 10px;
+  border: 1px solid lime;
+}
+
+.message.bot {
+  align-self: flex-start;
+  background-color: #003300;
+  padding: 5px 10px;
+  border-radius: 10px;
+  border: 1px solid lime;
+}
+
+#copy-button {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #004D00;
+  color: #f0f0f0;
+  border: 0.8px solid #B6B6B4;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#api-key-input[type="password"],
+#api-endpoint-input[type="text"] {
+  -webkit-text-security: disc;
+  -moz-text-security: disc;
+  -ms-text-security: disc;
+  text-security: disc;
+}
+
+table {
+  border-collapse: collapse;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+th,
+td {
+  padding: 5px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid #666362;
+}
+
+th:first-child,
+td:first-child {
+  padding-left: 0;
+}
+
+th:last-child,
+td:last-child {
+  padding-right: 0;
+}
+
+.table-header {
+  font-weight: bold;
+  background-color: #555;
+  color: #f0f0f0;
+}
+
+.table-data {
+  background-color: #222;
+  color: #f0f0f0;
+}
+
+/* Hide empty table cells */
+th:empty,
+td:empty {
+  display: none;
+}
+</style>
+<body>
+  <div id="chat-container">
+    <h1 onclick="toggleModelMenu()">Chat with GPT Models</h1>
+    <div id="model-menu" style="display: none;">
+      <ul>
+        <li onclick="selectModel('gpt-3.5-turbo')">GPT-3.5 Turbo</li>
+        <li onclick="selectModel('gpt-3.5-turbo-16k')">GPT-3.5 16k</li>
+        <li onclick="selectModel('gpt-3.5-turbo-0613')">GPT-3.5 0613</li>
+        <li onclick="selectModel('gpt-4')">GPT-4</li>
+        <li onclick="selectModel('gpt-4-0613')">GPT-4 0613</li>
+        <li onclick="selectModel('claude+')">Claude+</li>
+        <li onclick="selectModel('claude-instant')">Claude Instant</li>
+        <li onclick="selectModel('claude-instant-100k')">Claude Instant 100k</li>
+      </ul>
+    </div>
+    <button id="copy-button">Copy Latest Message</button>
+    <div id="chat-history"></div>
+    <input id="system-role-input" type="text" placeholder="Enter the system role" style="display: block;">
+    <input id="api-key-input" type="password" placeholder="Enter your API key">
+    <input id="api-endpoint-input" type="text" placeholder="Enter the API endpoint (optional)">
+    <textarea id="message-input" placeholder="Type your message"></textarea>
+    <button id="send-button">Send</button>
+    <div id="ai-thinking" style="display: none;">AI is thinking...</div>
+  </div>
+
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML"></script>
+
+  <script>
+    const chatHistory = document.getElementById('chat-history');
+    const apiKeyInput = document.getElementById('api-key-input');
+    const apiEndpointInput = document.getElementById('api-endpoint-input');
+    const messageInput = document.getElementById('message-input');
+    const modelMenu = document.getElementById('model-menu');
+    const aiThinkingMsg = document.getElementById('ai-thinking');
+    const systemRoleInput = document.getElementById('system-role-input');
+    let messages = [
+      {
+        "role": "system",
+        "content": localStorage.getItem('systemRole') || "You are a helpful assistant."
+      }
+    ];
+
+    // Retrieve API key, API endpoint, and selected model from local storage if available
+    let apiKey = localStorage.getItem('apiKey');
+    let apiEndpoint = localStorage.getItem('apiEndpoint');
+    let selectedModel = localStorage.getItem('selectedModel');
+
+    if (!apiKey) {
+      apiKeyInput.value = '';
+    } else {
+      apiKeyInput.value = apiKey;
+    }
+
+    if (!apiEndpoint) {
+      apiEndpointInput.value = '';
+    } else {
+      apiEndpointInput.value = apiEndpoint;
+    }
+
+    if (!selectedModel) {
+      selectedModel = 'gpt-3.5-turbo';
+      const modelOption = document.querySelector(`ul li[data-model="${selectedModel}"]`);
+      if (modelOption) {
+        modelOption.classList.add('selected');
+      }
+    } else {
+      const modelOption = document.querySelector(`ul li[data-model="${selectedModel}"]`);
+      if (modelOption) {
+        modelOption.classList.add('selected');
+      }
+    }
+
+    messageInput.addEventListener('input', () => {
+      messageInput.style.height = 'auto';
+      messageInput.style.height = `${messageInput.scrollHeight}px`;
+    });
+
+    messageInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        messageInput.value += '\n';
+        messageInput.style.height = `${messageInput.scrollHeight}px`;
+      }
+    });
+
+    apiKeyInput.addEventListener('focus', () => {
+      apiKeyInput.setAttribute('type', 'text');
+    });
+
+    apiKeyInput.addEventListener('blur', () => {
+      apiKeyInput.setAttribute('type', 'password');
+    });
+
+    document.getElementById('send-button').addEventListener('click', sendMessage);
+
+    function toggleModelMenu() {
+      modelMenu.style.display = (modelMenu.style.display === 'none') ? 'block' : 'none';
+    }
+
+    function selectModel(model) {
+      const modelOptions = document.querySelectorAll('ul li');
+      modelOptions.forEach(option => option.classList.remove('selected'));
+
+      const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
+      if (selectedModelOption) {
+        selectedModelOption.classList.add('selected');
+      }
+
+      selectedModel = model;
+      localStorage.setItem('selectedModel', selectedModel);
+
+      toggleModelMenu();
+      updateModelHeading();
+    }
+
+    function updateModelHeading() {
+      const modelHeading = document.querySelector('h1');
+      modelHeading.textContent = `Chat with ${selectedModel}`;
+    }
+
+    async function getBotResponse(apiKey, apiEndpoint, message) {
+      const ENDPOINT = apiEndpoint || "https://chimeragpt.adventblocks.cc/v1/chat/completions";
+      const headers = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      };
+
+      // Limit the total token count of the messages to 4096
+      let tokenCount = getTokenCount(messages[0].content); // Include system role token count
+      for (let i = 1; i < messages.length; i++) {
+        const messageTokenCount = getTokenCount(messages[i].content);
+        if (tokenCount + messageTokenCount > 4096) {
+          messages.splice(1, i - 1);
+          break;
+        }
+        tokenCount += messageTokenCount;
+      }
+
+      messages.push({
+        "role": "user",
+        "content": message
+      });
+
+      aiThinkingMsg.style.display = 'block';
+
+      const data = {
+        "model": selectedModel,
+        "messages": messages
+      };
+
+      const response = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(data)
+      });
+
+      aiThinkingMsg.style.display = 'none';
+
+      return response.json();
+    }
+
+    function getTokenCount(text) {
+      const words = text.trim().split(/\s+/);
+      return words.length;
+    }
+
+    async function createAndAppendMessage(content, owner) {
+      const message = document.createElement('div');
+      message.classList.add('message', owner);
+
+      let displayedText = content;
+
+      const parsedContent = parseResponse(displayedText);
+      message.innerHTML = parsedContent;
+
+      chatHistory.appendChild(message);
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+      MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
+    }
+
+    function parseResponse(response) {
+      let parsedResponse = response;
+
+      // Parse bold text surrounded by double asterisks (**) and make it bold
+      parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+
+      // Apply LaTeX formatting to text surrounded by "$$" or "$"
+      parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+      parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+
+      // Parse tables in Markdown syntax
+      parsedResponse = parseTables(parsedResponse);
+
+      return parsedResponse;
+    }
+
+    function parseTables(response) {
+      const tableRegex = /\n((?:\s*\|.*\|\n)+)\n/g;
+      return response.replace(tableRegex, createTable);
+    }
+
+    function createTable(match, table) {
+      const rows = table.trim().split('\n');
+      const tableElement = document.createElement('table');
+
+      const tableHeader = document.createElement('tr');
+      const tableHeaderCells = rows[0].split('|').slice(1, -1);
+      tableHeaderCells.forEach((cell) => {
+        const th = document.createElement('th');
+        th.classList.add('table-header');
+        th.textContent = cell.trim();
+        tableHeader.appendChild(th);
+      });
+      tableElement.appendChild(tableHeader);
+
+      for (let i = 2; i < rows.length; i++) {
+        const row = document.createElement('tr');
+        const tableCells = rows[i].split('|').slice(1, -1);
+        tableCells.forEach((cell) => {
+          const td = document.createElement('td');
+          td.classList.add('table-data');
+          td.innerHTML = parseResponse(cell.trim());
+          row.appendChild(td);
+        });
+        tableElement.appendChild(row);
+      }
+
+      return tableElement.outerHTML;
+    }
+
+    async function sendMessage() {
+      apiKey = apiKeyInput.value.trim();
+      apiEndpoint = apiEndpointInput.value.trim();
+      const message = messageInput.value.trim();
+
+      if (!apiKey || !message) {
+        alert('Please enter your API key and a message.');
+        return;
+      }
+
+      // Save API key and API endpoint in local storage
+      localStorage.setItem('apiKey', apiKey);
+      localStorage.setItem('apiEndpoint', apiEndpoint);
+
+      // Display user's message
+      createAndAppendMessage(message, 'user');
+      messageInput.value = '';
+      messageInput.style.height = 'auto'; // Reset the height after clearing the value
+
+      // Send message to OpenAI API
+      const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
+
+      const botResponse = jsonResponse.choices[0].message.content;
+      messages.push({
+        "role": "assistant",
+        "content": botResponse
+      });
+
+      createAndAppendMessage(botResponse, 'bot');
+    }
+
+    function copyToClipboard(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    }
+
+    document.getElementById('copy-button').addEventListener('click', () => {
+      const latestResponse = chatHistory.lastElementChild.innerHTML;
+      if (latestResponse) {
+        copyToClipboard(latestResponse);
+        alert('Text copied to clipboard');
+      } else {
+        alert('No text to copy');
+      }
+    });
+
+    systemRoleInput.value = localStorage.getItem('systemRole') || "You are a helpful assistant.";
+    systemRoleInput.addEventListener('input', () => {
+      localStorage.setItem('systemRole', systemRoleInput.value);
+      messages[0].content = systemRoleInput.value;
+    });
+  </script>
+
+</body>
+
+</html>
