@@ -4,8 +4,8 @@
   "description": "Chat with GPT Models",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000",
-  "theme_color": "#3f51b5",
+  "background_color": "#fff",
+  "theme_color": "#000",
   "icons": [{
     "src": "/logo.webp",
     "sizes": "256x256",
