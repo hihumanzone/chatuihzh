@@ -5,8 +5,6 @@ self.addEventListener('install', e => {
         '/',
         '/index.html',
         '/icon.png'
-        '/icon.webp'
-        '/icon.ico'
       ]);
     })
   );
