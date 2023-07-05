@@ -10,7 +10,7 @@ Visit the website [here](https://chatuihzh.vercel.app/).
 
 ## How to Use
 
-1. Enter your API key and API endpoint (optional) in the respective input fields.
+1. Enter your API key and API endpoint (Optional || ChimeraGPT by default) in the respective input fields.
 2. Select a model from the "Switch Model" dropdown menu of "Settings".
 3. Enter your system role in the "System Role" input field.
 4. Type your message in the "Type your message" textarea.
