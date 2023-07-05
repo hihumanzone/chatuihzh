@@ -1,6 +1,6 @@
-# Chat with GPT Models
+# Chat with GPT + Claude Models
 
-This website allows users to chat with GPT Models. Users can type their messages and receive responses from GPT Models in real-time.
+This website allows users to chat with GPT + Claude Models. Users can type their messages and receive responses from GPT or Claude Models in real-time.
 
 ![Chatbot UI](./ss.jpg)
 
@@ -11,7 +11,7 @@ Visit the website [here](https://chatuihzh.vercel.app/).
 ## How to Use
 
 1. Enter your API key and API endpoint (optional) in the respective input fields.
-2. Select a model from the "Switch Model" dropdown menu.
+2. Select a model from the "Switch Model" dropdown menu of "Settings".
 3. Enter your system role in the "System Role" input field.
 4. Type your message in the "Type your message" textarea.
 5. Click on the "Send" button to send your message.
