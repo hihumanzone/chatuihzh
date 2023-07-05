@@ -1,0 +1,20 @@
+{
+  "name": "ChatGPThzh",
+  "short_name": "GPThzh",
+  "description": "Chat with GPT Models",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000",
+  "theme_color": "#3f51b5",
+  "icons": [{
+    "src": "/logo.webp",
+    "sizes": "256x256",
+    "type": "image/webp"
+  },{
+    "src": "/logo.png",
+    "sizes": "256x256"
+  },{
+    "src": "/logo.ico",
+    "sizes": "256x256"
+  }]
+}
