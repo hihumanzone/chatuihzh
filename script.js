@@ -133,10 +133,11 @@
 
       aiThinkingMsg.style.display = 'block';
 
-      const data = {
-        "model": selectedModel,
-        "messages": messages
-      };
+const data = {
+  "model": selectedModel,
+  "messages": messages,
+  "max_tokens": maxTokens
+};
 
       const response = await fetch(ENDPOINT, {
         method: 'POST',
@@ -280,4 +281,4 @@
         .catch(function(error) {
           console.log('Service Worker registration failed:', error);
         });
-    }
+}
