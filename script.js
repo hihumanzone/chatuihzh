@@ -136,7 +136,7 @@
 const data = {
   "model": selectedModel,
   "messages": messages,
-  "max_tokens": maxTokens
+  "max_tokens": maxTokens, 
 };
 
       const response = await fetch(ENDPOINT, {
