@@ -2,20 +2,25 @@ const chatHistory = document.getElementById('chat-history');
 const apiKeyInput = document.getElementById('api-key-input');
 const apiEndpointInput = document.getElementById('api-endpoint-input');
 const messageInput = document.getElementById('message-input');
+const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
+const sendButton = document.getElementById('send-button');
+const copyButton = document.getElementById('copy-button');
+const modelOptions = document.querySelectorAll('ul li');
+const modelHeading = document.querySelector('h1');
 
-const messages = [
-  {
-    role: 'system',
-    content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
-  },
-];
+let messages = [{
+  role: 'system',
+  content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
+}];
 
+let apiKey = localStorage.getItem('apiKey') || '';
+let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
 let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
 
-apiKeyInput.value = localStorage.getItem('apiKey') || '';
-apiEndpointInput.value = localStorage.getItem('apiEndpoint') || '';
+apiKeyInput.value = apiKey;
+apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
 
@@ -32,10 +37,14 @@ messageInput.addEventListener('keydown', (event) => {
   }
 });
 
-document.getElementById('send-button').addEventListener('click', sendMessage);
+sendButton.addEventListener('click', sendMessage);
+copyButton.addEventListener('click', copyLatestResponse);
+
+function toggleModelMenu() {
+  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
+}
 
 function selectModel(model) {
-  const modelOptions = Array.from(document.querySelectorAll('ul li'));
   modelOptions.forEach((option) => option.classList.remove('selected'));
 
   const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
@@ -51,7 +60,6 @@ function selectModel(model) {
 }
 
 function updateModelHeading() {
-  const modelHeading = document.querySelector('h1');
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
 
@@ -62,7 +70,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     Authorization: `Bearer ${apiKey}`,
   };
 
-  const models = {
+  const maxTokens = {
     'gpt-3.5-turbo': 4096,
     'gpt-4-poe': 2100,
     'gpt-3.5-turbo-16k': 16384,
@@ -72,9 +80,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     'claude+': 10240,
     'claude-instant': 10240,
     'claude-instant-100k': 10240,
-  };
-
-  let maxTokens = models[selectedModel] || 4096;
+  }[selectedModel] || 4096;
 
   let tokenCount = getTokenCount(messages[0].content);
   for (let i = 1; i < messages.length; i++) {
@@ -98,44 +104,31 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     messages: messages,
   };
 
-  try {
-    const response = await fetch(ENDPOINT, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(data),
-    });
+  const response = await fetch(ENDPOINT, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify(data),
+  });
 
-    if (!response.ok) {
-      throw new Error(`Request failed with code ${response.status}`);
-    }
+  aiThinkingMsg.style.display = 'none';
 
-    const jsonResponse = await response.json();
-    aiThinkingMsg.style.display = 'none';
-    return jsonResponse;
-  } catch (error) {
-    aiThinkingMsg.style.display = 'none';
-    alert(`Error: ${error}`);
-  }
+  return response.json();
 }
 
 function getTokenCount(text) {
-  const words = text.trim().split(/\s+/);
-  return words.length;
+  return text.trim().split(/\s+/).length;
 }
 
 async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
 
-  let displayedText = content;
-
-  const parsedContent = parseResponse(displayedText);
+  const parsedContent = parseResponse(content);
   message.innerHTML = parsedContent;
 
   chatHistory.appendChild(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
 
-  // Render MathJax equations
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
 }
 
@@ -185,8 +178,8 @@ function createTable(match, table) {
 }
 
 async function sendMessage() {
-  const apiKey = apiKeyInput.value.trim();
-  const apiEndpoint = apiEndpointInput.value.trim();
+  apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
   const message = messageInput.value.trim();
 
   if (!apiKey || !message) {
@@ -203,18 +196,25 @@ async function sendMessage() {
 
   const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
 
-  if (jsonResponse) {
-    const botResponse = jsonResponse.choices[0].message.content;
-    messages.push({
-      role: 'assistant',
-      content: botResponse,
-    });
+  const botResponse = jsonResponse.choices[0].message.content;
+  messages.push({
+    role: 'assistant',
+    content: botResponse,
+  });
 
-    createAndAppendMessage(botResponse, 'bot');
-  }
+  createAndAppendMessage(botResponse, 'bot');
 }
 
-document.getElementById('copy-button').addEventListener('click', () => {
+function copyToClipboard(text) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+}
+
+function copyLatestResponse() {
   const latestResponse = chatHistory.lastElementChild.innerHTML;
   if (latestResponse) {
     copyToClipboard(latestResponse);
@@ -222,7 +222,7 @@ document.getElementById('copy-button').addEventListener('click', () => {
   } else {
     alert('No text to copy');
   }
-});
+}
 
 systemRoleInput.value = localStorage.getItem('systemRole') || 'You are a helpful assistant.';
 systemRoleInput.addEventListener('input', () => {
@@ -230,7 +230,7 @@ systemRoleInput.addEventListener('input', () => {
   messages[0].content = systemRoleInput.value;
 });
 
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
   updateModelHeading();
 });
     
