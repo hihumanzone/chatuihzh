@@ -248,7 +248,9 @@ systemRoleInput.addEventListener('input', () => {
   messages[0].content = systemRoleInput.value;
 });
 
-window.addEventListener('load', () => {
-  updateModelHeading();
-});
-  
+window.addEventListener('load', updateModelHeading);
+
+function updateModelHeading() {
+  const modelHeading = document.querySelector('h1');
+  modelHeading.textContent = `Chat with ${selectedModel}`;
+    }
