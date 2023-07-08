@@ -2,7 +2,8 @@
 
 This website allows users to chat with GPT + Claude Models. Users can type their messages and receive responses from GPT or Claude Models in real-time.
 
-![Chatbot UI](./ss.jpg)
+![Chatbot UI](./ss1.jpg)
+![Chatbot UI](./ss2.jpg)
 
 ## Website
 
