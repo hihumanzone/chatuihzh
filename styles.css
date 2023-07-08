@@ -34,8 +34,8 @@ h4 {
   text-align: center;
   margin-bottom: 2px;
   font-size: 12px;
-  border-left: 80px solid #949494;
-  border-right: 80px solid #949494;
+  border-left: 10px solid #949494;
+  border-right: 10px solid #949494;
   border-bottom: 1px solid #949494;
   border-radius: 3px;
 }
