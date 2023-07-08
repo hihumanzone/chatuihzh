@@ -146,7 +146,6 @@ async function createAndAppendMessage(content, owner) {
   chatHistory.appendChild(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
 
-  // Render MathJax equations
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
 }
 
