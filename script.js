@@ -1,19 +1,19 @@
-const chatHistory = document.getElementById('chat-history');
-const apiKeyInput = document.getElementById('api-key-input');
-const apiEndpointInput = document.getElementById('api-endpoint-input');
-const messageInput = document.getElementById('message-input');
-const modelMenu = document.getElementById('model-menu');
-const aiThinkingMsg = document.getElementById('ai-thinking');
-const systemRoleInput = document.getElementById('system-role-input');
-const sendButton = document.getElementById('send-button');
-const copyButton = document.getElementById('copy-button');
-const modelOptions = document.querySelectorAll('ul li');
-const modelHeading = document.querySelector('h1');
+const {
+  chatHistory,
+  apiKeyInput,
+  apiEndpointInput,
+  messageInput,
+  modelMenu,
+  aiThinkingMsg,
+  systemRoleInput
+} = document.getElementById;
 
-let messages = [{
-  role: 'system',
-  content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
-}];
+const messages = [
+  {
+    role: 'system',
+    content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
+  },
+];
 
 let apiKey = localStorage.getItem('apiKey') || '';
 let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
@@ -37,14 +37,23 @@ messageInput.addEventListener('keydown', (event) => {
   }
 });
 
-sendButton.addEventListener('click', sendMessage);
-copyButton.addEventListener('click', copyLatestResponse);
+document.getElementById('send-button').addEventListener('click', sendMessage);
+document.getElementById('copy-button').addEventListener('click', () => {
+  const latestResponse = chatHistory.lastElementChild?.innerHTML;
+  if (latestResponse) {
+    copyToClipboard(latestResponse);
+    alert('Text copied to clipboard');
+  } else {
+    alert('No text to copy');
+  }
+});
 
 function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
 }
 
 function selectModel(model) {
+  const modelOptions = document.querySelectorAll('ul li');
   modelOptions.forEach((option) => option.classList.remove('selected'));
 
   const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
@@ -60,6 +69,7 @@ function selectModel(model) {
 }
 
 function updateModelHeading() {
+  const modelHeading = document.querySelector('h1');
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
 
@@ -70,7 +80,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     Authorization: `Bearer ${apiKey}`,
   };
 
-  const maxTokens = {
+  const maxTokensMap = {
     'gpt-3.5-turbo': 4096,
     'gpt-4-poe': 2100,
     'gpt-3.5-turbo-16k': 16384,
@@ -80,17 +90,17 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     'claude+': 10240,
     'claude-instant': 10240,
     'claude-instant-100k': 10240,
-  }[selectedModel] || 4096;
+  };
 
   let tokenCount = getTokenCount(messages[0].content);
-  for (let i = 1; i < messages.length; i++) {
-    const messageTokenCount = getTokenCount(messages[i].content);
-    if (tokenCount + messageTokenCount > maxTokens) {
-      messages.splice(1, i - 1);
-      break;
-    }
+  messages.slice(1).reduce((count, message) => {
+    const messageTokenCount = getTokenCount(message.content);
     tokenCount += messageTokenCount;
-  }
+    if (count + messageTokenCount > maxTokensMap[selectedModel]) {
+      return Infinity;
+    }
+    return count + messageTokenCount;
+  }, tokenCount);
 
   messages.push({
     role: 'user',
@@ -119,25 +129,22 @@ function getTokenCount(text) {
   return text.trim().split(/\s+/).length;
 }
 
-async function createAndAppendMessage(content, owner) {
+function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
 
-  const parsedContent = parseResponse(content);
-  message.innerHTML = parsedContent;
+  const displayedText = parseResponse(content);
+  message.textContent = displayedText;
 
-  chatHistory.appendChild(message);
-  chatHistory.scrollTop = chatHistory.scrollHeight;
-
-  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
+  return message;
 }
 
 function parseResponse(response) {
   let parsedResponse = response;
 
-  parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-  parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
-  parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+  parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '$1');
+  parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '$1');
+  parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '$1');
   parsedResponse = parseTables(parsedResponse);
 
   return parsedResponse;
@@ -168,7 +175,7 @@ function createTable(match, table) {
     tableCells.forEach((cell) => {
       const td = document.createElement('td');
       td.classList.add('table-data');
-      td.innerHTML = parseResponse(cell.trim());
+      td.textContent = parseResponse(cell.trim());
       row.appendChild(td);
     });
     tableElement.appendChild(row);
@@ -190,7 +197,10 @@ async function sendMessage() {
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
 
-  createAndAppendMessage(message, 'user');
+  const userMessage = createAndAppendMessage(message, 'user');
+  const fragment = document.createDocumentFragment();
+  fragment.appendChild(userMessage);
+
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
@@ -202,7 +212,11 @@ async function sendMessage() {
     content: botResponse,
   });
 
-  createAndAppendMessage(botResponse, 'bot');
+  const botMessage = createAndAppendMessage(botResponse, 'bot');
+  fragment.appendChild(botMessage);
+
+  chatHistory.appendChild(fragment);
+  chatHistory.scrollTop = chatHistory.scrollHeight;
 }
 
 function copyToClipboard(text) {
@@ -214,23 +228,10 @@ function copyToClipboard(text) {
   document.body.removeChild(textarea);
 }
 
-function copyLatestResponse() {
-  const latestResponse = chatHistory.lastElementChild.innerHTML;
-  if (latestResponse) {
-    copyToClipboard(latestResponse);
-    alert('Text copied to clipboard');
-  } else {
-    alert('No text to copy');
-  }
-}
-
 systemRoleInput.value = localStorage.getItem('systemRole') || 'You are a helpful assistant.';
 systemRoleInput.addEventListener('input', () => {
   localStorage.setItem('systemRole', systemRoleInput.value);
   messages[0].content = systemRoleInput.value;
 });
 
-window.addEventListener('load', () => {
-  updateModelHeading();
-});
-    
+updateModelHeading();
