@@ -2,23 +2,20 @@ const chatHistory = document.getElementById('chat-history');
 const apiKeyInput = document.getElementById('api-key-input');
 const apiEndpointInput = document.getElementById('api-endpoint-input');
 const messageInput = document.getElementById('message-input');
-const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 
-let messages = [
+const messages = [
   {
     role: 'system',
     content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
   },
 ];
 
-let apiKey = localStorage.getItem('apiKey') || '';
-let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
 let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
 
-apiKeyInput.value = apiKey;
-apiEndpointInput.value = apiEndpoint;
+apiKeyInput.value = localStorage.getItem('apiKey') || '';
+apiEndpointInput.value = localStorage.getItem('apiEndpoint') || '';
 selectModel(selectedModel);
 updateModelHeading();
 
@@ -37,12 +34,8 @@ messageInput.addEventListener('keydown', (event) => {
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
-function toggleModelMenu() {
-  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
-}
-
 function selectModel(model) {
-  const modelOptions = document.querySelectorAll('ul li');
+  const modelOptions = Array.from(document.querySelectorAll('ul li'));
   modelOptions.forEach((option) => option.classList.remove('selected'));
 
   const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
@@ -69,32 +62,19 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     Authorization: `Bearer ${apiKey}`,
   };
 
-  let maxTokens;
-  switch (selectedModel) {
-    case 'gpt-3.5-turbo':
-      maxTokens = 4096;
-      break;
-    case 'gpt-4-poe':
-      maxTokens = 2100;
-      break;
-    case 'gpt-3.5-turbo-16k':
-      maxTokens = 16384;
-      break;
-    case 'gpt-3.5-turbo-0613':
-      maxTokens = 4096;
-      break;
-    case 'gpt-4-0613':
-    case 'gpt-4':
-      maxTokens = 8192;
-      break;
-    case 'claude+':
-    case 'claude-instant':
-    case 'claude-instant-100k':
-      maxTokens = 10240;
-      break;
-    default:
-      maxTokens = 4096;
-  }
+  const models = {
+    'gpt-3.5-turbo': 4096,
+    'gpt-4-poe': 2100,
+    'gpt-3.5-turbo-16k': 16384,
+    'gpt-3.5-turbo-0613': 4096,
+    'gpt-4-0613': 8192,
+    'gpt-4': 8192,
+    'claude+': 10240,
+    'claude-instant': 10240,
+    'claude-instant-100k': 10240,
+  };
+
+  let maxTokens = models[selectedModel] || 4096;
 
   let tokenCount = getTokenCount(messages[0].content);
   for (let i = 1; i < messages.length; i++) {
@@ -118,15 +98,24 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     messages: messages,
   };
 
-  const response = await fetch(ENDPOINT, {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify(data),
-  });
+  try {
+    const response = await fetch(ENDPOINT, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(data),
+    });
 
-  aiThinkingMsg.style.display = 'none';
+    if (!response.ok) {
+      throw new Error(`Request failed with code ${response.status}`);
+    }
 
-  return response.json();
+    const jsonResponse = await response.json();
+    aiThinkingMsg.style.display = 'none';
+    return jsonResponse;
+  } catch (error) {
+    aiThinkingMsg.style.display = 'none';
+    alert(`Error: ${error}`);
+  }
 }
 
 function getTokenCount(text) {
@@ -214,22 +203,15 @@ async function sendMessage() {
 
   const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
 
-  const botResponse = jsonResponse.choices[0].message.content;
-  messages.push({
-    role: 'assistant',
-    content: botResponse,
-  });
+  if (jsonResponse) {
+    const botResponse = jsonResponse.choices[0].message.content;
+    messages.push({
+      role: 'assistant',
+      content: botResponse,
+    });
 
-  createAndAppendMessage(botResponse, 'bot');
-}
-
-function copyToClipboard(text) {
-  const textarea = document.createElement('textarea');
-  textarea.value = text;
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand('copy');
-  document.body.removeChild(textarea);
+    createAndAppendMessage(botResponse, 'bot');
+  }
 }
 
 document.getElementById('copy-button').addEventListener('click', () => {
@@ -248,7 +230,7 @@ systemRoleInput.addEventListener('input', () => {
   messages[0].content = systemRoleInput.value;
 });
 
-window.addEventListener('load', () => {
+document.addEventListener('DOMContentLoaded', () => {
   updateModelHeading();
 });
-      
+    
