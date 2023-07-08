@@ -8,9 +8,9 @@ const systemRoleInput = document.getElementById('system-role-input');
 
 let messages = [
   {
-    "role": "system",
-    "content": localStorage.getItem('systemRole') || "You are a helpful assistant."
-  }
+    role: 'system',
+    content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
+  },
 ];
 
 let apiKey = localStorage.getItem('apiKey') || '';
@@ -38,12 +38,12 @@ messageInput.addEventListener('keydown', (event) => {
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
 function toggleModelMenu() {
-  modelMenu.style.display = (modelMenu.style.display === 'none') ? 'block' : 'none';
+  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
 }
 
 function selectModel(model) {
   const modelOptions = document.querySelectorAll('ul li');
-  modelOptions.forEach(option => option.classList.remove('selected'));
+  modelOptions.forEach((option) => option.classList.remove('selected'));
 
   const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
   if (selectedModelOption) {
@@ -63,10 +63,10 @@ function updateModelHeading() {
 }
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
-  const ENDPOINT = apiEndpoint || "https://chimeragpt.adventblocks.cc/v1/chat/completions";
+  const ENDPOINT = apiEndpoint || 'https://chimeragpt.adventblocks.cc/v1/chat/completions';
   const headers = {
-    "Content-Type": "application/json",
-    "Authorization": `Bearer ${apiKey}`
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${apiKey}`,
   };
 
   let maxTokens;
@@ -107,21 +107,21 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   }
 
   messages.push({
-    "role": "user",
-    "content": message
+    role: 'user',
+    content: message,
   });
 
   aiThinkingMsg.style.display = 'block';
 
   const data = {
-    "model": selectedModel,
-    "messages": messages
+    model: selectedModel,
+    messages: messages,
   };
 
   const response = await fetch(ENDPOINT, {
     method: 'POST',
     headers: headers,
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   });
 
   aiThinkingMsg.style.display = 'none';
@@ -216,8 +216,8 @@ async function sendMessage() {
 
   const botResponse = jsonResponse.choices[0].message.content;
   messages.push({
-    "role": "assistant",
-    "content": botResponse
+    role: 'assistant',
+    content: botResponse,
   });
 
   createAndAppendMessage(botResponse, 'bot');
@@ -242,7 +242,7 @@ document.getElementById('copy-button').addEventListener('click', () => {
   }
 });
 
-systemRoleInput.value = localStorage.getItem('systemRole') || "You are a helpful assistant.";
+systemRoleInput.value = localStorage.getItem('systemRole') || 'You are a helpful assistant.';
 systemRoleInput.addEventListener('input', () => {
   localStorage.setItem('systemRole', systemRoleInput.value);
   messages[0].content = systemRoleInput.value;
@@ -251,3 +251,4 @@ systemRoleInput.addEventListener('input', () => {
 window.addEventListener('load', () => {
   updateModelHeading();
 });
+  
