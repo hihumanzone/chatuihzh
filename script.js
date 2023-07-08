@@ -5,11 +5,8 @@ const messageInput = document.getElementById('message-input');
 const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
-const sendButton = document.getElementById('send-button');
-const copyButton = document.getElementById('copy-button');
-const h1 = document.querySelector('h1');
 
-const messages = [
+let messages = [
   {
     role: 'system',
     content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
@@ -20,50 +17,92 @@ let apiKey = localStorage.getItem('apiKey') || '';
 let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
 let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
 
-const selectModelOption = (model) => {
-  const modelOptions = Array.from(document.querySelectorAll('ul li'));
-  modelOptions.forEach(option => {
-    option.classList.remove('selected');
-    if (option.dataset.model === model) {
-      option.classList.add('selected');
-    }
-  });
-};
+apiKeyInput.value = apiKey;
+apiEndpointInput.value = apiEndpoint;
+selectModel(selectedModel);
+updateModelHeading();
 
-const updateModelHeading = () => {
-  h1.innerText = `Chat with ${selectedModel}`;
-};
+messageInput.addEventListener('input', () => {
+  messageInput.style.height = 'auto';
+  messageInput.style.height = `${messageInput.scrollHeight}px`;
+});
 
-const getBotResponse = async (apiKey, apiEndpoint, message) => {
+messageInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    messageInput.value += '\n';
+    messageInput.style.height = `${messageInput.scrollHeight}px`;
+  }
+});
+
+document.getElementById('send-button').addEventListener('click', sendMessage);
+
+function toggleModelMenu() {
+  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
+}
+
+function selectModel(model) {
+  const modelOptions = document.querySelectorAll('ul li');
+  modelOptions.forEach((option) => option.classList.remove('selected'));
+
+  const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
+  if (selectedModelOption) {
+    selectedModelOption.classList.add('selected');
+  }
+
+  selectedModel = model;
+  localStorage.setItem('selectedModel', selectedModel);
+
+  toggleModelMenu();
+  updateModelHeading();
+}
+
+function updateModelHeading() {
+  const modelHeading = document.querySelector('h1');
+  modelHeading.textContent = `Chat with ${selectedModel}`;
+}
+
+async function getBotResponse(apiKey, apiEndpoint, message) {
   const ENDPOINT = apiEndpoint || 'https://chimeragpt.adventblocks.cc/v1/chat/completions';
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
   };
 
-  const models = {
-    'gpt-3.5-turbo': 4096,
-    'gpt-4-poe': 2100,
-    'gpt-3.5-turbo-16k': 16384,
-    'gpt-3.5-turbo-0613': 4096,
-    'gpt-4-0613': 8192,
-    'gpt-4': 8192,
-    'claude+': 10240,
-    'claude-instant': 10240,
-    'claude-instant-100k': 10240,
-  };
+  let maxTokens;
+  switch (selectedModel) {
+    case 'gpt-3.5-turbo':
+      maxTokens = 4096;
+      break;
+    case 'gpt-4-poe':
+      maxTokens = 2100;
+      break;
+    case 'gpt-3.5-turbo-16k':
+      maxTokens = 16384;
+      break;
+    case 'gpt-3.5-turbo-0613':
+      maxTokens = 4096;
+      break;
+    case 'gpt-4-0613':
+    case 'gpt-4':
+      maxTokens = 8192;
+      break;
+    case 'claude+':
+    case 'claude-instant':
+    case 'claude-instant-100k':
+      maxTokens = 10240;
+      break;
+    default:
+      maxTokens = 4096;
+  }
 
-  const maxTokens = models[selectedModel] || 4096;
   let tokenCount = getTokenCount(messages[0].content);
-
   for (let i = 1; i < messages.length; i++) {
     const messageTokenCount = getTokenCount(messages[i].content);
-
     if (tokenCount + messageTokenCount > maxTokens) {
       messages.splice(1, i - 1);
       break;
     }
-
     tokenCount += messageTokenCount;
   }
 
@@ -88,14 +127,14 @@ const getBotResponse = async (apiKey, apiEndpoint, message) => {
   aiThinkingMsg.style.display = 'none';
 
   return response.json();
-};
+}
 
-const getTokenCount = (text) => {
+function getTokenCount(text) {
   const words = text.trim().split(/\s+/);
   return words.length;
-};
+}
 
-const createAndAppendMessage = (content, owner) => {
+async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
 
@@ -107,10 +146,11 @@ const createAndAppendMessage = (content, owner) => {
   chatHistory.appendChild(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
 
+  // Render MathJax equations
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
-};
+}
 
-const parseResponse = (response) => {
+function parseResponse(response) {
   let parsedResponse = response;
 
   parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -119,47 +159,43 @@ const parseResponse = (response) => {
   parsedResponse = parseTables(parsedResponse);
 
   return parsedResponse;
-};
+}
 
-const parseTables = (response) => {
+function parseTables(response) {
   const tableRegex = /\n((?:\s*\|.*\|\n)+)\n/g;
   return response.replace(tableRegex, createTable);
-};
+}
 
-const createTable = (match, table) => {
+function createTable(match, table) {
   const rows = table.trim().split('\n');
   const tableElement = document.createElement('table');
 
   const tableHeader = document.createElement('tr');
   const tableHeaderCells = rows[0].split('|').slice(1, -1);
-
-  tableHeaderCells.forEach(cell => {
+  tableHeaderCells.forEach((cell) => {
     const th = document.createElement('th');
     th.classList.add('table-header');
-    th.innerText = cell.trim();
+    th.textContent = cell.trim();
     tableHeader.appendChild(th);
   });
-
   tableElement.appendChild(tableHeader);
 
   for (let i = 2; i < rows.length; i++) {
     const row = document.createElement('tr');
     const tableCells = rows[i].split('|').slice(1, -1);
-
-    tableCells.forEach(cell => {
+    tableCells.forEach((cell) => {
       const td = document.createElement('td');
       td.classList.add('table-data');
       td.innerHTML = parseResponse(cell.trim());
       row.appendChild(td);
     });
-
     tableElement.appendChild(row);
   }
 
   return tableElement.outerHTML;
-};
+}
 
-const sendMessage = async () => {
+async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
   const message = messageInput.value.trim();
@@ -176,44 +212,28 @@ const sendMessage = async () => {
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
-  const json = await getBotResponse(apiKey, apiEndpoint, message);
-  const botResponse = json.choices[0].message.content;
+  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
 
+  const botResponse = jsonResponse.choices[0].message.content;
   messages.push({
     role: 'assistant',
     content: botResponse,
   });
 
   createAndAppendMessage(botResponse, 'bot');
-};
+}
 
-const copyToClipboard = (text) => {
+function copyToClipboard(text) {
   const textarea = document.createElement('textarea');
   textarea.value = text;
   document.body.appendChild(textarea);
   textarea.select();
   document.execCommand('copy');
   document.body.removeChild(textarea);
-};
+}
 
-sendButton.addEventListener('click', sendMessage);
-
-const toggleModelMenu = () => {
-  modelMenu.classList.toggle('hidden');
-};
-
-const selectModel = (model) => {
-  selectModelOption(model);
-  selectedModel = model;
-  localStorage.setItem('selectedModel', selectedModel);
-
-  toggleModelMenu();
-  updateModelHeading();
-};
-
-copyButton.addEventListener('click', () => {
-  const latestResponse = chatHistory.lastElementChild.innerText;
-
+document.getElementById('copy-button').addEventListener('click', () => {
+  const latestResponse = chatHistory.lastElementChild.innerHTML;
   if (latestResponse) {
     copyToClipboard(latestResponse);
     alert('Text copied to clipboard');
@@ -223,43 +243,11 @@ copyButton.addEventListener('click', () => {
 });
 
 systemRoleInput.value = localStorage.getItem('systemRole') || 'You are a helpful assistant.';
-
 systemRoleInput.addEventListener('input', () => {
   localStorage.setItem('systemRole', systemRoleInput.value);
   messages[0].content = systemRoleInput.value;
 });
 
-window.addEventListener('load', updateModelHeading);
-
-messageInput.addEventListener('input', () => {
-  messageInput.style.height = 'auto';
-  messageInput.style.height = `${messageInput.scrollHeight}px`;
+window.addEventListener('load', () => {
+  updateModelHeading();
 });
-
-messageInput.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    messageInput.value += '\n';
-    messageInput.style.height = `${messageInput.scrollHeight}px`;
-  }
-});
-
-modelMenu.addEventListener('click', (event) => {
-  if (!event.target.closest('.selected-model')) {
-    toggleModelMenu();
-  }
-});
-
-apiEndpointInput.addEventListener('input', () => {
-  apiEndpoint = apiEndpointInput.value.trim();
-});
-
-apiKeyInput.addEventListener('input', () => {
-  apiKey = apiKeyInput.value.trim();
-});
-
-// Initial setup
-apiKeyInput.value = apiKey;
-apiEndpointInput.value = apiEndpoint;
-selectModelOption(selectedModel);
-updateModelHeading();
