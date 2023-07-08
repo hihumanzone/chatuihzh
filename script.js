@@ -161,7 +161,7 @@ function parseResponse(response) {
 }
 
 function parseTables(response) {
-  const tableRegex = /((?:\|.*\|\n)+)/g; // Modify the regex to match all formats
+  const tableRegex = /\n((?:\s*:?[\|:].*\|\n)+)\n/g;
   return response.replace(tableRegex, createTable);
 }
 
@@ -179,7 +179,7 @@ function createTable(match, table) {
   });
   tableElement.appendChild(tableHeader);
 
-  for (let i = 1; i < rows.length; i++) { // Modify the loop to start from 1 for all formats
+  for (let i = 2; i < rows.length; i++) {
     const row = document.createElement('tr');
     const tableCells = rows[i].split('|').slice(1, -1);
     tableCells.forEach((cell) => {
@@ -192,7 +192,7 @@ function createTable(match, table) {
   }
 
   return tableElement.outerHTML;
-    }
+}
                                    
 async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
