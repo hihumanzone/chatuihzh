@@ -161,7 +161,7 @@ function parseResponse(response) {
 }
 
 function parseTables(response) {
-  const tableRegex = /\n((?:\s*\|.*\|\n)+)\n/g;
+  const tableRegex = /((?:\|.*\|\n)+)/g; // Modify the regex to match all formats
   return response.replace(tableRegex, createTable);
 }
 
@@ -170,7 +170,7 @@ function createTable(match, table) {
   const tableElement = document.createElement('table');
 
   const tableHeader = document.createElement('tr');
-  const tableHeaderCells = rows[0].split('|').filter(cell => cell.trim() !== '');
+  const tableHeaderCells = rows[0].split('|').slice(1, -1);
   tableHeaderCells.forEach((cell) => {
     const th = document.createElement('th');
     th.classList.add('table-header');
@@ -179,10 +179,9 @@ function createTable(match, table) {
   });
   tableElement.appendChild(tableHeader);
 
-  for (let i = 1; i < rows.length; i++) {
-    if (rows[i].trim() === '') continue;
+  for (let i = 1; i < rows.length; i++) { // Modify the loop to start from 1 for all formats
     const row = document.createElement('tr');
-    const tableCells = rows[i].split('|').filter(cell => cell.trim() !== '');
+    const tableCells = rows[i].split('|').slice(1, -1);
     tableCells.forEach((cell) => {
       const td = document.createElement('td');
       td.classList.add('table-data');
@@ -192,8 +191,8 @@ function createTable(match, table) {
     tableElement.appendChild(row);
   }
 
- return tableElement.outerHTML;
- }
+  return tableElement.outerHTML;
+    }
                                    
 async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
