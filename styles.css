@@ -1,6 +1,6 @@
 body {
   font-family: Arial, sans-serif;
-  background-color: #1A1B1C;
+  background-color: #000;
   color: #f0f0f0;
   margin: 0;
   padding: 0;
@@ -12,7 +12,7 @@ h1 {
   margin-bottom: 0px;
   font-size: 26px;
   border-bottom: 2px solid white;
-  color: #00ff00;
+  color: #f0f0f0;
 }
 
 h2 {
@@ -29,7 +29,7 @@ h3 {
   margin-bottom: 0px;
   font-size: 12px;
   border-bottom: 0.5px solid white;
-  color: #00ff00;
+  color: #f0f0f0;
 }
 
 h4 {
@@ -119,6 +119,7 @@ table {
   border-collapse: collapse;
   margin-bottom: 10px;
   width: 100%;
+  color: #f0f0f0;
 }
 
 th,
@@ -127,7 +128,6 @@ td {
   text-align: left;
   vertical-align: top;
   border-bottom: 1px solid #666362;
-  color: #f0f0f0;
 }
 
 th:first-child,
@@ -154,4 +154,4 @@ td:last-child {
 th:empty,
 td:empty {
   display: none;
-    }
+  }
