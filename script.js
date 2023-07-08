@@ -170,7 +170,7 @@ function createTable(match, table) {
   const tableElement = document.createElement('table');
 
   const tableHeader = document.createElement('tr');
-  const tableHeaderCells = rows[0].split('|').slice(1, -1);
+  const tableHeaderCells = rows[0].split('|').filter(cell => cell.trim() !== '');
   tableHeaderCells.forEach((cell) => {
     const th = document.createElement('th');
     th.classList.add('table-header');
@@ -179,9 +179,10 @@ function createTable(match, table) {
   });
   tableElement.appendChild(tableHeader);
 
-  for (let i = 2; i < rows.length; i++) {
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i].trim() === '') continue;
     const row = document.createElement('tr');
-    const tableCells = rows[i].split('|').slice(1, -1);
+    const tableCells = rows[i].split('|').filter(cell => cell.trim() !== '');
     tableCells.forEach((cell) => {
       const td = document.createElement('td');
       td.classList.add('table-data');
@@ -191,9 +192,9 @@ function createTable(match, table) {
     tableElement.appendChild(row);
   }
 
-  return tableElement.outerHTML;
-}
-
+ return tableElement.outerHTML;
+ }
+                                   
 async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
