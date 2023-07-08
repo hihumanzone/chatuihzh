@@ -12,6 +12,7 @@ h1 {
   margin-bottom: 0px;
   font-size: 26px;
   border-bottom: 2px solid white;
+  color: #00ff00;
 }
 
 h2 {
@@ -20,6 +21,7 @@ h2 {
   font-size: 15px;
   border: 0.8px solid #B6B6B4;
   border-radius: 5px;
+  color: #f0f0f0;
 }
 
 h3 {
@@ -27,6 +29,7 @@ h3 {
   margin-bottom: 0px;
   font-size: 12px;
   border-bottom: 0.5px solid white;
+  color: #00ff00;
 }
 
 h4 {
@@ -36,6 +39,7 @@ h4 {
   border-left: 0.2px solid #B6B6B4;
   border-right: 0.2px solid #B6B6B4;
   border-radius: 3px;
+  color: #f0f0f0;
 }
 
 #chat-container {
@@ -123,6 +127,7 @@ td {
   text-align: left;
   vertical-align: top;
   border-bottom: 1px solid #666362;
+  color: #f0f0f0;
 }
 
 th:first-child,
@@ -149,4 +154,4 @@ td:last-child {
 th:empty,
 td:empty {
   display: none;
-}
+    }
