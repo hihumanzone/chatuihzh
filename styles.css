@@ -81,7 +81,7 @@ h4 {
 #copy-button {
   margin-top: 10px;
   padding: 5px 10px;
-  background-color: #004d00;
+  background-color: #003399;
   color: #fff;
   border: 0.8px solid #B6B6B4;
   border-radius: 5px;
@@ -96,19 +96,19 @@ h4 {
 
 .message.user {
   align-self: flex-end;
-  background-color: #005013;
+  background-color: #003399;
   color: #f0f0f0;
   padding: 5px 10px;
   border-radius: 10px;
-  border: 1px solid #08A04B;
+  border: 1px solid #0066cc;
 }
 
 .message.bot {
   align-self: flex-start;
-  background-color: #003300;
+  background-color: #001a33;
   padding: 5px 10px;
   border-radius: 10px;
-  border: 1px solid #006400;
+  border: 1px solid #004080;
 }
 
 table {
@@ -149,4 +149,4 @@ td:last-child {
 th:empty,
 td:empty {
   display: none;
-}
+  }
