@@ -21,7 +21,7 @@ Visit the website [here](https://chatuihzh.vercel.app/).
 
 ## Features
 
-- Users can switch between different GPT models.
+- Users can switch between different GPT/Claude models.
 - Users can enter their system role and API key.
 - Users can copy the latest message.
 - The chat history is displayed in real-time.
