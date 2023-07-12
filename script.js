@@ -65,12 +65,14 @@ function updateModelHeading() {
 const messages = [];
 const ENDPOINT = apiEndpoint || 'https://chimeragpt.adventblocks.cc/v1/chat/completions';
 
-function getBotResponse(apiKey, apiEndpoint, message) {
+async function getBotResponse(apiKey, apiEndpoint, message) {
+  const ENDPOINT = apiEndpoint || 'https://chimeragpt.adventblocks.cc/v1/chat/completions';
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
   };
 
+  let maxTokens;
   switch (selectedModel) {
     case 'gpt-3.5-turbo':
     case 'gpt-3.5-turbo-0613':
@@ -95,11 +97,21 @@ function getBotResponse(apiKey, apiEndpoint, message) {
     case 'claude-instant-100k':
       maxTokens = 102400;
       break;
-    case 'claude-instant':
+   case 'claude-instant':
       maxTokens = 10240;
       break;
     default:
       maxTokens = 4096;
+  }
+
+  let tokenCount = getTokenCount(messages[0].content);
+  for (let i = 1; i < messages.length; i++) {
+    const messageTokenCount = getTokenCount(messages[i].content);
+    if (tokenCount + messageTokenCount > maxTokens) {
+      messages.splice(1, i - 1);
+      break;
+    }
+    tokenCount += messageTokenCount;
   }
 
   messages.push({
@@ -107,38 +119,28 @@ function getBotResponse(apiKey, apiEndpoint, message) {
     content: message,
   });
 
-  const filteredMessages = messages.reduce((result, msg) => {
-    const tokenCount = getTokenCount(msg.content);
-    if (result.tokenCount + tokenCount <= maxTokens) {
-      result.tokenCount += tokenCount;
-      result.filteredMessages.push(msg);
-    }
-    return result;
-  }, { tokenCount: 0, filteredMessages: [] }).filteredMessages;
+  aiThinkingMsg.style.display = 'block';
 
   const data = {
     model: selectedModel,
-    messages: filteredMessages,
+    messages: messages,
   };
 
-  aiThinkingMsg.style.display = 'block';
-
-  return fetch(ENDPOINT, {
+  const response = await fetch(ENDPOINT, {
     method: 'POST',
     headers: headers,
     body: JSON.stringify(data),
-  })
-    .then(response => response.json())
-    .then(responseData => {
-      aiThinkingMsg.style.display = 'none';
-      return responseData;
-    });
+  });
+
+  aiThinkingMsg.style.display = 'none';
+
+  return response.json();
 }
 
 function getTokenCount(text) {
-  return text.trim().split(/\s+/).length;
+  const words = text.trim().split(/\s+/);
+  return words.length;
 }
-
 
 async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
