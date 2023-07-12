@@ -62,11 +62,9 @@ function updateModelHeading() {
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
 
-const messages = [];
 const ENDPOINT = apiEndpoint || 'https://chimeragpt.adventblocks.cc/v1/chat/completions';
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
-  const ENDPOINT = apiEndpoint || 'https://chimeragpt.adventblocks.cc/v1/chat/completions';
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
@@ -201,7 +199,8 @@ function createTable(match, table) {
 
   return tableElement.outerHTML;
 }
-                                   
+
+
 async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
