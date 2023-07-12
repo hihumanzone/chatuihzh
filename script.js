@@ -62,53 +62,46 @@ function updateModelHeading() {
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
 
-async function getBotResponse(apiKey, apiEndpoint, message) {
+async function getBotResponse(apiKey, apiEndpoint, selectedModel, messages, message) {
   const ENDPOINT = apiEndpoint || 'https://chimeragpt.adventblocks.cc/v1/chat/completions';
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
   };
 
-  let maxTokens;
-  switch (selectedModel) {
-    case 'gpt-3.5-turbo':
-    case 'gpt-3.5-turbo-0613':
-      maxTokens = 4096;
-      break;
-    case 'gpt-3.5-turbo-16k':
-    case 'gpt-3.5-turbo-16k-poe':
-    case 'gpt-3.5-turbo-16k-0613':
-      maxTokens = 16384;
-      break;
-    case 'gpt-4-0613':
-    case 'gpt-4':
-    case 'gpt-4-poe':
-      maxTokens = 8192;
-      break;
-    case 'gpt-4-32k-0613':
-    case 'gpt-4-32k':
-    case 'gpt-4-32k-poe':
-      maxTokens = 32768;
-      break;
-    case 'claude-2-100k':
-    case 'claude-instant-100k':
-      maxTokens = 102400;
-      break;
-   case 'claude-instant':
-      maxTokens = 10240;
-      break;
-    default:
-      maxTokens = 4096;
-  }
+  const maxTokensLookup = {
+    'gpt-3.5-turbo': 4096,
+    'gpt-3.5-turbo-0613': 4096,
+    'gpt-3.5-turbo-16k': 16384,
+    'gpt-3.5-turbo-16k-poe': 16384,
+    'gpt-3.5-turbo-16k-0613': 16384,
+    'gpt-4-0613': 8192,
+    'gpt-4': 8192,
+    'gpt-4-poe': 8192,
+    'gpt-4-32k-0613': 32768,
+    'gpt-4-32k': 32768,
+    'gpt-4-32k-poe': 32768,
+    'claude-2-100k': 102400,
+    'claude-instant-100k': 102400,
+    'claude-instant': 10240,
+    default: 4096,
+  };
+
+  let maxTokens = maxTokensLookup[selectedModel] || maxTokensLookup['default'];
 
   let tokenCount = getTokenCount(messages[0].content);
+  let spliceIndex = -1;
   for (let i = 1; i < messages.length; i++) {
     const messageTokenCount = getTokenCount(messages[i].content);
     if (tokenCount + messageTokenCount > maxTokens) {
-      messages.splice(1, i - 1);
+      spliceIndex = i;
       break;
     }
     tokenCount += messageTokenCount;
+  }
+
+  if (spliceIndex >= 0) {
+    messages.splice(1, spliceIndex - 1);
   }
 
   messages.push({
@@ -135,9 +128,9 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 }
 
 function getTokenCount(text) {
-  const words = text.trim().split(/\s+/);
-  return words.length;
+  return text.trim().split(/\s+/).length;
 }
+
 
 async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
