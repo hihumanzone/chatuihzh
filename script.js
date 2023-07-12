@@ -72,24 +72,29 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   let maxTokens;
   switch (selectedModel) {
     case 'gpt-3.5-turbo':
-      maxTokens = 4096;
-      break;
-    case 'gpt-4-poe':
-      maxTokens = 2100;
-      break;
-    case 'gpt-3.5-turbo-16k':
-      maxTokens = 16384;
-      break;
     case 'gpt-3.5-turbo-0613':
       maxTokens = 4096;
       break;
+    case 'gpt-3.5-turbo-16k':
+    case 'gpt-3.5-turbo-16k-poe':
+    case 'gpt-3.5-turbo-16k-0613':
+      maxTokens = 16384;
+      break;
     case 'gpt-4-0613':
     case 'gpt-4':
+    case 'gpt-4-poe':
       maxTokens = 8192;
       break;
-    case 'claude+':
-    case 'claude-instant':
+    case 'gpt-4-32k-0613':
+    case 'gpt-4-32k':
+    case 'gpt-4-32k-poe':
+      maxTokens = 32768;
+      break;
+    case 'claude-2-100k':
     case 'claude-instant-100k':
+      maxTokens = 102400;
+      break;
+   case 'claude-instant':
       maxTokens = 10240;
       break;
     default:
