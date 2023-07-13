@@ -69,7 +69,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
   };
-
+  
   let maxTokens;
   switch (selectedModel) {
     case 'gpt-3.5-turbo':
@@ -112,7 +112,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     tokenCount += messageTokenCount;
   }
 
-  messages.push({
+messages.push({
     role: 'user',
     content: message,
   });
@@ -130,6 +130,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   });
 
   const reader = response.body.getReader();
+  let partialText = ''; // buffer for partial data
 
   while (true) {
     const { done, value } = await reader.read();
@@ -138,16 +139,30 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
       break;
     }
 
-    const jsonResponse = new TextDecoder().decode(value);
-       const botResponse = JSON.parse(jsonResponse).choices[0].message.content;
-    messages.push({
-      role: 'assistant',
-      content: botResponse,
-    });
+    partialText += new TextDecoder().decode(value);
 
-    createAndAppendMessage(botResponse, 'bot');
+    // check if we have received a complete JSON object
+    let leftBracketIndex = partialText.indexOf('{');
+    let rightBracketIndex = partialText.lastIndexOf('}');
+
+    while (leftBracketIndex !== -1 && rightBracketIndex !== -1 && leftBracketIndex < rightBracketIndex) {
+      const completeJSONText = partialText.slice(leftBracketIndex, rightBracketIndex + 1);
+      const jsonResponse = JSON.parse(completeJSONText);
+
+      const botResponse = jsonResponse.choices[0].message.content;
+      messages.push({
+        role: 'assistant',
+        content: botResponse,
+      });
+
+      createAndAppendMessage(botResponse, 'bot');
+
+      // remove the parsed JSON from the buffer
+      partialText = partialText.slice(rightBracketIndex + 1);
+      leftBracketIndex = partialText.indexOf('{');
+      rightBracketIndex = partialText.lastIndexOf('}');
+    }
   }
-}
 
 function getTokenCount(text) {
   const words = text.trim().split(/\s+/);
