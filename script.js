@@ -69,7 +69,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
   };
-  
+
   let maxTokens;
   switch (selectedModel) {
     case 'gpt-3.5-turbo':
@@ -112,7 +112,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     tokenCount += messageTokenCount;
   }
 
-messages.push({
+  messages.push({
     role: 'user',
     content: message,
   });
@@ -162,6 +162,8 @@ messages.push({
       leftBracketIndex = partialText.indexOf('{');
       rightBracketIndex = partialText.lastIndexOf('}');
     }
+  }
+}
 
 function getTokenCount(text) {
   const words = text.trim().split(/\s+/);
@@ -188,7 +190,6 @@ function parseResponse(response) {
 
   parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
   parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
-  parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parseTables(parsedResponse);
 
   return parsedResponse;
