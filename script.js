@@ -65,12 +65,13 @@ function updateModelHeading() {
 const ENDPOINT = apiEndpoint || 'https://chimeragpt.adventblocks.cc/v1/chat/completions';
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
+async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
   };
 
-  let maxTokens;
+let maxTokens;
   switch (selectedModel) {
     case 'gpt-3.5-turbo':
     case 'gpt-3.5-turbo-0613':
@@ -147,15 +148,20 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 
     while (leftBracketIndex !== -1 && rightBracketIndex !== -1 && leftBracketIndex < rightBracketIndex) {
       const completeJSONText = partialText.slice(leftBracketIndex, rightBracketIndex + 1);
-      const jsonResponse = JSON.parse(completeJSONText);
+      
+      try {
+        const jsonResponse = JSON.parse(completeJSONText);
 
-      const botResponse = jsonResponse.choices[0].message.content;
-      messages.push({
-        role: 'assistant',
-        content: botResponse,
-      });
+        const botResponse = jsonResponse.choices[0].message.content;
+        messages.push({
+          role: 'assistant',
+          content: botResponse,
+        });
 
-      createAndAppendMessage(botResponse, 'bot');
+        createAndAppendMessage(botResponse, 'bot');
+      } catch (e) {
+        console.error('Error parsing JSON or accessing array:', e);
+      }
 
       // remove the parsed JSON from the buffer
       partialText = partialText.slice(rightBracketIndex + 1);
