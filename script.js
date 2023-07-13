@@ -162,7 +162,6 @@ messages.push({
       leftBracketIndex = partialText.indexOf('{');
       rightBracketIndex = partialText.lastIndexOf('}');
     }
-  }
 
 function getTokenCount(text) {
   const words = text.trim().split(/\s+/);
