@@ -65,13 +65,12 @@ function updateModelHeading() {
 const ENDPOINT = apiEndpoint || 'https://chimeragpt.adventblocks.cc/v1/chat/completions';
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
-async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
   };
 
-let maxTokens;
+  let maxTokens;
   switch (selectedModel) {
     case 'gpt-3.5-turbo':
     case 'gpt-3.5-turbo-0613':
@@ -96,7 +95,7 @@ let maxTokens;
     case 'claude-instant-100k':
       maxTokens = 102400;
       break;
-   case 'claude-instant':
+    case 'claude-instant':
       maxTokens = 10240;
       break;
     default:
@@ -144,11 +143,11 @@ let maxTokens;
 
     // check if we have received a complete JSON object
     let leftBracketIndex = partialText.indexOf('{');
-    let rightBracketIndex = partialText.lastIndexOf('}');
+    letrightBracketIndex = partialText.lastIndexOf('}');
 
     while (leftBracketIndex !== -1 && rightBracketIndex !== -1 && leftBracketIndex < rightBracketIndex) {
       const completeJSONText = partialText.slice(leftBracketIndex, rightBracketIndex + 1);
-      
+
       try {
         const jsonResponse = JSON.parse(completeJSONText);
 
@@ -176,63 +175,12 @@ function getTokenCount(text) {
   return words.length;
 }
 
-async function createAndAppendMessage(content, owner) {
+function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
-
-  let displayedText = content;
-
-  const parsedContent = parseResponse(displayedText);
-  message.innerHTML = parsedContent;
-
+  message.textContent = content;
   chatHistory.appendChild(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
-
-  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
-}
-
-function parseResponse(response) {
-  let parsedResponse = response;
-
-  parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-  parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
-  parsedResponse = parseTables(parsedResponse);
-
-  return parsedResponse;
-}
-
-function parseTables(response) {
-  const tableRegex = /\n((?:\s*:?[\|:].*\|\n)+)\n/g;
-  return response.replace(tableRegex, createTable);
-}
-
-function createTable(match, table) {
-  const rows = table.trim().split('\n');
-  const tableElement = document.createElement('table');
-
-  const tableHeader = document.createElement('tr');
-  const tableHeaderCells = rows[0].split('|').slice(1, -1);
-  tableHeaderCells.forEach((cell) => {
-    const th = document.createElement('th');
-    th.classList.add('table-header');
-    th.textContent = cell.trim();
-    tableHeader.appendChild(th);
-  });
-  tableElement.appendChild(tableHeader);
-
-  for (let i = 2; i < rows.length; i++) {
-    const row = document.createElement('tr');
-    const tableCells = rows[i].split('|').slice(1, -1);
-    tableCells.forEach((cell) => {
-      const td = document.createElement('td');
-      td.classList.add('table-data');
-      td.innerHTML = parseResponse(cell.trim());
-      row.appendChild(td);
-    });
-    tableElement.appendChild(row);
-  }
-
-  return tableElement.outerHTML;
 }
 
 async function sendMessage() {
