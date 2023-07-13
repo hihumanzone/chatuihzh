@@ -70,58 +70,10 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     Authorization: `Bearer ${apiKey}`,
   };
 
-  let maxTokens;
-  switch (selectedModel) {
-    case 'gpt-3.5-turbo':
-    case 'gpt-3.5-turbo-0613':
-      maxTokens = 4096;
-      break;
-    case 'gpt-3.5-turbo-16k':
-    case 'gpt-3.5-turbo-16k-poe':
-    case 'gpt-3.5-turbo-16k-0613':
-      maxTokens = 16384;
-      break;
-    case 'gpt-4-0613':
-    case 'gpt-4':
-    case 'gpt-4-poe':
-      maxTokens = 8192;
-      break;
-    case 'gpt-4-32k-0613':
-    case 'gpt-4-32k':
-    case 'gpt-4-32k-poe':
-      maxTokens = 32768;
-      break;
-    case 'claude-2-100k':
-    case 'claude-instant-100k':
-      maxTokens = 102400;
-      break;
-   case 'claude-instant':
-      maxTokens = 10240;
-      break;
-    default:
-      maxTokens = 4096;
-  }
-
-  let tokenCount = getTokenCount(messages[0].content);
-  for (let i = 1; i < messages.length; i++) {
-    const messageTokenCount = getTokenCount(messages[i].content);
-    if (tokenCount + messageTokenCount > maxTokens) {
-      messages.splice(1, i - 1);
-      break;
-    }
-    tokenCount += messageTokenCount;
-  }
-
-  messages.push({
-    role: 'user',
-    content: message,
-  });
-
-  aiThinkingMsg.style.display = 'block';
-
   const data = {
     model: selectedModel,
     messages: messages,
+    stream: true,
   };
 
   const response = await fetch(ENDPOINT, {
@@ -130,9 +82,27 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     body: JSON.stringify(data),
   });
 
-  aiThinkingMsg.style.display = 'none';
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder('utf-8');
 
-  return response.json();
+  return new ReadableStream({
+    start(controller) {
+      function push() {
+        reader.read().then(({done, value}) => {
+          if (done) {
+            controller.close();
+            return;
+          }
+
+          const chunk = decoder.decode(value);
+          controller.enqueue(chunk);
+          push();
+        });
+      }
+
+      push();
+    }
+  });
 }
 
 function getTokenCount(text) {
@@ -200,7 +170,6 @@ function createTable(match, table) {
   return tableElement.outerHTML;
 }
 
-
 async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
@@ -218,15 +187,30 @@ async function sendMessage() {
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
-  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
+  const responseStream = await getBotResponse(apiKey, apiEndpoint, message);
+  const responseStreamReader = responseStream.getReader();
 
-  const botResponse = jsonResponse.choices[0].message.content;
-  messages.push({
-    role: 'assistant',
-    content: botResponse,
-  });
+  let responseText = '';
+  while (true) {
+    const {done, value} = await responseStreamReader.read();
 
-  createAndAppendMessage(botResponse, 'bot');
+    if (done) {
+      break;
+    }
+
+    responseText += value;
+
+    if (responseText.endsWith('\n')) {
+      const jsonResponse = JSON.parse(responseText);
+      const botResponse = jsonResponse.choices[0].message.content;
+      messages.push({
+        role: 'assistant',
+        content: botResponse,
+      });
+      createAndAppendMessage(botResponse, 'bot');
+      responseText = '';
+    }
+  }
 }
 
 function copyToClipboard(text) {
