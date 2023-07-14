@@ -95,7 +95,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     case 'claude-instant-100k':
       maxTokens = 102400;
       break;
-    case 'claude-instant':
+   case 'claude-instant':
       maxTokens = 10240;
       break;
     default:
@@ -117,10 +117,11 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     content: message,
   });
 
+  aiThinkingMsg.style.display = 'block';
+
   const data = {
     model: selectedModel,
     messages: messages,
-    stream: true,
   };
 
   const response = await fetch(ENDPOINT, {
@@ -129,45 +130,9 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     body: JSON.stringify(data),
   });
 
-  const reader = response.body.getReader();
-  let partialText = ''; // buffer for partial data
+  aiThinkingMsg.style.display = 'none';
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) {
-      aiThinkingMsg.style.display = 'none';
-      break;
-    }
-
-    partialText += new TextDecoder().decode(value);
-
-    // check if we have received a complete JSON object
-    let leftBracketIndex = partialText.indexOf('{');
-    letrightBracketIndex = partialText.lastIndexOf('}');
-
-    while (leftBracketIndex !== -1 && rightBracketIndex !== -1 && leftBracketIndex < rightBracketIndex) {
-      const completeJSONText = partialText.slice(leftBracketIndex, rightBracketIndex + 1);
-
-      try {
-        const jsonResponse = JSON.parse(completeJSONText);
-
-        const botResponse = jsonResponse.choices[0].message.content;
-        messages.push({
-          role: 'assistant',
-          content: botResponse,
-        });
-
-        createAndAppendMessage(botResponse, 'bot');
-      } catch (e) {
-        console.error('Error parsing JSON or accessing array:', e);
-      }
-
-      // remove the parsed JSON from the buffer
-      partialText = partialText.slice(rightBracketIndex + 1);
-      leftBracketIndex = partialText.indexOf('{');
-      rightBracketIndex = partialText.lastIndexOf('}');
-    }
-  }
+  return response.json();
 }
 
 function getTokenCount(text) {
@@ -175,13 +140,66 @@ function getTokenCount(text) {
   return words.length;
 }
 
-function createAndAppendMessage(content, owner) {
+async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
-  message.textContent = content;
+
+  let displayedText = content;
+
+  const parsedContent = parseResponse(displayedText);
+  message.innerHTML = parsedContent;
+
   chatHistory.appendChild(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
+
+  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
 }
+
+function parseResponse(response) {
+  let parsedResponse = response;
+
+  parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+  parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+  parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+  parsedResponse = parseTables(parsedResponse);
+
+  return parsedResponse;
+}
+
+function parseTables(response) {
+  const tableRegex = /\n((?:\s*:?[\|:].*\|\n)+)\n/g;
+  return response.replace(tableRegex, createTable);
+}
+
+function createTable(match, table) {
+  const rows = table.trim().split('\n');
+  const tableElement = document.createElement('table');
+
+  const tableHeader = document.createElement('tr');
+  const tableHeaderCells = rows[0].split('|').slice(1, -1);
+  tableHeaderCells.forEach((cell) => {
+    const th = document.createElement('th');
+    th.classList.add('table-header');
+    th.textContent = cell.trim();
+    tableHeader.appendChild(th);
+  });
+  tableElement.appendChild(tableHeader);
+
+  for (let i = 2; i < rows.length; i++) {
+    const row = document.createElement('tr');
+    const tableCells = rows[i].split('|').slice(1, -1);
+    tableCells.forEach((cell) => {
+      const td = document.createElement('td');
+      td.classList.add('table-data');
+      td.innerHTML = parseResponse(cell.trim());
+      row.appendChild(td);
+    });
+    tableElement.appendChild(row);
+  }
+
+  return tableElement.outerHTML;
+}
+
 
 async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
@@ -200,8 +218,15 @@ async function sendMessage() {
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
-  aiThinkingMsg.style.display = 'block';
-  await getBotResponse(apiKey, apiEndpoint, message);
+  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
+
+  const botResponse = jsonResponse.choices[0].message.content;
+  messages.push({
+    role: 'assistant',
+    content: botResponse,
+  });
+
+  createAndAppendMessage(botResponse, 'bot');
 }
 
 function copyToClipboard(text) {
