@@ -10,7 +10,8 @@
     {
       "src": "/logo.webp",
       "sizes": "256x256",
-      "type": "image/webp"
+      "type": "image/webp",
+      "purpose": "any"
     },
     {
       "src": "/logo2.png",
