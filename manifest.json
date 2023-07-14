@@ -12,7 +12,7 @@
     "type": "image/webp"
   },{
     "src": "/logo.png",
-    "sizes": "256x256"
+    "sizes": "512x512"
   },{
     "src": "/logo.ico",
     "sizes": "256x256"
