@@ -1,268 +1,257 @@
-// Import EventSource library
-const EventSource = require("eventsource");
+const chatHistory = document.getElementById('chat-history');
+const apiKeyInput = document.getElementById('api-key-input');
+const apiEndpointInput = document.getElementById('api-endpoint-input');
+const messageInput = document.getElementById('message-input');
+const modelMenu = document.getElementById('model-menu');
+const aiThinkingMsg = document.getElementById('ai-thinking');
+const systemRoleInput = document.getElementById('system-role-input');
 
-// Import React library and components
-const React = require("react");
-const ChatHistory = require("./ChatHistory");
-const ChatInput = require("./ChatInput");
-const ChatHeader = require("./ChatHeader");
+let messages = [
+  {
+    role: 'system',
+    content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
+  },
+];
 
-// Define OpenAI API key and endpoint
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_ENDPOINT = "https://chimeragpt.adventblocks.cc/v1/chat/completions";
+let apiKey = localStorage.getItem('apiKey') || '';
+let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
+let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
 
-// Define request body with model, messages, and stream parameters
-const requestBody = {
-  model: "gpt-3.5-turbo",
-  messages: [
-    { role: "user", content: "Say this is a test!" }
-  ],
-  stream: true // Set stream to true to enable streaming responses
-};
+apiKeyInput.value = apiKey;
+apiEndpointInput.value = apiEndpoint;
+selectModel(selectedModel);
+updateModelHeading();
 
-// Create a React component for the chat UI
-class Chat extends React.Component {
-  constructor(props) {
-    super(props);
-    // Initialize the state with an empty messages array and a loading flag
-    this.state = {
-      messages: [],
-      loading: false
-    };
-    // Bind the methods to the component instance
-    this.handleUserMessage = this.handleUserMessage.bind(this);
-    this.handleBotMessage = this.handleBotMessage.bind(this);
-    this.handleBotPartialMessage = this.handleBotPartialMessage.bind(this);
+messageInput.addEventListener('input', () => {
+  messageInput.style.height = 'auto';
+  messageInput.style.height = `${messageInput.scrollHeight}px`;
+});
+
+messageInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    messageInput.value += '\n';
+    messageInput.style.height = `${messageInput.scrollHeight}px`;
   }
+});
 
-  // Method to handle user messages
-  handleUserMessage(message) {
-    // Add the user message to the state messages array
-    this.setState((prevState) => ({
-      messages: [...prevState.messages, { role: "user", content: message }]
-    }));
-    // Set the loading flag to true to indicate that the bot is typing
-    this.setState({ loading: true });
-    // Call the getBotResponse method with the user message
-    this.getBotResponse(message);
-  }
+document.getElementById('send-button').addEventListener('click', sendMessage);
 
-  // Method to handle bot messages
-  handleBotMessage(message) {
-    // Add the bot message to the state messages array
-    this.setState((prevState) => ({
-      messages: [...prevState.messages, { role: "bot", content: message }]
-    }));
-    // Set the loading flag to false to indicate that the bot is done typing
-    this.setState({ loading: false });
-  }
-
-  // Method to handle bot partial messages
-  handleBotPartialMessage(message) {
-    // Update the last bot message in the state messages array with the partial message
-    this.setState((prevState) => {
-      const updatedMessages = [...prevState.messages];
-      updatedMessages[updatedMessages.length - 1] = { role: "bot", content: message };
-      return { messages: updatedMessages };
-    });
-  }
-  // Method to get bot response using OpenAI API and EventSource
-  getBotResponse(message) {
-    // Create an event source object with the endpoint and headers
-    const eventSource = new EventSource(OPENAI_ENDPOINT, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${OPENAI_API_KEY}`
-      },
-      method: "POST",
-      body: JSON.stringify(requestBody)
-    });
-
-    // Create an event listener for data events
-    eventSource.addEventListener("data", (event) => {
-      // Parse the data chunk as JSON
-      const data = JSON.parse(event.data);
-
-      // Check if the data contains a token or a completion
-      if (data.type === "token") {
-        // Append the token to a partial text variable
-        let partialText = partialText + data.data;
-        // Call the handleBotPartialMessage method with the partial text
-        this.handleBotPartialMessage(partialText);
-      } else if (data.type === "completion") {
-        // Append the completion to the partial text variable
-        let partialText = partialText + data.data;
-        // Call the handleBotMessage method with the final text
-        this.handleBotMessage(partialText);
-        // Close the event source connection
-        eventSource.close();
-      }
-    });
-  }
-
-  // Render the chat UI using React components
-  render() {
-    return (
-      <div className="chat-container">
-        <ChatHeader model={requestBody.model} />
-        <ChatHistory messages={this.state.messages} loading={this.state.loading} />
-        <ChatInput onUserMessage={this.handleUserMessage} />
-      </div>
-    );
-  }
+function toggleModelMenu() {
+  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
 }
 
-// Export the Chat component
-module.exports = Chat;
-// Create a React component for the chat header
-class ChatHeader extends React.Component {
-  constructor(props) {
-    super(props);
-    // Bind the methods to the component instance
-    this.toggleModelMenu = this.toggleModelMenu.bind(this);
-    this.selectModel = this.selectModel.bind(this);
+function selectModel(model) {
+  const modelOptions = document.querySelectorAll('ul li');
+  modelOptions.forEach((option) => option.classList.remove('selected'));
+
+  const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
+  if (selectedModelOption) {
+    selectedModelOption.classList.add('selected');
   }
 
-  // Method to toggle the model menu visibility
-  toggleModelMenu() {
-    const modelMenu = document.getElementById("model-menu");
-    modelMenu.style.display = modelMenu.style.display === "none" ? "block" : "none";
-  }
+  selectedModel = model;
+  localStorage.setItem('selectedModel', selectedModel);
 
-  // Method to select a model from the menu
-  selectModel(model) {
-    // Update the request body with the selected model
-    requestBody.model = model;
-    // Toggle the model menu visibility
-    this.toggleModelMenu();
-  }
-
-  // Render the chat header using React elements
-  render() {
-    return (
-      <div className="chat-header">
-        <h1>Chat with {this.props.model}</h1>
-        <div className="model-selector" onClick={this.toggleModelMenu}>
-          <span>Select a different model</span>
-          <i className="fas fa-angle-down"></i>
-        </div>
-        <ul id="model-menu" style={{ display: "none" }}>
-          <li data-model="gpt-3.5-turbo" onClick={() => this.selectModel("gpt-3.5-turbo")}>
-            gpt-3.5-turbo
-          </li>
-          <li data-model="gpt-3.5-turbo-0613" onClick={() => this.selectModel("gpt-3.5-turbo-0613")}>
-            gpt-3.5-turbo-0613
-          </li>
-          <li data-model="gpt-3.5-turbo-16k" onClick={() => this.selectModel("gpt-3.5-turbo-16k")}>
-            gpt-3.5-turbo-16k
-          </li>
-          <li data-model="gpt-3.5-turbo-16k-poe" onClick={() => this.selectModel("gpt-3.5-turbo-16k-poe")}>
-            gpt-3.5-turbo-16k-poe
-          </li>
-          <li data-model="gpt-3.5-turbo-16k-0613" onClick={() => this.selectModel("gpt-3.5-turbo-16k-0613")}>
-            gpt-3.5-turbo-16k-0613
-          </li>
-          <li data-model="gpt-4" onClick={() => this.selectModel("gpt-4")}>
-            gpt-4
-          </li>
-          <li data-model="gpt-4-poe" onClick={() => this.selectModel("gpt-4-poe")}>
-            gpt-4-poe
-          </li>
-          <li data-model="gpt-4-0613" onClick={() => this.selectModel("gpt-4-0613")}>
-            gpt-4-0613
-          </li>
-          <li data-model="gpt-4-32k" onClick={() => this.selectModel("gpt-4-32k")}>
-            gpt-4-32k
-          </li>
-          <li data-model="gpt-4-32k-poe" onClick={() => this.selectModel("gpt-4-32k-poe")}>
-            gpt-4-32k-poe
-          </li>
-          <li data-model="gpt-4-32k-poe" onClick={() => this.selectModel("claude-instant")}>
-            claude-instant
-          </li>
-        </ul>
-      </div>
-    );
-  }
+  toggleModelMenu();
+  updateModelHeading();
 }
 
-// Export the ChatHeader component
-module.exports = ChatHeader;
-// Create a React component for the chat history
-class ChatHistory extends React.Component {
-  // Render the chat history using React elements
-  render() {
-    return (
-      <div className="chat-history" id="chat-history">
-        {this.props.messages.map((message, index) => (
-          <div key={index} className={`message ${message.role}`}>
-            {this.parseResponse(message.content)}
-          </div>
-        ))}
-        {this.props.loading && (
-          <div className="message bot">
-            <span className="typing-indicator"></span>
-          </div>
-        )}
-      </div>
-    );
+function updateModelHeading() {
+  const modelHeading = document.querySelector('h1');
+  modelHeading.textContent = `Chat with ${selectedModel}`;
+}
+
+const ENDPOINT = apiEndpoint || 'https://chimeragpt.adventblocks.cc/v1/chat/completions';
+
+async function getBotResponse(apiKey, apiEndpoint, message) {
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${apiKey}`,
+  };
+
+  let maxTokens;
+  switch (selectedModel) {
+    case 'gpt-3.5-turbo':
+    case 'gpt-3.5-turbo-0613':
+      maxTokens = 4096;
+      break;
+    case 'gpt-3.5-turbo-16k':
+    case 'gpt-3.5-turbo-16k-poe':
+    case 'gpt-3.5-turbo-16k-0613':
+      maxTokens = 16384;
+      break;
+    case 'gpt-4-0613':
+    case 'gpt-4':
+    case 'gpt-4-poe':
+      maxTokens = 8192;
+      break;
+    case 'gpt-4-32k-0613':
+    case 'gpt-4-32k':
+    case 'gpt-4-32k-poe':
+      maxTokens = 32768;
+      break;
+    case 'claude-2-100k':
+    case 'claude-instant-100k':
+      maxTokens = 102400;
+      break;
+   case 'claude-instant':
+      maxTokens = 10240;
+      break;
+    default:
+      maxTokens = 4096;
   }
 
-  // Method to parse the response and add markdown and mathjax elements
-  parseResponse(response) {
-    let parsedResponse = response;
-
-    parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
-    parsedResponse = parsedResponse.replace(
-      /\$\$(.*?)\$\$/g,
-      '<span class="mathjax-latex">\\($1\\)</span>'
-    );
-    parsedResponse = parsedResponse.replace(
-      /\$(.*?)\$/g,
-      '<span class="mathjax-latex">\\($1\\)</span>'
-    );
-    parsedResponse = this.parseTables(parsedResponse);
-
-    return parsedResponse;
-  }
-
-  // Method to parse the tables and create table elements
-  parseTables(response) {
-    const tableRegex = /\n((?:\s*:?[\|:].*\|\n)+)\n/g;
-    return response.replace(tableRegex, this.createTable);
-  }
-
-  // Method to create a table element from a table string
-  createTable(match, table) {
-    const rows = table.trim().split("\n");
-    const tableElement = document.createElement("table");
-
-    const tableHeader = document.createElement("tr");
-    const tableHeaderCells = rows[0].split("|").slice(1, -1);
-    tableHeaderCells.forEach((cell) => {
-      const th = document.createElement("th");
-      th.classList.add("table-header");
-      th.textContent = cell.trim();
-      tableHeader.appendChild(th);
-    });
-    tableElement.appendChild(tableHeader);
-
-    for (let i = 2; i < rows.length; i++) {
-      const row = document.createElement("tr");
-      const tableCells = rows[i].split("|").slice(1, -1);
-      tableCells.forEach((cell) => {
-        const td = document.createElement("td");
-        td.classList.add("table-data");
-        td.innerHTML = this.parseResponse(cell.trim());
-        row.appendChild(td);
-      });
-      tableElement.appendChild(row);
+  let tokenCount = getTokenCount(messages[0].content);
+  for (let i = 1; i < messages.length; i++) {
+    const messageTokenCount = getTokenCount(messages[i].content);
+    if (tokenCount + messageTokenCount > maxTokens) {
+      messages.splice(1, i - 1);
+      break;
     }
-
-    return tableElement.outerHTML;
+    tokenCount += messageTokenCount;
   }
+
+  messages.push({
+    role: 'user',
+    content: message,
+  });
+
+  aiThinkingMsg.style.display = 'block';
+
+  const data = {
+    model: selectedModel,
+    messages: messages,
+  };
+
+  const response = await fetch(ENDPOINT, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify(data),
+  });
+
+  aiThinkingMsg.style.display = 'none';
+
+  return response.json();
 }
 
-// Export the ChatHistory component
-module.exports = ChatHistory;
-  
+function getTokenCount(text) {
+  const words = text.trim().split(/\s+/);
+  return words.length;
+}
+
+async function createAndAppendMessage(content, owner) {
+  const message = document.createElement('div');
+  message.classList.add('message', owner);
+
+  let displayedText = content;
+
+  const parsedContent = parseResponse(displayedText);
+  message.innerHTML = parsedContent;
+
+  chatHistory.appendChild(message);
+  chatHistory.scrollTop = chatHistory.scrollHeight;
+
+  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
+}
+
+function parseResponse(response) {
+  let parsedResponse = response;
+
+  parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+  parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+  parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+  parsedResponse = parseTables(parsedResponse);
+
+  return parsedResponse;
+}
+
+function parseTables(response) {
+  const tableRegex = /\n((?:\s*:?[\|:].*\|\n)+)\n/g;
+  return response.replace(tableRegex, createTable);
+}
+
+function createTable(match, table) {
+  const rows = table.trim().split('\n');
+  const tableElement = document.createElement('table');
+
+  const tableHeader = document.createElement('tr');
+  const tableHeaderCells = rows[0].split('|').slice(1, -1);
+  tableHeaderCells.forEach((cell) => {
+    const th = document.createElement('th');
+    th.classList.add('table-header');
+    th.textContent = cell.trim();
+    tableHeader.appendChild(th);
+  });
+  tableElement.appendChild(tableHeader);
+
+  for (let i = 2; i < rows.length; i++) {
+    const row = document.createElement('tr');
+    const tableCells = rows[i].split('|').slice(1, -1);
+    tableCells.forEach((cell) => {
+      const td = document.createElement('td');
+      td.classList.add('table-data');
+      td.innerHTML = parseResponse(cell.trim());
+      row.appendChild(td);
+    });
+    tableElement.appendChild(row);
+  }
+
+  return tableElement.outerHTML;
+}
+
+
+async function sendMessage() {
+  apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
+  const message = messageInput.value.trim();
+
+  if (!apiKey || !message) {
+    alert('Please enter your API key and a message.');
+    return;
+  }
+
+  localStorage.setItem('apiKey', apiKey);
+  localStorage.setItem('apiEndpoint', apiEndpoint);
+
+  createAndAppendMessage(message, 'user');
+  messageInput.value = '';
+  messageInput.style.height = 'auto';
+
+  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
+
+  const botResponse = jsonResponse.choices[0].message.content;
+  messages.push({
+    role: 'assistant',
+    content: botResponse,
+  });
+
+  createAndAppendMessage(botResponse, 'bot');
+}
+
+function copyToClipboard(text) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+}
+
+document.getElementById('copy-button').addEventListener('click', () => {
+  const latestResponse = chatHistory.lastElementChild.innerHTML;
+  if (latestResponse) {
+    copyToClipboard(latestResponse);
+    alert('Text copied to clipboard');
+  } else {
+    alert('No text to copy');
+  }
+});
+
+systemRoleInput.value = localStorage.getItem('systemRole') || 'You are a helpful assistant.';
+systemRoleInput.addEventListener('input', () => {
+  localStorage.setItem('systemRole', systemRoleInput.value);
+  messages[0].content = systemRoleInput.value;
+});
+
+window.addEventListener('load', updateModelHeading);
