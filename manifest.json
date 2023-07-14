@@ -4,17 +4,31 @@
   "description": "Chat with GPT Models",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#fff",
+  "background_color": "#000000",
   "theme_color": "#000",
-  "icons": [{
-    "src": "/logo.webp",
-    "sizes": "256x256",
-    "type": "image/webp"
-  },{
-    "src": "/logo2.png",
-    "sizes": "512x512"
-  },{
-    "src": "/logo.ico",
-    "sizes": "256x256"
-  }]
+  "icons": [
+    {
+      "src": "/logo.webp",
+      "sizes": "256x256",
+      "type": "image/webp"
+    },
+    {
+      "src": "/logo2.png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "/logo.ico",
+      "sizes": "256x256"
+    }
+  ],
+  "dir": "auto",
+  "lang": "en",
+  "orientation": "any",
+  "display_override": [
+    "standalone",
+    "window-controls-overlay"
+  ],
+  "categories": [
+    "utilities"
+  ]
 }
