@@ -63,6 +63,22 @@ function updateModelHeading() {
 }
 
 const ENDPOINT = apiEndpoint || 'https://chimeragpt.adventblocks.cc/v1/chat/completions';
+const MAX_TOKENS_BY_MODEL = {
+  'gpt-3.5-turbo': 4096,
+  'gpt-3.5-turbo-0613': 4096,
+  'gpt-3.5-turbo-16k': 16384,
+  'gpt-3.5-turbo-16k-poe': 16384,
+  'gpt-3.5-turbo-16k-0613': 16384,
+  'gpt-4-0613': 8192,
+  'gpt-4': 8192,
+  'gpt-4-poe': 8192,
+  'gpt-4-32k-0613': 32768,
+  'gpt-4-32k': 32768,
+  'gpt-4-32k-poe': 32768,
+  'claude-2-100k': 102400,
+  'claude-instant-100k': 102400,
+  'claude-instant': 10240,
+};
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
@@ -70,37 +86,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     Authorization: `Bearer ${apiKey}`,
   };
 
-  let maxTokens;
-  switch (selectedModel) {
-    case 'gpt-3.5-turbo':
-    case 'gpt-3.5-turbo-0613':
-      maxTokens = 4096;
-      break;
-    case 'gpt-3.5-turbo-16k':
-    case 'gpt-3.5-turbo-16k-poe':
-    case 'gpt-3.5-turbo-16k-0613':
-      maxTokens = 16384;
-      break;
-    case 'gpt-4-0613':
-    case 'gpt-4':
-    case 'gpt-4-poe':
-      maxTokens = 8192;
-      break;
-    case 'gpt-4-32k-0613':
-    case 'gpt-4-32k':
-    case 'gpt-4-32k-poe':
-      maxTokens = 32768;
-      break;
-    case 'claude-2-100k':
-    case 'claude-instant-100k':
-      maxTokens = 102400;
-      break;
-   case 'claude-instant':
-      maxTokens = 10240;
-      break;
-    default:
-      maxTokens = 4096;
-  }
+  const maxTokens = MAX_TOKENS_BY_MODEL[selectedModel] || 4096;
 
   let tokenCount = getTokenCount(messages[0].content);
   for (let i = 1; i < messages.length; i++) {
@@ -152,7 +138,7 @@ async function createAndAppendMessage(content, owner) {
   chatHistory.appendChild(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
 
-  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
+ MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
 }
 
 function parseResponse(response) {
@@ -199,7 +185,6 @@ function createTable(match, table) {
 
   return tableElement.outerHTML;
 }
-
 
 async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
