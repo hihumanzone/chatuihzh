@@ -6,12 +6,10 @@ const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 
-let messages = [
-  {
-    role: 'system',
-    content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
-  },
-];
+let messages = [{
+  role: 'system',
+  content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
+}];
 
 let apiKey = localStorage.getItem('apiKey') || '';
 let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
@@ -138,7 +136,7 @@ async function createAndAppendMessage(content, owner) {
   chatHistory.appendChild(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
 
- MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
+  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
 }
 
 function parseResponse(response) {
