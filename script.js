@@ -120,8 +120,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 }
 
 function getTokenCount(text) {
-  const words = text.trim().split(/\s+/);
-  return words.length;
+  return text.trim().split(/\s+/).length;
 }
 
 async function createAndAppendMessage(content, owner) {
@@ -136,7 +135,7 @@ async function createAndAppendMessage(content, owner) {
   chatHistory.appendChild(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
 
-  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
+  MathJax.Hub.Queue(['TypesetMathJax.Hub, message]);
 }
 
 function parseResponse(response) {
