@@ -1,6 +1,6 @@
 body {
   font-family: Arial, sans-serif;
-  background-color: #112220;
+  background-color: #081110;
   color: #ffffff;
   margin: 0;
   padding: 0;
@@ -98,7 +98,7 @@ h4 {
 
 .message.user {
   align-self: flex-end;
-  background-color: #32675f;
+  background-color: #193430;
   color: #ffffff;
   padding: 5px 10px;
   border-radius: 10px;
@@ -107,7 +107,7 @@ h4 {
 
 .message.bot {
   align-self: flex-start;
-  background-color: #21453f;
+  background-color: #112220;
   padding: 5px 10px;
   border-radius: 10px;
   border: 1px solid #53ac9f;
