@@ -11,7 +11,7 @@ h1 {
   text-align: center;
   margin-bottom: 0px;
   font-size: 26px;
-  border-bottom: 2px solid #62b2a4;
+  border-bottom: 1.5px solid #62b2a4;
 }
 
 h2 {
@@ -98,7 +98,7 @@ h4 {
 
 .message.user {
   align-self: flex-end;
-  background-color: #3a786f;
+  background-color: #32675f;
   color: #ffffff;
   padding: 5px 10px;
   border-radius: 10px;
@@ -107,7 +107,7 @@ h4 {
 
 .message.bot {
   align-self: flex-start;
-  background-color: #29564f;
+  background-color: #21453f;
   padding: 5px 10px;
   border-radius: 10px;
   border: 1px solid #53ac9f;
