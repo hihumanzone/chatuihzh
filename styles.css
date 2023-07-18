@@ -1,7 +1,7 @@
 body {
   font-family: Arial, sans-serif;
-  background-color: var(--background);
-  color: var(--text);
+  background-color: #0d1b19;
+  color: #ffffff;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -11,15 +11,15 @@ h1 {
   text-align: center;
   margin-bottom: 0px;
   font-size: 26px;
-  border-bottom: 2px solid var(--secondary);
+  border-bottom: 2px solid #757575;
 }
 
 h2 {
   text-align: center;
   margin-bottom: 0px;
-  color: var(--primary);
+  color: #c0c0c0;
   font-size: 15px;
-  border: 0.8px solid var(--accent);
+  border: 0.8px solid #949494;
   border-radius: 5px;
 }
 
@@ -27,16 +27,16 @@ h3 {
   text-align: right;
   margin-bottom: 0px;
   font-size: 15px;
-  border-bottom: 0.5px solid var(--secondary);
+  border-bottom: 0.5px solid #757575;
 }
 
 h4 {
   text-align: center;
   margin-bottom: 2px;
   font-size: 12px;
-  border-left: 10px solid var(--accent);
-  border-right: 10px solid var(--accent);
-  border-bottom: 1px solid var(--accent);
+  border-left: 10px solid #949494;
+  border-right: 10px solid #949494;
+  border-bottom: 1px solid #949494;
   border-radius: 3px;
 }
 
@@ -48,7 +48,7 @@ h4 {
   min-width: 300px;
   margin: 50px auto;
   padding: 20px;
-  background-color: var(--primary);
+  background-color: #191919;
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 1);
 }
@@ -61,7 +61,7 @@ h4 {
   padding: 10px;
   border: 1px solid #555;
   border-radius: 5px;
-  background-color: var(--secondary);
+  background-color: #212121;
 }
 
 #api-key-input,
@@ -74,8 +74,8 @@ h4 {
   border: 1px solid #777;
   border-radius: 5px;
   outline: none;
-  background-color: var(--secondary);
-  color: var(--text);
+  background-color: #333;
+  color: #c0c0c0;
   resize: none;
 }
 
@@ -83,9 +83,9 @@ h4 {
 #copy-button {
   margin-top: 10px;
   padding: 5px 10px;
-  background-color: var(--primary);
-  color: var(--text);
-  border: 0.8px solid var(--accent);
+  background-color: #62b2a4;
+  color: #ffffff;
+  border: 0.8px solid #949494;
   border-radius: 5px;
 }
 
@@ -98,19 +98,19 @@ h4 {
 
 .message.user {
   align-self: flex-end;
-  background-color: var(--primary);
-  color: var(--text);
+  background-color: #0051ba;
+  color: #ffffff;
   padding: 5px 10px;
   border-radius: 10px;
-  border: 1px solid var(--primary);
+  border: 1px solid #0073e6;
 }
 
 .message.bot {
   align-self: flex-start;
-  background-color: var(--secondary);
+  background-color: #002853;
   padding: 5px 10px;
   border-radius: 10px;
-  border: 1px solid var(--secondary);
+  border: 1px solid #004786;
 }
 
 table {
@@ -139,17 +139,16 @@ td:last-child {
 
 .table-header {
   font-weight: bold;
-  background-color: var(--secondary);
-  color: var(--text);
+  background-color: #333;
+  color: #c0c0c0;
 }
 
 .table-data {
-  background-color: var(--primary);
-  color: var(--text);
+  background-color: #212121;
+  color: #c0c0c0;
 }
 
 th:empty,
 td:empty {
   display: none;
-  }
-  
+}
