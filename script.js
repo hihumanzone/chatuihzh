@@ -64,7 +64,7 @@ function updateModelHeading() {
 
 const ENDPOINT = apiEndpoint || 'https://chimeragpt.adventblocks.cc/api/v1/chat/completions';
 const MAX_TOKENS_BY_MODEL = {
-  'gpt-3.5-turbo': 4096,
+  'gpt-3.5-turbo': 10,
   'gpt-3.5-turbo-0613': 4096,
   'gpt-3.5-turbo-16k': 16384,
   'gpt-3.5-turbo-16k-0613': 16384,
