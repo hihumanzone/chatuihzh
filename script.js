@@ -62,7 +62,7 @@ function updateModelHeading() {
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
 
-const ENDPOINT = apiEndpoint || 'https://chimeragpt.adventblocks.cc/v1/chat/completions';
+const ENDPOINT = apiEndpoint || 'https://chimeragpt.adventblocks.cc/api/v1/chat/completions';
 const MAX_TOKENS_BY_MODEL = {
   'gpt-3.5-turbo': 4096,
   'gpt-3.5-turbo-0613': 4096,
