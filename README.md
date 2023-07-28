@@ -1,9 +1,8 @@
-# Chat with GPT + Claude Models
+# Chat With GPT Models
 
 This website allows users to chat with GPT + Claude Models. Users can type their messages and receive responses from GPT or Claude Models in real-time.
 
 ![Chatbot UI](./ss1.jpg)
-![Chatbot UI](./ss2.jpg)
 
 ## Website
 
@@ -21,7 +20,7 @@ Visit the website [here](https://chatuihzh.vercel.app/).
 
 ## Features
 
-- Users can switch between different GPT/Claude models.
+- Users can switch between different GPT models.
 - Users can enter their system role and API key.
 - Users can copy the latest message.
 - The chat history is displayed in real-time.
