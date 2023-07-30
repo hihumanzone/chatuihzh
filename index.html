@@ -52,11 +52,23 @@
 const apiKeyInput = document.getElementById('api-key-input');
 
 apiKeyInput.addEventListener('focus', () => {
-  apiKeyInput.type = 'text';
+  const textInput = document.createElement('input');
+  textInput.type = 'text';
+  textInput.id = 'api-key-input';
+  textInput.placeholder = 'Enter your API key';
+  textInput.value = apiKeyInput.value;
+  
+  apiKeyInput.replaceWith(textInput);
+  textInput.focus();
 });
 
 apiKeyInput.addEventListener('blur', () => {
-  apiKeyInput.type = 'password';
+  const passwordInput = document.createElement('input');
+  passwordInput.type = 'password';
+  passwordInput.id = 'api-key-input';
+  passwordInput.placeholder = 'Enter your API key';
+  
+  apiKeyInput.replaceWith(passwordInput);
 });
   </script>
 </body>
