@@ -75,7 +75,7 @@ const MAX_TOKENS_BY_MODEL = {
   'claude-2-100k': 102400,
   'llama-2-7b-chat': 4096,
   'llama-2-13b-chat': 4096,
-  'llama-2-70b-chat': 4096
+  'llama-2-70b-chat': 4096,
 };
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
