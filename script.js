@@ -238,3 +238,13 @@ systemRoleInput.addEventListener('input', () => {
 });
 
 window.addEventListener('load', updateModelHeading);
+
+const apiKeyInput = document.getElementById('api-key-input');
+
+apiKeyInput.addEventListener('focus', () => {
+  apiKeyInput.type = 'text';
+});
+
+apiKeyInput.addEventListener('blur', () => {
+  apiKeyInput.type = 'password';
+});
