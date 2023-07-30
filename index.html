@@ -47,6 +47,17 @@
   if (typeof navigator.serviceWorker !== 'undefined') {
     navigator.serviceWorker.register('sw.js')
   }
-</script>
+   </script>
+  <script>
+    const apiKeyInput = document.getElementById('api-key-input');
+
+apiKeyInput.addEventListener('focus', () => {
+  apiKeyInput.type = 'text';
+});
+
+apiKeyInput.addEventListener('blur', () => {
+  apiKeyInput.type = 'password';
+});
+  </script>
 </body>
 </html>
