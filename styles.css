@@ -77,11 +77,6 @@ h4 {
   outline: none;
   background-color: #0d1b19;
   color: #ffffff;
-}
-
-#api-key-input,
-#api-endpoint-input,
-#system-role-input {
   width: 100%;
 }
 
@@ -158,29 +153,6 @@ td:last-child {
 th:empty,
 td:empty {
   display: none;
-}
-
-.code-block {
-  border: 0.8px solid #1c3630;
-  background-color: #0d1b19;
-  padding: 10px;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  overflow-x: auto;
-  margin: 10px 0;
-}
-
-.code-block pre {
-  margin: 0;
-}
-
-.copy-code-button {
-  background-color: #000;
-  color: #ffffff;
-  border: 0.8px solid #2f6058;
-  border-radius: 5px;
-  padding: 5px 10px;
-  margin-top: 5px;
 }
 
 .mathjax-latex {
