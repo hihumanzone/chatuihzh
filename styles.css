@@ -68,7 +68,7 @@ h4 {
 #system-role-input,
 #message-input {
   margin-top: 10px;
-  width: 60%;
+  width: 100%;
   max-width: 700px;
   min-width: 300px;
   padding: 5px;
