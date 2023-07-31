@@ -128,8 +128,14 @@ async function createAndAppendMessage(content, owner) {
 
   let displayedText = content;
 
-  const parsedContent = parseResponse(displayedText);
-  message.innerHTML = parsedContent;
+  const isCodeBlock = displayedText.startsWith('```') && displayedText.endsWith('```');
+  if (isCodeBlock) {
+    displayedText = displayedText.replace(/^```([\s\S]*?)```/, '$1');
+    message.appendChild(createCodeBlock(displayedText));
+  } else {
+    const parsedContent = parseResponse(displayedText);
+    message.innerHTML = parsedContent;
+  }
 
   chatHistory.appendChild(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -144,27 +150,8 @@ function parseResponse(response) {
   parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parseTables(parsedResponse);
-  parsedResponse = parseCodeBlocks(parsedResponse);
-  parsedResponse = escapeHtml(parsedResponse);
 
   return parsedResponse;
-}
-
-function escapeHtml(unsafe) {
-  return unsafe.replace(/[<&>'"]/g, function (m) {
-    switch (m) {
-      case '<':
-        return '&lt;';
-      case '>':
-        return '&gt;';
-      case '&':
-        return '&amp;';
-      case "'":
-        return '&#39;';
-      case '"':
-        return '&quot;';
-    }
-  });
 }
 
 function parseTables(response) {
@@ -201,38 +188,6 @@ function createTable(match, table) {
   return tableElement.outerHTML;
 }
 
-function parseCodeBlocks(response) {
-  return response.replace(/```(.*?)```/gs, '<pre class="code-block">$1</pre><button class="copy-code-button" onclick="copyCodeToClipboard(event)">Copy The Code</button>');
-}
-
-async function sendMessage() {
-  apiKey = apiKeyInput.value.trim();
-  apiEndpoint = apiEndpointInput.value.trim();
-  const message = messageInput.value.trim();
-
-  if (!apiKey || !message) {
-    alert('Please enter your API key and a message.');
-    return;
-  }
-
-  localStorage.setItem('apiKey', apiKey);
-  localStorage.setItem('apiEndpoint', apiEndpoint);
-
-  createAndAppendMessage(message, 'user');
-  messageInput.value = '';
-  messageInput.style.height = 'auto';
-
-  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
-
-  const botResponse = jsonResponse.choices[0].message.content;
-  messages.push({
-    role: 'assistant',
-    content: botResponse,
-  });
-
-  createAndAppendMessage(botResponse, 'bot');
-}
-
 function copyToClipboard(text) {
   const textarea = document.createElement('textarea');
   textarea.value = text;
@@ -240,14 +195,6 @@ function copyToClipboard(text) {
   textarea.select();
   document.execCommand('copy');
   document.body.removeChild(textarea);
-}
-
-function copyCodeToClipboard(event) {
-  const codeElement = event.target.previousSibling;
-  if (codeElement.tagName === 'PRE') {
-    copyToClipboard(codeElement.textContent);
-    alert('Code copied to clipboard');
-  }
 }
 
 document.getElementById('copy-button').addEventListener('click', () => {
