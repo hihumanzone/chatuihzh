@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <link rel="icon" href="logo.png" type="image/png">
   <meta charset="UTF-8">
@@ -10,32 +9,7 @@
   <title>Chat with GPT Models</title>
   <link rel="stylesheet" type="text/css" href="styles.css">
   <link rel="manifest" href="/manifest.json">
-  <style>
-    .code-block {
-      border: 0.8px solid #1c3630;
-      background-color: #0d1b19;
-      padding: 10px;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      overflow-x: auto;
-      margin: 10px 0;
-    }
-
-    .code-block pre {
-      margin: 0;
-    }
-
-    .copy-code-button {
-      background-color: #000;
-      color: #ffffff;
-      border: 0.8px solid #2f6058;
-      border-radius: 5px;
-      padding: 5px 10px;
-      margin-top: 5px;
-    }
-  </style>
 </head>
-
 <body>
   <div id="chat-container">
     <h1>Chat with GPT Models</h1>
@@ -55,11 +29,11 @@
         <li onclick="selectModel('llama-2-70b-chat')">Llama 2 70b</li>
       </ul>
       <h3>System Role:</h3>
-      <input id="system-role-input" placeholder="Enter the system role" style="display: block;">
+      <input id="system-role-input" placeholder="Enter the system role">
       <h3>API Key:</h3>
       <input type="password" id="api-key-input" placeholder="Enter your API key">
       <h3>API Endpoint:</h3>
-      <input id="api-endpoint-input" placeholder="Enter the API endpoint (optional)"> <br> <br> <br> <br>
+      <input id="api-endpoint-input" placeholder="Enter the API endpoint (optional)"><br><br><br><br>
     </div>
     <button id="copy-button">Copy Latest Message</button>
     <div id="chat-history">
@@ -80,19 +54,5 @@
       });
     }
   </script>
-  <script>
-    // Add event listener to copy code button
-    document.addEventListener('click', function(event) {
-      const target = event.target;
-      if (target.classList.contains('copy-code-button')) {
-        const codeBlock = target.parentElement.querySelector('pre');
-        if (codeBlock) {
-          copyToClipboard(codeBlock.textContent);
-          alert('Code copied to clipboard');
-        }
-      }
-    });
-  </script>
 </body>
-
 </html>
