@@ -1,10 +1,10 @@
-const chatHistory = document.querySelector('#chat-history');
-const apiKeyInput = document.querySelector('#api-key-input');
-const apiEndpointInput = document.querySelector('#api-endpoint-input');
-const messageInput = document.querySelector('#message-input');
-const modelMenu = document.querySelector('#model-menu');
-const aiThinkingMsg = document.querySelector('#ai-thinking');
-const systemRoleInput = document.querySelector('#system-role-input');
+const chatHistory = document.getElementById('chat-history');
+const apiKeyInput = document.getElementById('api-key-input');
+const apiEndpointInput = document.getElementById('api-endpoint-input');
+const messageInput = document.getElementById('message-input');
+const modelMenu = document.getElementById('model-menu');
+const aiThinkingMsg = document.getElementById('ai-thinking');
+const systemRoleInput = document.getElementById('system-role-input');
 
 let messages = [
   {
@@ -13,9 +13,9 @@ let messages = [
   },
 ];
 
-const apiKey = localStorage.getItem('apiKey') || '';
-const apiEndpoint = localStorage.getItem('apiEndpoint') || '';
-const selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
+let apiKey = localStorage.getItem('apiKey') || '';
+let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
+let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
 
 apiKeyInput.value = apiKey;
 apiEndpointInput.value = apiEndpoint;
@@ -28,7 +28,7 @@ messageInput.addEventListener('input', () => {
 });
 
 messageInput.addEventListener('keydown', (event) => {
-  if (event.code === 'Enter' && !event.shiftKey) {
+  if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     messageInput.value += '\n';
     messageInput.style.height = `${messageInput.scrollHeight}px`;
@@ -50,7 +50,8 @@ function selectModel(model) {
     selectedModelOption.classList.add('selected');
   }
 
-  localStorage.setItem('selectedModel', model);
+  selectedModel = model;
+  localStorage.setItem('selectedModel', selectedModel);
 
   toggleModelMenu();
   updateModelHeading();
@@ -172,7 +173,7 @@ function createTable(match, table) {
     tableCells.forEach((cell) => {
       const td = document.createElement('td');
       td.classList.add('table-data');
-      td.textContent = parseResponse(cell.trim());
+      td.innerHTML = parseResponse(cell.trim());
       row.appendChild(td);
     });
     tableElement.appendChild(row);
@@ -182,8 +183,8 @@ function createTable(match, table) {
 }
 
 async function sendMessage() {
-  const apiKey = apiKeyInput.value.trim();
-  const apiEndpoint = apiEndpointInput.value.trim();
+  apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
   const message = messageInput.value.trim();
 
   if (!apiKey || !message) {
@@ -219,7 +220,7 @@ function copyToClipboard(text) {
 }
 
 document.getElementById('copy-button').addEventListener('click', () => {
-  const latestResponse = chatHistory.lastElementChild.textContent;
+  const latestResponse = chatHistory.lastElementChild.innerHTML;
   if (latestResponse) {
     copyToClipboard(latestResponse);
     alert('Text copied to clipboard');
