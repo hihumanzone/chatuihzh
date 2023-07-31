@@ -75,23 +75,7 @@ const MAX_TOKENS_BY_MODEL = {
   'llama-2-70b-chat': 4096,
 };
 
-async function sendMessage() {
-  const apiKey = apiKeyInput.value.trim();
-  const apiEndpoint = apiEndpointInput.value.trim();
-  const message = messageInput.value.trim();
-
-  if (!apiKey || !message) {
-    alert('Please enter your API key and a message.');
-    return;
-  }
-
-  localStorage.setItem('apiKey', apiKey);
-  localStorage.setItem('apiEndpoint', apiEndpoint);
-
-  createAndAppendMessage(message, 'user');
-  messageInput.value = '';
-  messageInput.style.height = 'auto';
-
+async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
@@ -119,7 +103,6 @@ async function sendMessage() {
   const data = {
     model: selectedModel,
     messages: messages,
-    stream: true, // Enable streaming
   };
 
   const response = await fetch(ENDPOINT, {
@@ -130,30 +113,12 @@ async function sendMessage() {
 
   aiThinkingMsg.style.display = 'none';
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
+  return response.json();
+}
 
-  while (true) {
-    const { done, value } = await reader.read();
-
-    if (done) {
-      break;
-    }
-
-    const text = decoder.decode(value);
-    const jsonResponse = JSON.parse(text);
-    const choices = jsonResponse.choices;
-
-    if (choices && choices.length > 0) {
-      const botResponse = choices[0].message.content;
-      messages.push({
-        role: 'assistant',
-        content: botResponse,
-      });
-
-      createAndAppendMessage(botResponse, 'bot');
-    }
-  }
+function getTokenCount(text) {
+  const words = text.trim().split(/\s+/);
+  return words.length;
 }
 
 async function createAndAppendMessage(content, owner) {
@@ -216,9 +181,32 @@ function createTable(match, table) {
   return tableElement.outerHTML;
 }
 
-function getTokenCount(text) {
-  const words = text.trim().split(/\s+/);
-  return words.length;
+async function sendMessage() {
+  const apiKey = apiKeyInput.value.trim();
+  const apiEndpoint = apiEndpointInput.value.trim();
+  const message = messageInput.value.trim();
+
+  if (!apiKey || !message) {
+    alert('Please enter your API key and a message.');
+    return;
+  }
+
+  localStorage.setItem('apiKey', apiKey);
+  localStorage.setItem('apiEndpoint', apiEndpoint);
+
+  createAndAppendMessage(message, 'user');
+  messageInput.value = '';
+  messageInput.style.height = 'auto';
+
+  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
+
+  const botResponse = jsonResponse.choices[0].message.content;
+  messages.push({
+    role: 'assistant',
+    content: botResponse,
+  });
+
+  createAndAppendMessage(botResponse, 'bot');
 }
 
 function copyToClipboard(text) {
