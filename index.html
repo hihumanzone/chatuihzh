@@ -9,6 +9,24 @@
   <title>Chat with GPT Models</title>
   <link rel="stylesheet" type="text/css" href="styles.css">
   <link rel="manifest" href="/manifest.json">
+  <style>
+    .message.bot .code-block {
+      border: 0.8px solid #1c3630;
+      background-color: #0d1b19;
+      padding: 5px;
+      margin-top: 5px;
+      overflow-wrap: break-word;
+    }
+
+    .message.bot .copy-code-button {
+      margin-top: 5px;
+      padding: 5px 10px;
+      background-color: #000;
+      color: #ffffff;
+      border: 0.8px solid #2f6058;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
   <div id="chat-container">
@@ -52,6 +70,49 @@
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('sw.js');
       });
+    }
+  </script>
+  <script>
+    function copyCode(event) {
+      const codeBlock = event.target.previousSibling;
+      const code = codeBlock.textContent.trim();
+      copyToClipboard(code);
+      alert('Code copied to clipboard');
+    }
+
+    function createCodeBlock(code) {
+      const codeBlock = document.createElement('div');
+      codeBlock.classList.add('code-block');
+      codeBlock.textContent = code;
+
+      const copyButton = document.createElement('button');
+      copyButton.classList.add('copy-code-button');
+      copyButton.textContent = 'Copy The Code';
+      copyButton.addEventListener('click', copyCode);
+
+      codeBlock.appendChild(copyButton);
+      return codeBlock;
+    }
+
+    async function createAndAppendMessage(content, owner) {
+      const message = document.createElement('div');
+      message.classList.add('message', owner);
+
+      let displayedText = content;
+
+      const isCodeBlock = displayedText.startsWith('```') && displayedText.endsWith('```');
+      if (isCodeBlock) {
+        displayedText = displayedText.replace(/^```[\s\S]*?```/, '');
+        message.appendChild(createCodeBlock(displayedText));
+      } else {
+        const parsedContent = parseResponse(displayedText);
+        message.innerHTML = parsedContent;
+      }
+
+      chatHistory.appendChild(message);
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+
+      MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
     }
   </script>
 </body>
