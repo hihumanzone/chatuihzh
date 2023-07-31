@@ -7,16 +7,18 @@ body {
   box-sizing: border-box;
 }
 
+h1, h2, h3, h4 {
+  margin-bottom: 0px;
+}
+
 h1 {
   text-align: center;
-  margin-bottom: 0px;
   font-size: 26px;
   border-bottom: 1.5px solid #62b2a4;
 }
 
 h2 {
   text-align: center;
-  margin-bottom: 0px;
   color: #ddeeec;
   font-size: 15px;
   border: 0.8px solid #62b2a4;
@@ -25,7 +27,6 @@ h2 {
 
 h3 {
   text-align: right;
-  margin-bottom: 0px;
   font-size: 15px;
   border-bottom: 0.5px solid #62b2a4;
 }
@@ -34,9 +35,7 @@ h4 {
   text-align: center;
   margin-bottom: 2px;
   font-size: 12px;
-  border-left: 10px solid #62b2a4;
-  border-right: 10px solid #62b2a4;
-  border-bottom: 1px solid #62b2a4;
+  border: 1px solid #62b2a4;
   border-radius: 3px;
 }
 
@@ -152,4 +151,3 @@ th:empty,
 td:empty {
   display: none;
 }
-  
