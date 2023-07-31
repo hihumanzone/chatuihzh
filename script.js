@@ -1,13 +1,10 @@
-// Cache frequently accessed DOM elements
-const elements = {
-  chatHistory: document.querySelector('#chat-history'),
-  apiKeyInput: document.querySelector('#api-key-input'),
-  apiEndpointInput: document.querySelector('#api-endpoint-input'),
-  messageInput: document.querySelector('#message-input'),
-  modelMenu: document.querySelector('#model-menu'),
-  aiThinkingMsg: document.querySelector('#ai-thinking'),
-  systemRoleInput: document.querySelector('#system-role-input'),
-};
+const chatHistory = document.querySelector('#chat-history');
+const apiKeyInput = document.querySelector('#api-key-input');
+const apiEndpointInput = document.querySelector('#api-endpoint-input');
+const messageInput = document.querySelector('#message-input');
+const modelMenu = document.querySelector('#model-menu');
+const aiThinkingMsg = document.querySelector('#ai-thinking');
+const systemRoleInput = document.querySelector('#system-role-input');
 
 let messages = [
   {
@@ -20,28 +17,28 @@ const apiKey = localStorage.getItem('apiKey') || '';
 const apiEndpoint = localStorage.getItem('apiEndpoint') || '';
 const selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
 
-elements.apiKeyInput.value = apiKey;
-elements.apiEndpointInput.value = apiEndpoint;
+apiKeyInput.value = apiKey;
+apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
 
-elements.messageInput.addEventListener('input', () => {
-  elements.messageInput.style.height = 'auto';
-  elements.messageInput.style.height = `${elements.messageInput.scrollHeight}px`;
+messageInput.addEventListener('input', () => {
+  messageInput.style.height = 'auto';
+  messageInput.style.height = `${messageInput.scrollHeight}px`;
 });
 
-elements.messageInput.addEventListener('keydown', (event) => {
+messageInput.addEventListener('keydown', (event) => {
   if (event.code === 'Enter' && !event.shiftKey) {
     event.preventDefault();
-    elements.messageInput.value += '\n';
-    elements.messageInput.style.height = `${elements.messageInput.scrollHeight}px`;
+    messageInput.value += '\n';
+    messageInput.style.height = `${messageInput.scrollHeight}px`;
   }
 });
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
 function toggleModelMenu() {
-  elements.modelMenu.style.display = elements.modelMenu.style.display === 'none' ? 'block' : 'none';
+  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
 }
 
 function selectModel(model) {
@@ -64,6 +61,7 @@ function updateModelHeading() {
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
 
+const ENDPOINT = apiEndpoint || 'https://api.openai.com/v1/chat/completions';
 const MAX_TOKENS_BY_MODEL = {
   'gpt-3.5-turbo': 4096,
   'gpt-3.5-turbo-0613': 4096,
@@ -100,30 +98,30 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     content: message,
   });
 
-  elements.aiThinkingMsg.style.display = 'block';
+  aiThinkingMsg.style.display = 'block';
 
   const data = {
     model: selectedModel,
     messages: messages,
   };
 
-  const response = await fetch(apiEndpoint || 'https://api.openai.com/v1/chat/completions', {
+  const response = await fetch(ENDPOINT, {
     method: 'POST',
     headers: headers,
     body: JSON.stringify(data),
   });
 
-  elements.aiThinkingMsg.style.display = 'none';
+  aiThinkingMsg.style.display = 'none';
 
   return response.json();
 }
 
 function getTokenCount(text) {
-  return text.trim().split(/\s+/).length;
+  const words = text.trim().split(/\s+/);
+  return words.length;
 }
 
 async function createAndAppendMessage(content, owner) {
-  const fragment = document.createDocumentFragment();
   const message = document.createElement('div');
   message.classList.add('message', owner);
 
@@ -132,11 +130,8 @@ async function createAndAppendMessage(content, owner) {
   const parsedContent = parseResponse(displayedText);
   message.innerHTML = parsedContent;
 
-  if (message.textContent) {
-    fragment.appendChild(message);
-  }
-  elements.chatHistory.appendChild(fragment);
-  elements.chatHistory.scrollTop = elements.chatHistory.scrollHeight;
+  chatHistory.appendChild(message);
+  chatHistory.scrollTop = chatHistory.scrollHeight;
 
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
 }
@@ -187,9 +182,9 @@ function createTable(match, table) {
 }
 
 async function sendMessage() {
-  const apiKey = elements.apiKeyInput.value.trim();
-  const apiEndpoint = elements.apiEndpointInput.value.trim();
-  const message = elements.messageInput.value.trim();
+  const apiKey = apiKeyInput.value.trim();
+  const apiEndpoint = apiEndpointInput.value.trim();
+  const message = messageInput.value.trim();
 
   if (!apiKey || !message) {
     alert('Please enter your API key and a message.');
@@ -200,8 +195,8 @@ async function sendMessage() {
   localStorage.setItem('apiEndpoint', apiEndpoint);
 
   createAndAppendMessage(message, 'user');
-  elements.messageInput.value = '';
-  elements.messageInput.style.height = 'auto';
+  messageInput.value = '';
+  messageInput.style.height = 'auto';
 
   const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
 
@@ -224,7 +219,7 @@ function copyToClipboard(text) {
 }
 
 document.getElementById('copy-button').addEventListener('click', () => {
-  const latestResponse = elements.chatHistory.lastElementChild.textContent;
+  const latestResponse = chatHistory.lastElementChild.textContent;
   if (latestResponse) {
     copyToClipboard(latestResponse);
     alert('Text copied to clipboard');
@@ -233,10 +228,10 @@ document.getElementById('copy-button').addEventListener('click', () => {
   }
 });
 
-elements.systemRoleInput.value = localStorage.getItem('systemRole') || 'You are a helpful assistant.';
-elements.systemRoleInput.addEventListener('input', () => {
-  localStorage.setItem('systemRole', elements.systemRoleInput.value);
-  messages[0].content = elements.systemRoleInput.value;
+systemRoleInput.value = localStorage.getItem('systemRole') || 'You are a helpful assistant.';
+systemRoleInput.addEventListener('input', () => {
+  localStorage.setItem('systemRole', systemRoleInput.value);
+  messages[0].content = systemRoleInput.value;
 });
 
 window.addEventListener('load', updateModelHeading);
