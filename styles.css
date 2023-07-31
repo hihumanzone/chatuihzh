@@ -119,20 +119,6 @@ h4 {
   border: 1px solid #2f6058;
 }
 
-.message.bot code {
-  display: block;
-  border: 0.8px solid #1c3630;
-  background-color: #0d1b19;
-  padding: 5px;
-  margin-top: 5px;
-  color: #ffffff;
-}
-
-.message.bot code {
-  background-color: #0d1b19;
-  color: #ffffff;
-}
-
 table {
   border: 0.8px solid #1c3630;
   border-collapse: collapse;
