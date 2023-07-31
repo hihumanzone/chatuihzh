@@ -122,20 +122,49 @@ function getTokenCount(text) {
   return words.length;
 }
 
+// Extract code blocks from bot response and wrap in UI
+function extractCodeBlocks(response) {
+  const codeBlockRegex = /```(.*?)```/gs;
+  const codeBlocks = response.match(codeBlockRegex);
+
+  if (codeBlocks) {
+    codeBlocks.forEach((codeBlock) => {
+      response = response.replace(codeBlock, createCodeBlockUI(codeBlock));
+    });
+  }
+
+  return response;
+}
+
+function createCodeBlockUI(codeBlock) {
+  const preElement = document.createElement('pre');
+  preElement.textContent = codeBlock.replace(/```/g, '');
+
+  const codeBlockElement = document.createElement('div');
+  codeBlockElement.classList.add('code-block');
+  codeBlockElement.appendChild(preElement);
+
+  const copyCodeButton = document.createElement('button');
+  copyCodeButton.classList.add('copy-code-button');
+  copyCodeButton.textContent = 'Copy The Code';
+  codeBlockElement.appendChild(copyCodeButton);
+
+  return codeBlockElement.outerHTML;
+}
+
 async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
 
   let displayedText = content;
 
-  const isCodeBlock = displayedText.startsWith('```') && displayedText.endsWith('```');
-  if (isCodeBlock) {
-    displayedText = displayedText.replace(/^```([\s\S]*?)```/, '$1');
-    message.appendChild(createCodeBlock(displayedText));
-  } else {
-    const parsedContent = parseResponse(displayedText);
-    message.innerHTML = parsedContent;
+  // Extract code blocks
+  if (owner === 'bot') {
+    displayedText = extractCodeBlocks(displayedText);
   }
+
+  const parsedContent = parseResponse(displayedText);
+  message.innerHTML = parsedContent;
 
   chatHistory.appendChild(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -186,6 +215,34 @@ function createTable(match, table) {
   }
 
   return tableElement.outerHTML;
+}
+
+async function sendMessage() {
+  apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
+  const message = messageInput.value.trim();
+
+  if (!apiKey || !message) {
+    alert('Please enter your API key and a message.');
+    return;
+  }
+
+  localStorage.setItem('apiKey', apiKey);
+  localStorage.setItem('apiEndpoint', apiEndpoint);
+
+  createAndAppendMessage(message, 'user');
+  messageInput.value = '';
+  messageInput.style.height = 'auto';
+
+  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
+
+  const botResponse = jsonResponse.choices[0].message.content;
+  messages.push({
+    role: 'assistant',
+    content: botResponse,
+  });
+
+  createAndAppendMessage(botResponse, 'bot');
 }
 
 function copyToClipboard(text) {
