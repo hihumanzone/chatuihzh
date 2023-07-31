@@ -103,6 +103,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   const data = {
     model: selectedModel,
     messages: messages,
+    stream: true, // Enable streaming
   };
 
   const response = await fetch(ENDPOINT, {
@@ -113,7 +114,30 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 
   aiThinkingMsg.style.display = 'none';
 
-  return response.json();
+  // Process the streamed response
+  const reader = response.body.getReader();
+  const decoder = new TextDecoderStream();
+
+  reader.pipeTo(decoder.writable);
+
+  const streamReader = decoder.readable.getReader();
+  let result = '';
+
+  while (true) {
+    const { done, value } = await streamReader.read();
+
+    if (done) {
+      break;
+    }
+
+    result += value;
+    // Process the partial response here
+    // For example, update the UI with the partial response
+    console.log(value);
+  }
+
+  const finalResponse = JSON.parse(result);
+  return finalResponse;
 }
 
 function getTokenCount(text) {
