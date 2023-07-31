@@ -144,6 +144,7 @@ function parseResponse(response) {
   parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parseTables(parsedResponse);
+  parsedResponse = parseCodeBlocks(parsedResponse);
 
   return parsedResponse;
 }
@@ -182,6 +183,10 @@ function createTable(match, table) {
   return tableElement.outerHTML;
 }
 
+function parseCodeBlocks(response) {
+  return response.replace(/```(.*?)```/gs, '<code>$1</code><button class="copy-code-button" onclick="copyCodeToClipboard(event)">Copy The Code</button>');
+}
+
 async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
@@ -217,6 +222,14 @@ function copyToClipboard(text) {
   textarea.select();
   document.execCommand('copy');
   document.body.removeChild(textarea);
+}
+
+function copyCodeToClipboard(event) {
+  const codeElement = event.target.previousSibling;
+  if (codeElement.tagName === 'CODE') {
+    copyToClipboard(codeElement.textContent);
+    alert('Code copied to clipboard');
+  }
 }
 
 document.getElementById('copy-button').addEventListener('click', () => {
