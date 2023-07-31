@@ -1,10 +1,4 @@
-const chatHistory = document.querySelector('#chat-history');
-const apiKeyInput = document.querySelector('#api-key-input');
-const apiEndpointInput = document.querySelector('#api-endpoint-input');
-const messageInput = document.querySelector('#message-input');
-const modelMenu = document.querySelector('#model-menu');
-const aiThinkingMsg = document.querySelector('#ai-thinking');
-const systemRoleInput = document.querySelector('#system-role-input');
+const [chatHistory, apiKeyInput, apiEndpointInput, messageInput, modelMenu, aiThinkingMsg, systemRoleInput] = document.querySelectorAll('#chat-history, #api-key-input, #api-endpoint-input, #message-input, #model-menu, #ai-thinking, #system-role-input');
 
 let messages = [
   {
@@ -13,22 +7,24 @@ let messages = [
   },
 ];
 
-const apiKey = localStorage.getItem('apiKey') || '';
-const apiEndpoint = localStorage.getItem('apiEndpoint') || '';
-const selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
+const apiKey = '';
+const apiEndpoint = '';
+const selectedModel = 'gpt-3.5-turbo';
 
 apiKeyInput.value = apiKey;
 apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
 
-messageInput.addEventListener('input', () => {
-  messageInput.style.height = 'auto';
-  messageInput.style.height = `${messageInput.scrollHeight}px`;
+document.addEventListener('input', (event) => {
+  if (event.target === messageInput) {
+    messageInput.style.height = 'auto';
+    messageInput.style.height = `${messageInput.scrollHeight}px`;
+  }
 });
 
-messageInput.addEventListener('keydown', (event) => {
-  if (event.code === 'Enter' && !event.shiftKey) {
+document.addEventListener('keydown', (event) => {
+  if (event.target === messageInput && event.code === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     messageInput.value += '\n';
     messageInput.style.height = `${messageInput.scrollHeight}px`;
@@ -38,7 +34,7 @@ messageInput.addEventListener('keydown', (event) => {
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
 function toggleModelMenu() {
-  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
+  modelMenu.classList.toggle('hidden');
 }
 
 function selectModel(model) {
@@ -110,6 +106,11 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     headers: headers,
     body: JSON.stringify(data),
   });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(`Error: ${error.error.message}`);
+  }
 
   aiThinkingMsg.style.display = 'none';
 
