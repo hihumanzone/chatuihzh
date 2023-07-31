@@ -5,6 +5,19 @@ const messageInput = document.getElementById('message-input');
 const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
+const codeBlockRegex = /```(.*?)```/gs;
+const MAX_TOKENS_BY_MODEL = {
+  'gpt-3.5-turbo': 4096,
+  'gpt-3.5-turbo-0613': 4096,
+  'gpt-3.5-turbo-16k': 16384,
+  'gpt-3.5-turbo-16k-0613': 16384,
+  'gpt-4-0613': 8192,
+  'gpt-4': 8192,
+  'gpt-4-32k': 32768,
+  'gpt-4-32k-0613': 32768,
+  'claude-2-100k': 102400,
+  'llama-2-70b-chat': 4096,
+};
 
 let messages = [
   {
@@ -63,18 +76,11 @@ function updateModelHeading() {
 }
 
 const ENDPOINT = apiEndpoint || 'https://api.openai.com/v1/chat/completions';
-const MAX_TOKENS_BY_MODEL = {
-  'gpt-3.5-turbo': 4096,
-  'gpt-3.5-turbo-0613': 4096,
-  'gpt-3.5-turbo-16k': 16384,
-  'gpt-3.5-turbo-16k-0613': 16384,
-  'gpt-4-0613': 8192,
-  'gpt-4': 8192,
-  'gpt-4-32k': 32768,
-  'gpt-4-32k-0613': 32768,
-  'claude-2-100k': 102400,
-  'llama-2-70b-chat': 4096,
-};
+
+function getTokenCount(text) {
+  const words = text.trim().split(/\s+/);
+  return words.length;
+}
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
@@ -117,22 +123,13 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   return response.json();
 }
 
-function getTokenCount(text) {
-  const words = text.trim().split(/\s+/);
-  return words.length;
-}
-
-// Extract code blocks from bot response and wrap in UI
 function extractCodeBlocks(response) {
-  const codeBlockRegex = /```(.*?)```/gs;
   const codeBlocks = response.match(codeBlockRegex);
-
   if (codeBlocks) {
     codeBlocks.forEach((codeBlock) => {
       response = response.replace(codeBlock, createCodeBlockUI(codeBlock));
     });
   }
-
   return response;
 }
 
