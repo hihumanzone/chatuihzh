@@ -1,5 +1,13 @@
-const [chatHistory, apiKeyInput, apiEndpointInput, messageInput, modelMenu, aiThinkingMsg, systemRoleInput] = document.querySelectorAll('#chat-history, #api-key-input, #api-endpoint-input, #message-input, #model-menu, #ai-thinking, #system-role-input');
+// Cache DOM queries
+const chatHistory = document.getElementById('chat-history');
+const apiKeyInput = document.getElementById('api-key-input');
+const apiEndpointInput = document.getElementById('api-endpoint-input');
+const messageInput = document.getElementById('message-input');
+const modelMenu = document.getElementById('model-menu');
+const aiThinkingMsg = document.getElementById('ai-thinking');
+const systemRoleInput = document.getElementById('system-role-input');
 
+// Variables for storing data
 let messages = [
   {
     role: 'system',
@@ -7,39 +15,51 @@ let messages = [
   },
 ];
 
-const apiKey = '';
-const apiEndpoint = '';
-const selectedModel = 'gpt-3.5-turbo';
+const apiKey = localStorage.getItem('apiKey') || '';
+const apiEndpoint = localStorage.getItem('apiEndpoint') || '';
+const selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
 
 apiKeyInput.value = apiKey;
 apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
 
-messageInput.addEventListener('input', (event) => {
-  const messageInput = event.target;
-  messageInput.style.height = 'auto';
-  messageInput.style.height = `${messageInput.scrollHeight}px`;
-});
-
-messageInput.addEventListener('keydown', (event) => {
-  if (event.code === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    const messageInput = event.target;
-    messageInput.value += '\n';
+// Event listener with event delegation
+chatHistory.addEventListener('input', (event) => {
+  if (event.target.id === 'message-input') {
+    messageInput.style.height = 'auto';
     messageInput.style.height = `${messageInput.scrollHeight}px`;
   }
 });
 
-document.getElementById('send-button').addEventListener('click', sendMessage);
+chatHistory.addEventListener('keydown', (event) => {
+  if (event.target.id === 'message-input') {
+    if (event.code === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      messageInput.value += '\n';
+      messageInput.style.height = `${messageInput.scrollHeight}px`;
+    }
+  }
+});
 
+document.getElementById('send-button').addEventListener('click', (event) => {
+  if (event.target.id === 'send-button') {
+    sendMessage();
+  }
+});
+
+// Function for toggling model menu
 function toggleModelMenu() {
-  modelMenu.classList.toggle('hidden');
+  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
 }
 
+// Function for selecting a model
 function selectModel(model) {
   const modelOptions = document.querySelectorAll('ul li');
-  modelOptions.forEach((option) => option.classList.remove('selected'));
+  
+  modelOptions.forEach((option) => {
+    option.classList.remove('selected');
+  });
 
   const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
   if (selectedModelOption) {
@@ -52,6 +72,7 @@ function selectModel(model) {
   updateModelHeading();
 }
 
+// Function for updating the model heading
 function updateModelHeading() {
   const modelHeading = document.querySelector('h1');
   modelHeading.textContent = `Chat with ${selectedModel}`;
@@ -71,6 +92,7 @@ const MAX_TOKENS_BY_MODEL = {
   'llama-2-70b-chat': 4096,
 };
 
+// Function for getting bot response
 async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
     'Content-Type': 'application/json',
@@ -107,20 +129,18 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     body: JSON.stringify(data),
   });
 
-  if (!response.ok) {
-    throw new Error(`Error: ${response.status}`);
-  }
-
   aiThinkingMsg.style.display = 'none';
 
   return response.json();
 }
 
+// Function for counting tokens in a text
 function getTokenCount(text) {
   const words = text.trim().split(/\s+/);
   return words.length;
 }
 
+// Function for creating and appending a message
 async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
@@ -136,6 +156,7 @@ async function createAndAppendMessage(content, owner) {
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
 }
 
+// Function for parsing a response
 function parseResponse(response) {
   let parsedResponse = response;
 
@@ -147,11 +168,13 @@ function parseResponse(response) {
   return parsedResponse;
 }
 
+// Function for parsing tables in a response
 function parseTables(response) {
   const tableRegex = /\n((?:\s*:?[\|:].*\|\n)+)\n/g;
   return response.replace(tableRegex, createTable);
 }
 
+// Function for creating a table from a matched string
 function createTable(match, table) {
   const rows = table.trim().split('\n');
   const tableElement = document.createElement('table');
@@ -166,6 +189,7 @@ function createTable(match, table) {
   });
   tableElement.appendChild(tableHeader);
 
+  const fragment = document.createDocumentFragment();
   for (let i = 2; i < rows.length; i++) {
     const row = document.createElement('tr');
     const tableCells = rows[i].split('|').slice(1, -1);
@@ -175,12 +199,14 @@ function createTable(match, table) {
       td.textContent = parseResponse(cell.trim());
       row.appendChild(td);
     });
-    tableElement.appendChild(row);
+    fragment.appendChild(row);
   }
 
+  tableElement.appendChild(fragment);
   return tableElement.outerHTML;
 }
 
+// Function for sending a message
 async function sendMessage() {
   const apiKey = apiKeyInput.value.trim();
   const apiEndpoint = apiEndpointInput.value.trim();
@@ -198,20 +224,18 @@ async function sendMessage() {
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
-  try {
-    const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
-    const botResponse = jsonResponse.choices[0].message.content;
-    messages.push({
-      role: 'assistant',
-      content: botResponse,
-    });
-    createAndAppendMessage(botResponse, 'bot');
-  } catch (error) {
-    console.error(error);
-    alert('An error occurred during the conversation. Please try again.');
-  }
+  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
+
+  const botResponse = jsonResponse.choices[0].message.content;
+  messages.push({
+    role: 'assistant',
+    content: botResponse,
+  });
+
+  createAndAppendMessage(botResponse, 'bot');
 }
 
+// Function for copying text to clipboard
 function copyToClipboard(text) {
   const textarea = document.createElement('textarea');
   textarea.value = text;
