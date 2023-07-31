@@ -57,7 +57,7 @@ function selectModel(model) {
 }
 
 function updateModelHeading() {
-  const modelHeading = document.querySelector('#model-heading');
+  const modelHeading = document.querySelector('h1');
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
 
