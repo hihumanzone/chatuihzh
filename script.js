@@ -16,16 +16,16 @@ apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
 
-document.addEventListener('input', (event) => {
-  if (event.target === messageInput) {
-    messageInput.style.height = 'auto';
-    messageInput.style.height = `${messageInput.scrollHeight}px`;
-  }
+messageInput.addEventListener('input', (event) => {
+  const messageInput = event.target;
+  messageInput.style.height = 'auto';
+  messageInput.style.height = `${messageInput.scrollHeight}px`;
 });
 
-document.addEventListener('keydown', (event) => {
-  if (event.target === messageInput && event.code === 'Enter' && !event.shiftKey) {
+messageInput.addEventListener('keydown', (event) => {
+  if (event.code === 'Enter' && !event.shiftKey) {
     event.preventDefault();
+    const messageInput = event.target;
     messageInput.value += '\n';
     messageInput.style.height = `${messageInput.scrollHeight}px`;
   }
@@ -108,8 +108,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(`Error: ${error.error.message}`);
+    throw new Error(`Error: ${response.status}`);
   }
 
   aiThinkingMsg.style.display = 'none';
@@ -199,15 +198,18 @@ async function sendMessage() {
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
-  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
-
-  const botResponse = jsonResponse.choices[0].message.content;
-  messages.push({
-    role: 'assistant',
-    content: botResponse,
-  });
-
-  createAndAppendMessage(botResponse, 'bot');
+  try {
+    const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
+    const botResponse = jsonResponse.choices[0].message.content;
+    messages.push({
+      role: 'assistant',
+      content: botResponse,
+    });
+    createAndAppendMessage(botResponse, 'bot');
+  } catch (error) {
+    console.error(error);
+    alert('An error occurred during the conversation. Please try again.');
+  }
 }
 
 function copyToClipboard(text) {
