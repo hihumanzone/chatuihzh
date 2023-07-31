@@ -1,3 +1,4 @@
+// DOM elements
 const chatHistory = document.getElementById('chat-history');
 const apiKeyInput = document.getElementById('api-key-input');
 const apiEndpointInput = document.getElementById('api-endpoint-input');
@@ -6,22 +7,18 @@ const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 
+// Initial values
 let messages = [
   {
     role: 'system',
     content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
   },
 ];
-
 let apiKey = localStorage.getItem('apiKey') || '';
 let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
 let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
 
-apiKeyInput.value = apiKey;
-apiEndpointInput.value = apiEndpoint;
-selectModel(selectedModel);
-updateModelHeading();
-
+// Event Listeners
 messageInput.addEventListener('input', () => {
   messageInput.style.height = 'auto';
   messageInput.style.height = `${messageInput.scrollHeight}px`;
@@ -36,7 +33,16 @@ messageInput.addEventListener('keydown', (event) => {
 });
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
+document.getElementById('copy-button').addEventListener('click', copyToClipboard);
 
+systemRoleInput.addEventListener('input', () => {
+  localStorage.setItem('systemRole', systemRoleInput.value);
+  messages[0].content = systemRoleInput.value;
+});
+
+window.addEventListener('load', updateModelHeading);
+
+// Functions
 function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
 }
@@ -61,20 +67,6 @@ function updateModelHeading() {
   const modelHeading = document.querySelector('h1');
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
-
-const ENDPOINT = apiEndpoint || 'https://api.openai.com/v1/chat/completions';
-const MAX_TOKENS_BY_MODEL = {
-  'gpt-3.5-turbo': 4096,
-  'gpt-3.5-turbo-0613': 4096,
-  'gpt-3.5-turbo-16k': 16384,
-  'gpt-3.5-turbo-16k-0613': 16384,
-  'gpt-4-0613': 8192,
-  'gpt-4': 8192,
-  'gpt-4-32k': 32768,
-  'gpt-4-32k-0613': 32768,
-  'claude-2-100k': 102400,
-  'llama-2-70b-chat': 4096,
-};
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
@@ -219,20 +211,17 @@ function copyToClipboard(text) {
   document.body.removeChild(textarea);
 }
 
-document.getElementById('copy-button').addEventListener('click', () => {
-  const latestResponse = chatHistory.lastElementChild.innerHTML;
-  if (latestResponse) {
-    copyToClipboard(latestResponse);
-    alert('Text copied to clipboard');
-  } else {
-    alert('No text to copy');
-  }
-});
-
-systemRoleInput.value = localStorage.getItem('systemRole') || 'You are a helpful assistant.';
-systemRoleInput.addEventListener('input', () => {
-  localStorage.setItem('systemRole', systemRoleInput.value);
-  messages[0].content = systemRoleInput.value;
-});
-
-window.addEventListener('load', updateModelHeading);
+// Constants
+const ENDPOINT = apiEndpoint || 'https://api.openai.com/v1/chat/completions';
+const MAX_TOKENS_BY_MODEL = {
+  'gpt-3.5-turbo': 4096,
+  'gpt-3.5-turbo-0613': 4096,
+  'gpt-3.5-turbo-16k': 16384,
+  'gpt-3.5-turbo-16k-0613': 16384,
+  'gpt-4-0613': 8192,
+  'gpt-4': 8192,
+  'gpt-4-32k': 32768,
+  'gpt-4-32k-0613': 32768,
+  'claude-2-100k': 102400,
+  'llama-2-70b-chat': 4096,
+};
