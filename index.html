@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <link rel="icon" href="logo.png" type="image/png">
   <meta charset="UTF-8">
@@ -10,24 +11,31 @@
   <link rel="stylesheet" type="text/css" href="styles.css">
   <link rel="manifest" href="/manifest.json">
   <style>
-    .message.bot .code-block {
+    .code-block {
       border: 0.8px solid #1c3630;
       background-color: #0d1b19;
-      padding: 5px;
-      margin-top: 5px;
-      overflow-wrap: break-word;
+      padding: 10px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-x: auto;
+      margin: 10px 0;
     }
 
-    .message.bot .copy-code-button {
-      margin-top: 5px;
-      padding: 5px 10px;
+    .code-block pre {
+      margin: 0;
+    }
+
+    .copy-code-button {
       background-color: #000;
       color: #ffffff;
       border: 0.8px solid #2f6058;
       border-radius: 5px;
+      padding: 5px 10px;
+      margin-top: 5px;
     }
   </style>
 </head>
+
 <body>
   <div id="chat-container">
     <h1>Chat with GPT Models</h1>
@@ -73,47 +81,18 @@
     }
   </script>
   <script>
-    function copyCode(event) {
-      const codeBlock = event.target.previousSibling;
-      const code = codeBlock.textContent.trim();
-      copyToClipboard(code);
-      alert('Code copied to clipboard');
-    }
-
-    function createCodeBlock(code) {
-      const codeBlock = document.createElement('div');
-      codeBlock.classList.add('code-block');
-      codeBlock.textContent = code;
-
-      const copyButton = document.createElement('button');
-      copyButton.classList.add('copy-code-button');
-      copyButton.textContent = 'Copy The Code';
-      copyButton.addEventListener('click', copyCode);
-
-      codeBlock.appendChild(copyButton);
-      return codeBlock;
-    }
-
-    async function createAndAppendMessage(content, owner) {
-      const message = document.createElement('div');
-      message.classList.add('message', owner);
-
-      let displayedText = content;
-
-      const isCodeBlock = displayedText.startsWith('```') && displayedText.endsWith('```');
-      if (isCodeBlock) {
-        displayedText = displayedText.replace(/^```[\s\S]*?```/, '');
-        message.appendChild(createCodeBlock(displayedText));
-      } else {
-        const parsedContent = parseResponse(displayedText);
-        message.innerHTML = parsedContent;
+    // Add event listener to copy code button
+    document.addEventListener('click', function(event) {
+      const target = event.target;
+      if (target.classList.contains('copy-code-button')) {
+        const codeBlock = target.parentElement.querySelector('pre');
+        if (codeBlock) {
+          copyToClipboard(codeBlock.textContent);
+          alert('Code copied to clipboard');
+        }
       }
-
-      chatHistory.appendChild(message);
-      chatHistory.scrollTop = chatHistory.scrollHeight;
-
-      MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
-    }
+    });
   </script>
 </body>
+
 </html>
