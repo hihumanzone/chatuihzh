@@ -159,3 +159,37 @@ th:empty,
 td:empty {
   display: none;
 }
+
+.code-block {
+  border: 0.8px solid #1c3630;
+  background-color: #0d1b19;
+  padding: 10px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.code-block pre {
+  margin: 0;
+}
+
+.copy-code-button {
+  background-color: #000;
+  color: #ffffff;
+  border: 0.8px solid #2f6058;
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin-top: 5px;
+}
+
+.mathjax-latex {
+  font-size: 14px;
+}
+
+/* MathJax responsive font size */
+@media screen and (max-width: 700px) {
+  .mjx-container {
+    font-size: 14px !important;
+  }
+}
