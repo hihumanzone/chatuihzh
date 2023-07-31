@@ -1,11 +1,10 @@
-const chatContainer = document.getElementById('chat-container');
 const chatHistory = document.getElementById('chat-history');
-const modelMenu = document.getElementById('model-menu');
-const selectedModelElement = document.getElementById('selected-model');
-const settingsButton = document.getElementById('settings-button');
 const apiKeyInput = document.getElementById('api-key-input');
-const systemRoleInput = document.getElementById('system-role-input');
+const apiEndpointInput = document.getElementById('api-endpoint-input');
 const messageInput = document.getElementById('message-input');
+const modelMenu = document.getElementById('model-menu');
+const aiThinkingMsg = document.getElementById('ai-thinking');
+const systemRoleInput = document.getElementById('system-role-input');
 
 let messages = [
   {
@@ -15,10 +14,13 @@ let messages = [
 ];
 
 let apiKey = localStorage.getItem('apiKey') || '';
+let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
 let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
 
 apiKeyInput.value = apiKey;
+apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
+updateModelHeading();
 
 messageInput.addEventListener('input', () => {
   messageInput.style.height = 'auto';
@@ -33,10 +35,10 @@ messageInput.addEventListener('keydown', (event) => {
   }
 });
 
-settingsButton.addEventListener('click', toggleModelMenu);
+document.getElementById('send-button').addEventListener('click', sendMessage);
 
 function toggleModelMenu() {
-  modelMenu.classList.toggle('hidden');
+  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
 }
 
 function selectModel(model) {
@@ -51,42 +53,37 @@ function selectModel(model) {
   selectedModel = model;
   localStorage.setItem('selectedModel', selectedModel);
 
-  updateModelHeading();
   toggleModelMenu();
+  updateModelHeading();
 }
 
 function updateModelHeading() {
-  selectedModelElement.textContent = selectedModel;
+  const modelHeading = document.querySelector('h1');
+  modelHeading.textContent = `Chat with ${selectedModel}`;
 }
 
-async function getBotResponse(apiKey, message) {
-  const maxTokens = getModelMaxTokens(selectedModel) || 4096;
-  const tokenCount = calculateTokenCount(messages, maxTokens);
+const ENDPOINT = apiEndpoint || 'https://api.openai.com/v1/chat/completions';
+const MAX_TOKENS_BY_MODEL = {
+  'gpt-3.5-turbo': 4096,
+  'gpt-3.5-turbo-0613': 4096,
+  'gpt-3.5-turbo-16k': 16384,
+  'gpt-3.5-turbo-16k-0613': 16384,
+  'gpt-4-0613': 8192,
+  'gpt-4': 8192,
+  'gpt-4-32k': 32768,
+  'gpt-4-32k-0613': 32768,
+  'claude-2-100k': 102400,
+  'llama-2-70b-chat': 4096,
+};
 
+async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
   };
 
-  const data = {
-    model: selectedModel,
-    messages: messages,
-  };
+  const maxTokens = MAX_TOKENS_BY_MODEL[selectedModel] || 4096;
 
-  aiThinkingMsg.classList.remove('hidden');
-
-  const response = await fetch('/api/completions', {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify(data),
-  });
-
-  aiThinkingMsg.classList.add('hidden');
-
-  return response.json();
-}
-
-function calculateTokenCount(messages, maxTokens) {
   let tokenCount = getTokenCount(messages[0].content);
   for (let i = 1; i < messages.length; i++) {
     const messageTokenCount = getTokenCount(messages[i].content);
@@ -96,11 +93,63 @@ function calculateTokenCount(messages, maxTokens) {
     }
     tokenCount += messageTokenCount;
   }
+
+  messages.push({
+    role: 'user',
+    content: message,
+  });
+
+  aiThinkingMsg.style.display = 'block';
+
+  const data = {
+    model: selectedModel,
+    messages: messages,
+  };
+
+  const response = await fetch(ENDPOINT, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify(data),
+  });
+
+  aiThinkingMsg.style.display = 'none';
+
+  return response.json();
 }
 
 function getTokenCount(text) {
   const words = text.trim().split(/\s+/);
   return words.length;
+}
+
+// Extract code blocks from bot response and wrap in UI
+function extractCodeBlocks(response) {
+  const codeBlockRegex = /```(.*?)```/gs;
+  const codeBlocks = response.match(codeBlockRegex);
+
+  if (codeBlocks) {
+    codeBlocks.forEach((codeBlock) => {
+      response = response.replace(codeBlock, createCodeBlockUI(codeBlock));
+    });
+  }
+
+  return response;
+}
+
+function createCodeBlockUI(codeBlock) {
+  const preElement = document.createElement('pre');
+  preElement.textContent = codeBlock.replace(/```/g, '');
+
+  const codeBlockElement = document.createElement('div');
+  codeBlockElement.classList.add('code-block');
+  codeBlockElement.appendChild(preElement);
+
+  const copyCodeButton = document.createElement('button');
+  copyCodeButton.classList.add('copy-code-button');
+  copyCodeButton.textContent = 'Copy The Code';
+  codeBlockElement.appendChild(copyCodeButton);
+
+  return codeBlockElement.outerHTML;
 }
 
 async function createAndAppendMessage(content, owner) {
@@ -109,7 +158,6 @@ async function createAndAppendMessage(content, owner) {
 
   let displayedText = content;
 
-  // Extract code blocks
   if (owner === 'bot') {
     displayedText = extractCodeBlocks(displayedText);
   }
@@ -170,6 +218,7 @@ function createTable(match, table) {
 
 async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
   const message = messageInput.value.trim();
 
   if (!apiKey || !message) {
@@ -178,12 +227,13 @@ async function sendMessage() {
   }
 
   localStorage.setItem('apiKey', apiKey);
+  localStorage.setItem('apiEndpoint', apiEndpoint);
 
   createAndAppendMessage(message, 'user');
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
-  const jsonResponse = await getBotResponse(apiKey, message);
+  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
 
   const botResponse = jsonResponse.choices[0].message.content;
   messages.push({
@@ -219,50 +269,4 @@ systemRoleInput.addEventListener('input', () => {
   messages[0].content = systemRoleInput.value;
 });
 
-settingsButton.addEventListener('load', updateModelHeading);
-
-function getModelMaxTokens(model) {
-  const MAX_TOKENS_BY_MODEL = {
-    'gpt-3.5-turbo': 4096,
-    'gpt-3.5-turbo-0613': 4096,
-    'gpt-3.5-turbo-16k': 16384,
-    'gpt-3.5-turbo-16k-0613': 16384,
-    'gpt-4-0613': 8192,
-    'gpt-4': 8192,
-    'gpt-4-32k': 32768,
-    'gpt-4-32k-0613': 32768,
-    'claude-2-100k': 102400,
-    'llama-2-70b-chat': 4096,
-  };
-
-  return MAX_TOKENS_BY_MODEL[model];
-}
-
-function extractCodeBlocks(response) {
-  const codeBlockRegex = /```(.*?)```/gs;
-  const codeBlocks = response.match(codeBlockRegex);
-
-  if (codeBlocks) {
-    codeBlocks.forEach((codeBlock) => {
-      response = response.replace(codeBlock, createCodeBlockUI(codeBlock));
-    });
-  }
-
-  return response;
-}
-
-function createCodeBlockUI(codeBlock) {
-  const preElement = document.createElement('pre');
-  preElement.textContent = codeBlock.replace(/```/g, '');
-
-  const codeBlockElement = document.createElement('div');
-  codeBlockElement.classList.add('code-block');
-  codeBlockElement.appendChild(preElement);
-
-  const copyCodeButton = document.createElement('button');
-  copyCodeButton.classList.add('copy-code-button');
-  copyCodeButton.textContent = 'Copy The Code';
-  codeBlockElement.appendChild(copyCodeButton);
-
-  return codeBlockElement.outerHTML;
-}
+window.addEventListener('load', updateModelHeading);
