@@ -145,8 +145,26 @@ function parseResponse(response) {
   parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parseTables(parsedResponse);
   parsedResponse = parseCodeBlocks(parsedResponse);
+  parsedResponse = escapeHtml(parsedResponse);
 
   return parsedResponse;
+}
+
+function escapeHtml(unsafe) {
+  return unsafe.replace(/[<&>'"]/g, function (m) {
+    switch (m) {
+      case '<':
+        return '&lt;';
+      case '>':
+        return '&gt;';
+      case '&':
+        return '&amp;';
+      case "'":
+        return '&#39;';
+      case '"':
+        return '&quot;';
+    }
+  });
 }
 
 function parseTables(response) {
@@ -184,7 +202,7 @@ function createTable(match, table) {
 }
 
 function parseCodeBlocks(response) {
-  return response.replace(/```(.*?)```/gs, '<code>$1</code><button class="copy-code-button" onclick="copyCodeToClipboard(event)">Copy The Code</button>');
+  return response.replace(/```(.*?)```/gs, '<pre class="code-block">$1</pre><button class="copy-code-button" onclick="copyCodeToClipboard(event)">Copy The Code</button>');
 }
 
 async function sendMessage() {
@@ -226,7 +244,7 @@ function copyToClipboard(text) {
 
 function copyCodeToClipboard(event) {
   const codeElement = event.target.previousSibling;
-  if (codeElement.tagName === 'CODE') {
+  if (codeElement.tagName === 'PRE') {
     copyToClipboard(codeElement.textContent);
     alert('Code copied to clipboard');
   }
