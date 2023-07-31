@@ -68,16 +68,13 @@ h4 {
 #system-role-input,
 #message-input {
   margin-top: 10px;
-  width: 100%;
-  max-width: 700px;
-  min-width: 300px;
   padding: 5px;
   border: 1px solid #2f6058;
   border-radius: 5px;
   outline: none;
   background-color: #0d1b19;
   color: #ffffff;
-  resize: none;
+  resize: auto;
 }
 
 #send-button,
