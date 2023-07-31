@@ -74,7 +74,12 @@ h4 {
   outline: none;
   background-color: #0d1b19;
   color: #ffffff;
-  resize: auto;
+}
+
+#api-key-input,
+#api-endpoint-input,
+#system-role-input {
+  width: 100%;
 }
 
 #send-button,
