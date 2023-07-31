@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <link rel="icon" href="logo.png" type="image/png">
   <meta charset="UTF-8">
@@ -10,24 +9,48 @@
   <title>Chat with GPT Models</title>
   <link rel="stylesheet" type="text/css" href="styles.css">
   <link rel="manifest" href="/manifest.json">
+  <style>
+    .code-block {
+      border: 0.8px solid #1c3630;
+      background-color: #0d1b19;
+      padding: 10px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-x: auto;
+      margin: 10px 0;
+    }
+
+    .code-block pre {
+      margin: 0;
+    }
+
+    .copy-code-button {
+      background-color: #000;
+      color: #ffffff;
+      border: 0.8px solid #2f6058;
+      border-radius: 5px;
+      padding: 5px 10px;
+      margin-top: 5px;
+    }
+  </style>
 </head>
 <body>
   <div id="chat-container">
     <h1>Chat with GPT Models</h1>
-    <h2 id="model-settings">Settings</h2>
+    <h2 onclick="toggleModelMenu()">Settings</h2>
     <div id="model-menu" style="display: none;">
       <ul>
         <h3>Switch Model:</h3>
-        <li>GPT-3.5 Turbo</li>
-        <li>GPT-3.5 0613</li>
-        <li>GPT-3.5 16k</li>
-        <li>GPT-3.5 16k 0613</li>
-        <li>GPT-4</li>
-        <li>GPT-4 0613</li>
-        <li>GPT-4 32k</li>
-        <li>GPT-4 32k 0613</li>
-        <li>Claude 2 100k</li>
-        <li>Llama 2 70b</li>
+        <li onclick="selectModel('gpt-3.5-turbo')">GPT-3.5 Turbo</li>
+        <li onclick="selectModel('gpt-3.5-turbo-0613')">GPT-3.5 0613</li>
+        <li onclick="selectModel('gpt-3.5-turbo-16k')">GPT-3.5 16k</li>
+        <li onclick="selectModel('gpt-3.5-turbo-16k-0613')">GPT-3.5 16k 0613</li>
+        <li onclick="selectModel('gpt-4')">GPT-4</li>
+        <li onclick="selectModel('gpt-4-0613')">GPT-4 0613</li>
+        <li onclick="selectModel('gpt-4-32k')">GPT-4 32k</li>
+        <li onclick="selectModel('gpt-4-32k-0613')">GPT-4 32k 0613</li>
+        <li onclick="selectModel('claude-2-100k')">Claude 2 100k</li>
+        <li onclick="selectModel('llama-2-70b-chat')">Llama 2 70b</li>
       </ul>
       <h3>System Role:</h3>
       <input id="system-role-input" placeholder="Enter the system role" style="display: block;">
