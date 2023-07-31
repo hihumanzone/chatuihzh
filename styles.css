@@ -7,12 +7,8 @@ body {
   box-sizing: border-box;
 }
 
-.hidden {
-  display: none;
-}
-
 h1, h2, h3, h4 {
-  margin-bottom: 0;
+  margin-bottom: 0px;
 }
 
 h1 {
@@ -20,7 +16,6 @@ h1 {
   text-align: center;
   font-size: 26px;
   border-bottom: 1.5px solid #62b2a4;
-  padding: 10px 0;
 }
 
 h2 {
@@ -29,9 +24,6 @@ h2 {
   font-size: 15px;
   border: 0.8px solid #62b2a4;
   border-radius: 5px;
-  padding: 10px 0;
-  margin-bottom: 0;
-  cursor: pointer;
 }
 
 h3 {
