@@ -180,20 +180,8 @@ function parseResponse(response) {
 }
 
 function parseTables(response) {
-  const formats = ["1st Format:", "2nd Format:", "3rd Format:"];
-  const tableFormats = formats.map(format => createTableFormatRegex(format));
-  const tableRegex = new RegExp(tableFormats.join('|'), 'g');
-
+  const tableRegex = /\n((?:\s*:?[\|:].*\|\n)+)\n/g;
   return response.replace(tableRegex, createTable);
-}
-
-function createTableFormatRegex(format) {
-  const escapeSpecialChars = format.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-  const headingSeparatorRegex = `(?:\\s*\\|\\s*:?[-]+:?\\|)+`;
-  const headerRowRegex = `\\s*\\|${headingSeparatorRegex}\\s*${escapeSpecialChars}\\s*${headingSeparatorRegex}\\s*\\|`;
-  const tableRegex = `\\n${headerRowRegex}(?:\\n\\s*\\|.*\\|)+\\n`;
-
-  return `^${tableRegex}$`;
 }
 
 function createTable(match, table) {
