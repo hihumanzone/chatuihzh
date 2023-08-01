@@ -1,3 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="logo.png" type="image/png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Chat with GPT Models">
+  <meta name="keywords" content="Chat, OpenAI, GPT, AI">
+  <title>Chat with GPT Models</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  <link rel="manifest" href="/manifest.json">
+</head>
+<body>
+  <div id="chat-container">
+    <h1>Chat with GPT Models</h1>
+    <h2 id="model-menu-button">Settings</h2>
+    <div id="model-menu">
+      <ul id="model-list">
+        <h3>Switch Model:</h3>
+        <li data-model="gpt-3.5-turbo">GPT-3.5 Turbo</li>
+        <li data-model="gpt-3.5-turbo-0613">GPT-3.5 0613</li>
+        <li data-model="gpt-3.5-turbo-16k">GPT-3.5 16k</li>
+        <li data-model="gpt-3.5-turbo-16k-0613">GPT-3.5 16k 0613</li>
+        <li data-model="gpt-4">GPT-4</li>
+        <li data-model="gpt-4-0613">GPT-4 0613</li>
+        <li data-model="gpt-4-32k">GPT-4 32k</li>
+        <li data-model="gpt-4-32k-0613">GPT-4 32k 0613</li>
+        <li data-model="claude-2-100k">Claude 2 100k</li>
+        <li data-model="llama-2-70b-chat">Llama 2 70b</li>
+      </ul>
+      <h3>System Role:</h3>
+      <input id="system-role-input" placeholder="Enter the system role" style="display: block;">
+      <h3>API Key:</h3>
+      <input type="password" id="api-key-input" placeholder="Enter your API key">
+      <h3>API Endpoint:</h3>
+      <input id="api-endpoint-input" placeholder="Enter the API endpoint (optional)"> <br> <br> <br> <br>
+    </div>
+    <button id="copy-button">Copy Latest Message</button>
+    <div id="chat-history">
+      <div id="ai-thinking" style="display: none;">
+        <h4>AI is thinking...</h4>
+      </div>
+    </div>
+    <textarea id="message-input" placeholder="Type your message"></textarea>
+    <button id="send-button">Send➤️</button>
+  </div>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML"></script>
+  <script type="text/javascript" src="script.js"></script>
+  <script>
+    if (navigator.serviceWorker) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js');
+      });
+    }
+  </script>
+  <script>
+    document.addEventListener('click', function(event) {
+      const target = event.target;
+      if (target.id === 'model-menu-button') {
+        const modelMenu = document.getElementById('model-menu');
+        if (modelMenu.style.display === 'none') {
+          modelMenu.style.display = 'block';
+        } else {
+          modelMenu.style.display = 'none';
+        }
+      } else if (target.tagName === 'LI' && target.parentElement.id === 'model-list') {
+        const model = target.dataset.model;
+        selectModel(model);
+      } else if (target.classList.contains('copy-code-button')) {
+        const codeBlock = target.parentElement.querySelector('pre');
+        if (codeBlock) {
+          copyToClipboard(codeBlock.textContent);
+          alert('Code copied to clipboard');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
+
 body {
   font-family: Arial, sans-serif;
   background-color: #081110;
@@ -77,11 +157,6 @@ h4 {
   outline: none;
   background-color: #0d1b19;
   color: #ffffff;
-}
-
-#api-key-input,
-#api-endpoint-input,
-#system-role-input {
   width: 100%;
 }
 
