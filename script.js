@@ -19,36 +19,26 @@ const MAX_TOKENS_BY_MODEL = {
   'llama-2-70b-chat': 4096,
 };
 
-let messages = [
-  {
-    role: 'system',
-    content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
-  },
-];
+let messages = getMessageFromLocalStorage();
 
-let apiKey = localStorage.getItem('apiKey') || '';
-let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
-let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
-
-apiKeyInput.value = apiKey;
-apiEndpointInput.value = apiEndpoint;
-selectModel(selectedModel);
+apiKeyInput.value = localStorage.getItem('apiKey') || '';
+apiEndpointInput.value = localStorage.getItem('apiEndpoint') || '';
+selectModel(localStorage.getItem('selectedModel') || 'gpt-3.5-turbo');
 updateModelHeading();
 
-messageInput.addEventListener('input', () => {
-  messageInput.style.height = 'auto';
-  messageInput.style.height = `${messageInput.scrollHeight}px`;
-});
-
-messageInput.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    messageInput.value += '\n';
-    messageInput.style.height = `${messageInput.scrollHeight}px`;
-  }
-});
+messageInput.addEventListener('input', adjustMessageInputSize);
+messageInput.addEventListener('keydown', handleEnterKey);
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
+
+function getMessageFromLocalStorage() {
+  return [
+    {
+      role: 'system',
+      content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
+    },
+  ];
+}
 
 function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
@@ -63,19 +53,17 @@ function selectModel(model) {
     selectedModelOption.classList.add('selected');
   }
 
-  selectedModel = model;
-  localStorage.setItem('selectedModel', selectedModel);
-
+  localStorage.setItem('selectedModel', model);
   toggleModelMenu();
   updateModelHeading();
 }
 
 function updateModelHeading() {
   const modelHeading = document.querySelector('h1');
-  modelHeading.textContent = `Chat with ${selectedModel}`;
+  modelHeading.textContent = `Chat with ${localStorage.getItem('selectedModel')}`;
 }
 
-const ENDPOINT = apiEndpoint || 'https://api.openai.com/v1/chat/completions';
+const ENDPOINT = localStorage.getItem('apiEndpoint') || 'https://api.openai.com/v1/chat/completions';
 
 function getTokenCount(text) {
   const words = text.trim().split(/\s+/);
@@ -88,9 +76,10 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     Authorization: `Bearer ${apiKey}`,
   };
 
-  const maxTokens = MAX_TOKENS_BY_MODEL[selectedModel] || 4096;
+  const maxTokens = MAX_TOKENS_BY_MODEL[localStorage.getItem('selectedModel')] || 4096;
 
   let tokenCount = getTokenCount(messages[0].content);
+
   for (let i = 1; i < messages.length; i++) {
     const messageTokenCount = getTokenCount(messages[i].content);
     if (tokenCount + messageTokenCount > maxTokens) {
@@ -108,7 +97,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   aiThinkingMsg.style.display = 'block';
 
   const data = {
-    model: selectedModel,
+    model: localStorage.getItem('selectedModel'),
     messages: messages,
   };
 
@@ -125,11 +114,13 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 
 function extractCodeBlocks(response) {
   const codeBlocks = response.match(codeBlockRegex);
+
   if (codeBlocks) {
     codeBlocks.forEach((codeBlock) => {
       response = response.replace(codeBlock, createCodeBlockUI(codeBlock));
     });
   }
+
   return response;
 }
 
@@ -184,7 +175,7 @@ function parseTables(response) {
   return response.replace(tableRegex, createTable);
 }
 
-function createTable(match, table) {
+function createTable(_, table) {
   const rows = table.trim().split('\n');
   const tableElement = document.createElement('table');
 
@@ -214,8 +205,8 @@ function createTable(match, table) {
 }
 
 async function sendMessage() {
-  apiKey = apiKeyInput.value.trim();
-  apiEndpoint = apiEndpointInput.value.trim();
+  const apiKey = apiKeyInput.value.trim();
+  const apiEndpoint = apiEndpointInput.value.trim();
   const message = messageInput.value.trim();
 
   if (!apiKey || !message) {
@@ -228,7 +219,7 @@ async function sendMessage() {
 
   createAndAppendMessage(message, 'user');
   messageInput.value = '';
-  messageInput.style.height = 'auto';
+  adjustMessageInputSize();
 
   const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
 
@@ -267,3 +258,16 @@ systemRoleInput.addEventListener('input', () => {
 });
 
 window.addEventListener('load', updateModelHeading);
+
+function adjustMessageInputSize() {
+  messageInput.style.height = 'auto';
+  messageInput.style.height = `${messageInput.scrollHeight}px`;
+}
+
+function handleEnterKey(event) {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    messageInput.value += '\n';
+    adjustMessageInputSize();
+  }
+}
