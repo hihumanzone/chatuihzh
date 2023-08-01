@@ -79,6 +79,7 @@ h4 {
   color: #ffffff;
 }
 
+#api-key-input,
 #api-endpoint-input,
 #system-role-input {
   width: 100%;
