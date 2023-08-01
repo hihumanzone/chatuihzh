@@ -6,8 +6,6 @@ const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 const codeBlockRegex = /```(.*?)```/gs;
-
-// move the MAX_TOKENS_BY_MODEL object outside the function to avoid constant re-creation
 const MAX_TOKENS_BY_MODEL = {
   'gpt-3.5-turbo': 4096,
   'gpt-3.5-turbo-0613': 4096,
@@ -21,28 +19,36 @@ const MAX_TOKENS_BY_MODEL = {
   'llama-2-70b-chat': 4096,
 };
 
-let messages = getMessageFromLocalStorage();
+let messages = [
+  {
+    role: 'system',
+    content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
+  },
+];
 
-apiKeyInput.value = localStorage.getItem('apiKey') || '';
-apiEndpointInput.value = localStorage.getItem('apiEndpoint') || '';
-selectModel(localStorage.getItem('selectedModel') || 'gpt-3.5-turbo');
+let apiKey = localStorage.getItem('apiKey') || '';
+let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
+let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
+
+apiKeyInput.value = apiKey;
+apiEndpointInput.value = apiEndpoint;
+selectModel(selectedModel);
 updateModelHeading();
 
-messageInput.addEventListener('input', adjustMessageInputSize);
-messageInput.addEventListener('keydown', handleEnterKey);
+messageInput.addEventListener('input', () => {
+  messageInput.style.height = 'auto';
+  messageInput.style.height = `${messageInput.scrollHeight}px`;
+});
+
+messageInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    messageInput.value += '\n';
+    messageInput.style.height = `${messageInput.scrollHeight}px`;
+  }
+});
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
-
-function getMessageFromLocalStorage() {
-  const storedMessage = localStorage.getItem('systemRole') || 'You are a helpful assistant.';
-  
-  return [
-    {
-      role: 'system',
-      content: storedMessage,
-    },
-  ];
-}
 
 function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
@@ -50,29 +56,26 @@ function toggleModelMenu() {
 
 function selectModel(model) {
   const modelOptions = document.querySelectorAll('ul li');
-  
-  modelOptions.forEach((option) => {
-    option.classList.remove('selected');
-  });
+  modelOptions.forEach((option) => option.classList.remove('selected'));
 
   const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
-  
   if (selectedModelOption) {
     selectedModelOption.classList.add('selected');
   }
 
-  localStorage.setItem('selectedModel', model);
+  selectedModel = model;
+  localStorage.setItem('selectedModel', selectedModel);
+
   toggleModelMenu();
   updateModelHeading();
 }
 
 function updateModelHeading() {
-  const selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
   const modelHeading = document.querySelector('h1');
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
 
-const ENDPOINT = localStorage.getItem('apiEndpoint') || 'https://api.openai.com/v1/chat/completions';
+const ENDPOINT = apiEndpoint || 'https://api.openai.com/v1/chat/completions';
 
 function getTokenCount(text) {
   const words = text.trim().split(/\s+/);
@@ -85,19 +88,15 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     Authorization: `Bearer ${apiKey}`,
   };
 
-  const selectedModel = localStorage.getItem('selectedModel');
   const maxTokens = MAX_TOKENS_BY_MODEL[selectedModel] || 4096;
 
   let tokenCount = getTokenCount(messages[0].content);
-
   for (let i = 1; i < messages.length; i++) {
     const messageTokenCount = getTokenCount(messages[i].content);
-    
     if (tokenCount + messageTokenCount > maxTokens) {
       messages.splice(i);
       break;
     }
-    
     tokenCount += messageTokenCount;
   }
 
@@ -126,13 +125,11 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 
 function extractCodeBlocks(response) {
   const codeBlocks = response.match(codeBlockRegex);
-
   if (codeBlocks) {
     codeBlocks.forEach((codeBlock) => {
       response = response.replace(codeBlock, createCodeBlockUI(codeBlock));
     });
   }
-
   return response;
 }
 
@@ -187,20 +184,18 @@ function parseTables(response) {
   return response.replace(tableRegex, createTable);
 }
 
-function createTable(_, table) {
+function createTable(match, table) {
   const rows = table.trim().split('\n');
   const tableElement = document.createElement('table');
 
   const tableHeader = document.createElement('tr');
   const tableHeaderCells = rows[0].split('|').slice(1, -1);
-  
   tableHeaderCells.forEach((cell) => {
     const th = document.createElement('th');
     th.classList.add('table-header');
     th.textContent = cell.trim();
     tableHeader.appendChild(th);
   });
-  
   tableElement.appendChild(tableHeader);
 
   for (let i = 2; i < rows.length; i++) {
@@ -219,8 +214,8 @@ function createTable(_, table) {
 }
 
 async function sendMessage() {
-  const apiKey = apiKeyInput.value.trim();
-  const apiEndpoint = apiEndpointInput.value.trim();
+  apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
   const message = messageInput.value.trim();
 
   if (!apiKey || !message) {
@@ -233,7 +228,7 @@ async function sendMessage() {
 
   createAndAppendMessage(message, 'user');
   messageInput.value = '';
-  adjustMessageInputSize();
+  messageInput.style.height = 'auto';
 
   const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
 
@@ -257,7 +252,6 @@ function copyToClipboard(text) {
 
 document.getElementById('copy-button').addEventListener('click', () => {
   const latestResponse = chatHistory.lastElementChild.innerHTML;
-  
   if (latestResponse) {
     copyToClipboard(latestResponse);
     alert('Text copied to clipboard');
@@ -273,16 +267,3 @@ systemRoleInput.addEventListener('input', () => {
 });
 
 window.addEventListener('load', updateModelHeading);
-
-function adjustMessageInputSize() {
-  messageInput.style.height = 'auto';
-  messageInput.style.height = `${messageInput.scrollHeight}px`;
-}
-
-function handleEnterKey(event) {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    messageInput.value += '\n';
-    adjustMessageInputSize();
-  }
-}
