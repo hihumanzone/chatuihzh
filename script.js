@@ -180,8 +180,22 @@ function parseResponse(response) {
 }
 
 function parseTables(response) {
-  const tableRegex = /\n((?:.*\|.*\n)+)/g;
-  return response.replace(tableRegex, createTable);
+  const tableRegex = /\n(?:(?:\s*:?[\|:].*\|\n)+)\n((?:.*\n)+)/g; 
+
+  const separators = ['| --- |', '|:---:|', '|----|'];
+  const lines = response.split('\n');
+  let formattedLines = [];
+
+  lines.forEach((line) => {
+    if (separators.includes(line.trim())) { 
+      formattedLines.push('| --- |'); 
+    } else {
+      formattedLines.push(line);
+    }
+  });
+
+  const formattedResponse = formattedLines.join('\n');
+  return formattedResponse.replace(tableRegex, createTable);
 }
 
 function createTable(match, table) {
@@ -194,8 +208,10 @@ function createTable(match, table) {
     const th = document.createElement('th');
     th.classList.add('table-header');
     th.textContent = cell.trim();
+
     tableHeader.appendChild(th);
   });
+
   tableElement.appendChild(tableHeader);
 
   for (let i = 2; i < rows.length; i++) {
@@ -204,9 +220,11 @@ function createTable(match, table) {
     tableCells.forEach((cell) => {
       const td = document.createElement('td');
       td.classList.add('table-data');
-      td.innerHTML = parseResponse(cell.trim());
+      td.textContent = cell.trim();
+
       row.appendChild(td);
     });
+
     tableElement.appendChild(row);
   }
 
