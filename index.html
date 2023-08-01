@@ -13,9 +13,9 @@
 <body>
   <div id="chat-container">
     <h1>Chat with GPT Models</h1>
-    <h2 id="settings-title">Settings</h2>
+    <h2 id="model-menu-button">Settings</h2>
     <div id="model-menu">
-      <ul>
+      <ul id="model-list">
         <h3>Switch Model:</h3>
         <li data-model="gpt-3.5-turbo">GPT-3.5 Turbo</li>
         <li data-model="gpt-3.5-turbo-0613">GPT-3.5 0613</li>
@@ -29,7 +29,7 @@
         <li data-model="llama-2-70b-chat">Llama 2 70b</li>
       </ul>
       <h3>System Role:</h3>
-      <input id="system-role-input" placeholder="Enter the system role">
+      <input id="system-role-input" placeholder="Enter the system role" style="display: block;">
       <h3>API Key:</h3>
       <input type="password" id="api-key-input" placeholder="Enter your API key">
       <h3>API Endpoint:</h3>
@@ -37,7 +37,7 @@
     </div>
     <button id="copy-button">Copy Latest Message</button>
     <div id="chat-history">
-      <div id="ai-thinking">
+      <div id="ai-thinking" style="display: none;">
         <h4>AI is thinking...</h4>
       </div>
     </div>
@@ -52,9 +52,21 @@
         navigator.serviceWorker.register('sw.js');
       });
     }
+  </script>
+  <script>
     document.addEventListener('click', function(event) {
       const target = event.target;
-      if (target.classList.contains('copy-code-button')) {
+      if (target.id === 'model-menu-button') {
+        const modelMenu = document.getElementById('model-menu');
+        if (modelMenu.style.display === 'none') {
+          modelMenu.style.display = 'block';
+        } else {
+          modelMenu.style.display = 'none';
+        }
+      } else if (target.tagName === 'LI' && target.parentElement.id === 'model-list') {
+        const model = target.dataset.model;
+        selectModel(model);
+      } else if (target.classList.contains('copy-code-button')) {
         const codeBlock = target.parentElement.querySelector('pre');
         if (codeBlock) {
           copyToClipboard(codeBlock.textContent);
@@ -62,17 +74,6 @@
         }
       }
     });
-    const modelMenu = document.getElementById('model-menu');
-    const settingsTitle = document.getElementById('settings-title');
-    settingsTitle.onclick = function() {
-      modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
-    }
-    const modelList = modelMenu.getElementsByTagName('li');
-    for (let i = 0; i < modelList.length; i++) {
-      modelList[i].onclick = function() {
-        selectModel(modelList[i].dataset.model);
-      }
-    }
   </script>
 </body>
 </html>
