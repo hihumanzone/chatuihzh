@@ -19,10 +19,12 @@ const MAX_TOKENS_BY_MODEL = {
   'llama-2-70b-chat': 4096,
 };
 
-let messages = [{
-  role: 'system',
-  content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
-}];
+let messages = [
+  {
+    role: 'system',
+    content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
+  },
+];
 
 let apiKey = localStorage.getItem('apiKey') || '';
 let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
@@ -74,10 +76,10 @@ function updateModelHeading() {
 }
 
 const ENDPOINT = apiEndpoint || 'https://api.openai.com/v1/chat/completions';
-const TOKENS_REGEX = /\S+/g;
 
 function getTokenCount(text) {
-  return (text.match(TOKENS_REGEX) || []).length;
+  const words = text.trim().split(/\s+/);
+  return words.length;
 }
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
