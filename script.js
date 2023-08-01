@@ -1,4 +1,3 @@
-// Cache frequently accessed DOM elements
 const chatHistory = document.getElementById('chat-history');
 const apiKeyInput = document.getElementById('api-key-input');
 const apiEndpointInput = document.getElementById('api-endpoint-input');
@@ -6,8 +5,6 @@ const messageInput = document.getElementById('message-input');
 const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
-
-// Cache regex and constants
 const codeBlockRegex = /```(.*?)```/gs;
 const MAX_TOKENS_BY_MODEL = {
   'gpt-3.5-turbo': 4096,
@@ -22,51 +19,39 @@ const MAX_TOKENS_BY_MODEL = {
   'llama-2-70b-chat': 4096,
 };
 
-// Initialize variables
-let messages = [
-  {
-    role: 'system',
-    content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
-  },
-];
+let messages = [{
+  role: 'system',
+  content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
+}];
+
 let apiKey = localStorage.getItem('apiKey') || '';
 let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
 let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
 
-// Set initial values for input elements
 apiKeyInput.value = apiKey;
 apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
 
-// Set event listeners
-messageInput.addEventListener('input', adjustMessageInputHeight);
-messageInput.addEventListener('keydown', handleEnterKey);
-document.getElementById('send-button').addEventListener('click', sendMessage);
-document.getElementById('copy-button').addEventListener('click', copyLatestResponse);
-systemRoleInput.addEventListener('input', updateSystemRole);
-
-// Function to adjust the height of the message input box
-function adjustMessageInputHeight() {
+messageInput.addEventListener('input', () => {
   messageInput.style.height = 'auto';
   messageInput.style.height = `${messageInput.scrollHeight}px`;
-}
+});
 
-// Function to handle the Enter key in the message input box
-function handleEnterKey(event) {
+messageInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     messageInput.value += '\n';
-    adjustMessageInputHeight();
+    messageInput.style.height = `${messageInput.scrollHeight}px`;
   }
-}
+});
 
-// Function to toggle the model menu
+document.getElementById('send-button').addEventListener('click', sendMessage);
+
 function toggleModelMenu() {
-  modelMenu.style.display = (modelMenu.style.display === 'none') ? 'block' : 'none';
+  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
 }
 
-// Function to select a model
 function selectModel(model) {
   const modelOptions = document.querySelectorAll('ul li');
   modelOptions.forEach((option) => option.classList.remove('selected'));
@@ -83,22 +68,18 @@ function selectModel(model) {
   updateModelHeading();
 }
 
-// Function to update the model heading
 function updateModelHeading() {
   const modelHeading = document.querySelector('h1');
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
 
-// API endpoint
 const ENDPOINT = apiEndpoint || 'https://api.openai.com/v1/chat/completions';
+const TOKENS_REGEX = /\S+/g;
 
-// Function to count the number of tokens in a text
 function getTokenCount(text) {
-  const words = text.trim().split(/\s+/);
-  return words.length;
+  return (text.match(TOKENS_REGEX) || []).length;
 }
 
-// Function to get the bot's response
 async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
     'Content-Type': 'application/json',
@@ -140,7 +121,6 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   return response.json();
 }
 
-// Function to extract and format code blocks from the bot's response
 function extractCodeBlocks(response) {
   const codeBlocks = response.match(codeBlockRegex);
   if (codeBlocks) {
@@ -151,7 +131,6 @@ function extractCodeBlocks(response) {
   return response;
 }
 
-// Function to create the UI for a code block
 function createCodeBlockUI(codeBlock) {
   const preElement = document.createElement('pre');
   preElement.textContent = codeBlock.replace(/```/g, '');
@@ -163,15 +142,11 @@ function createCodeBlockUI(codeBlock) {
   const copyCodeButton = document.createElement('button');
   copyCodeButton.classList.add('copy-code-button');
   copyCodeButton.textContent = 'Copy The Code';
-  copyCodeButton.addEventListener('click', () => {
-    copyToClipboard(codeBlock.replace(/```/g, ''));
-  });
   codeBlockElement.appendChild(copyCodeButton);
 
   return codeBlockElement.outerHTML;
 }
 
-// Function to create and append a message to the chat history
 async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
@@ -191,7 +166,6 @@ async function createAndAppendMessage(content, owner) {
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
 }
 
-// Function to parse and format the bot's response
 function parseResponse(response) {
   let parsedResponse = response;
 
@@ -203,13 +177,11 @@ function parseResponse(response) {
   return parsedResponse;
 }
 
-// Function to parse and format tables in the bot's response
 function parseTables(response) {
   const tableRegex = /\n((?:\s*:?[\|:].*\|\n)+)\n/g;
   return response.replace(tableRegex, createTable);
 }
 
-// Function to create a table from a match
 function createTable(match, table) {
   const rows = table.trim().split('\n');
   const tableElement = document.createElement('table');
@@ -239,7 +211,6 @@ function createTable(match, table) {
   return tableElement.outerHTML;
 }
 
-// Function to handle sending a user message
 async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
@@ -268,18 +239,6 @@ async function sendMessage() {
   createAndAppendMessage(botResponse, 'bot');
 }
 
-// Function to copy the latest response to the clipboard
-function copyLatestResponse() {
-  const latestResponse = chatHistory.lastElementChild.innerHTML;
-  if (latestResponse) {
-    copyToClipboard(latestResponse);
-    alert('Text copied to clipboard');
-  } else {
-    alert('No text to copy');
-  }
-}
-
-// Function to copy text to the clipboard
 function copyToClipboard(text) {
   const textarea = document.createElement('textarea');
   textarea.value = text;
@@ -289,11 +248,20 @@ function copyToClipboard(text) {
   document.body.removeChild(textarea);
 }
 
-// Function to update the system role
-function updateSystemRole() {
+document.getElementById('copy-button').addEventListener('click', () => {
+  const latestResponse = chatHistory.lastElementChild.innerHTML;
+  if (latestResponse) {
+    copyToClipboard(latestResponse);
+    alert('Text copied to clipboard');
+  } else {
+    alert('No text to copy');
+  }
+});
+
+systemRoleInput.value = localStorage.getItem('systemRole') || 'You are a helpful assistant.';
+systemRoleInput.addEventListener('input', () => {
   localStorage.setItem('systemRole', systemRoleInput.value);
   messages[0].content = systemRoleInput.value;
-}
+});
 
-// Update the model heading on page load
 window.addEventListener('load', updateModelHeading);
