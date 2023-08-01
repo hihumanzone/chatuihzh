@@ -82,7 +82,7 @@ function getTokenCount(text) {
   return words.length;
 }
 
-async function getBotResponse(apiKey, message) {
+async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
@@ -118,12 +118,9 @@ async function getBotResponse(apiKey, message) {
     body: JSON.stringify(data),
   });
 
-  if (response.status !== 200) {
-    aiThinkingMsg.style.display = 'none';
-    throw new Error(`Failed to fetch bot response: ${response.statusText}`);
-  }
+  aiThinkingMsg.style.display = 'none';
 
-  return response.body;
+  return response.json();
 }
 
 function extractCodeBlocks(response) {
@@ -218,6 +215,7 @@ function createTable(match, table) {
 
 async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
   const message = messageInput.value.trim();
 
   if (!apiKey || !message) {
@@ -226,54 +224,21 @@ async function sendMessage() {
   }
 
   localStorage.setItem('apiKey', apiKey);
+  localStorage.setItem('apiEndpoint', apiEndpoint);
 
   createAndAppendMessage(message, 'user');
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
-  try {
-    const response = await getBotResponse(apiKey, message);
-    const decoder = new TextDecoder();
-    const reader = response.getReader();
-    let buffer = '';
-    let done = false;
+  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
 
-    while (!done) {
-      const { value, done: isDone } = await reader.read();
-      buffer += decoder.decode(value);
-      done = isDone;
+  const botResponse = jsonResponse.choices[0].message.content;
+  messages.push({
+    role: 'assistant',
+    content: botResponse,
+  });
 
-      while (buffer.includes('\n\n')) {
-        const eventIndex = buffer.indexOf('\n\n');
-        const eventData = buffer.slice(0, eventIndex);
-        buffer = buffer.slice(eventIndex + 2);
-
-        processEventData(eventData);
-      }
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    aiThinkingMsg.style.display = 'none';
-  }
-}
-
-function processEventData(eventData) {
-  const eventLines = eventData.split('\n');
-  const eventType = eventLines.shift();
-
-  if (eventType === 'data') {
-    const response = JSON.parse(eventLines.join('\n')).choices[0].message.content;
-    messages.push({
-      role: 'assistant',
-      content: response,
-    });
-    createAndAppendMessage(response, 'bot');
-  } else if (eventType === 'error') {
-    const errorMessage = JSON.parse(eventLines.join('\n')).details;
-    console.error(errorMessage);
-  } else {
-    console.log('Received event:', eventData);
-  }
+  createAndAppendMessage(botResponse, 'bot');
 }
 
 function copyToClipboard(text) {
