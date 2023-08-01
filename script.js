@@ -85,7 +85,7 @@ function getTokenCount(text) {
 async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${apiKey}`
+    Authorization: `Bearer ${apiKey}`,
   };
 
   const maxTokens = MAX_TOKENS_BY_MODEL[selectedModel] || 4096;
@@ -102,20 +102,20 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 
   messages.push({
     role: 'user',
-    content: message
+    content: message,
   });
 
   aiThinkingMsg.style.display = 'block';
 
   const data = {
     model: selectedModel,
-    messages: messages
+    messages: messages,
   };
 
   const response = await fetch(ENDPOINT, {
     method: 'POST',
     headers: headers,
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   });
 
   aiThinkingMsg.style.display = 'none';
@@ -180,58 +180,37 @@ function parseResponse(response) {
 }
 
 function parseTables(response) {
-  const tableRegexes = [
-    /\|([^\r\n|]*)\|/g,
-    /:?(?:---+|—+)/g
-  ];
+  const tableRegex = /\n((?:\s*:?[\|:].*\|\n)+)\n/g;
+  return response.replace(tableRegex, createTable);
+}
 
-  const tableMatches = tableRegexes.map((regex) => response.matchAll(regex));
-  if (tableMatches.some((matches) => !matches || matches.length === 0)) {
-    return response;
+function createTable(match, table) {
+  const rows = table.trim().split('\n');
+  const tableElement = document.createElement('table');
+
+  const tableHeader = document.createElement('tr');
+  const tableHeaderCells = rows[0].split('|').slice(1, -1);
+  tableHeaderCells.forEach((cell) => {
+    const th = document.createElement('th');
+    th.classList.add('table-header');
+    th.textContent = cell.trim();
+    tableHeader.appendChild(th);
+  });
+  tableElement.appendChild(tableHeader);
+
+  for (let i = 2; i < rows.length; i++) {
+    const row = document.createElement('tr');
+    const tableCells = rows[i].split('|').slice(1, -1);
+    tableCells.forEach((cell) => {
+      const td = document.createElement('td');
+      td.classList.add('table-data');
+      td.innerHTML = parseResponse(cell.trim());
+      row.appendChild(td);
+    });
+    tableElement.appendChild(row);
   }
 
-  const tableElements = tableMatches.map((matches) => {
-    const iterator = matches[Symbol.iterator]();
-    const [headerRow, ...contentRows] = iterator;
-
-    const headerCells = Array.from(headerRow).slice(1, -1).map((cell) => cell.trim());
-    const tableElement = document.createElement('table');
-    const thead = document.createElement('thead');
-    const tbody = document.createElement('tbody');
-
-    const tableHeader = document.createElement('tr');
-    headerCells.forEach((headerCell) => {
-      const th = document.createElement('th');
-      th.classList.add('table-header');
-      th.textContent = headerCell;
-      tableHeader.appendChild(th);
-    });
-
-    thead.appendChild(tableHeader);
-    tableElement.appendChild(thead);
-
-    for (const contentRow of contentRows) {
-      const rowCells = Array.from(contentRow).slice(1, -1).map((cell) => cell.trim());
-      const tr = document.createElement('tr');
-      rowCells.forEach((rowCell) => {
-        const td = document.createElement('td');
-        td.classList.add('table-data');
-        td.innerHTML = parseResponse(rowCell);
-        tr.appendChild(td);
-      });
-      tbody.appendChild(tr);
-    }
-
-    tableElement.appendChild(tbody);
-    return tableElement;
-  });
-
-  let tableIndex = 0;
-  return response.replace(new RegExp(tableRegexes.map((regex) => regex.source).join('|'), 'g'), () => {
-    const tableElement = tableElements[tableIndex];
-    tableIndex++;
-    return tableElement.outerHTML;
-  });
+  return tableElement.outerHTML;
 }
 
 async function sendMessage() {
