@@ -179,22 +179,12 @@ function parseResponse(response) {
   return parsedResponse;
 }
 
-
-
-async function sendMessage() {
-  apiKey = apiKeyInput.value.trim();
-  apiEndpoint = apiEndpointInput.value.trim();
-  const message = messageInput.value.trim();
-
-  if (!apiKey || !message) {
-    alert('Please enter your API key and a message.');
-    return;
-  function parseTables(response) {
-  const tableRegex = /\n((?:\|(?:-+:?)+\|?)\n((?:\s*:?[\|:].*\|\n?)+))\n/g;
+function parseTables(response) {
+  const tableRegex = /\n((?:\s*:?[\|:].*\|\n)+)\n/g;
   return response.replace(tableRegex, createTable);
 }
 
-function createTable(match, separator, table) {
+function createTable(match, table) {
   const rows = table.trim().split('\n');
   const tableElement = document.createElement('table');
 
@@ -222,6 +212,16 @@ function createTable(match, separator, table) {
 
   return tableElement.outerHTML;
 }
+
+async function sendMessage() {
+  apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
+  const message = messageInput.value.trim();
+
+  if (!apiKey || !message) {
+    alert('Please enter your API key and a message.');
+    return;
+  }
 
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
