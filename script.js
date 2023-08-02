@@ -250,6 +250,10 @@ function copyToClipboard(text) {
   document.body.removeChild(textarea);
 }
 
+function clearChatHistory() {
+  chatHistory.innerHTML = '';
+}
+
 document.getElementById('copy-button').addEventListener('click', () => {
   const latestResponse = chatHistory.lastElementChild.innerHTML;
   if (latestResponse) {
