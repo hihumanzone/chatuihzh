@@ -180,13 +180,12 @@ function parseResponse(response) {
 }
 
 function parseTables(response) {
-  const tableRegex = /\n((?:\s*[:|-]*\|[:|-]*.*\|\n)+)\n/g;
+  const tableRegex = /\n((?:\s*:?[\|:].*\|\n)+)\n/g;
   return response.replace(tableRegex, createTable);
 }
 
 function createTable(match, table) {
-  let rows = table.trim().split('\n');
-  rows = rows.filter(row => !row.match(/[-|:]+/));
+  const rows = table.trim().split('\n');
   const tableElement = document.createElement('table');
 
   const tableHeader = document.createElement('tr');
@@ -199,7 +198,7 @@ function createTable(match, table) {
   });
   tableElement.appendChild(tableHeader);
 
-  for (let i = 1; i < rows.length; i++) {
+  for (let i = 2; i < rows.length; i++) {
     const row = document.createElement('tr');
     const tableCells = rows[i].split('|').slice(1, -1);
     tableCells.forEach((cell) => {
