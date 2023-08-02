@@ -5,6 +5,7 @@ const messageInput = document.getElementById('message-input');
 const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
+const clearHistoryButton = document.getElementById('clear-history');
 const codeBlockRegex = /```(.*?)```/gs;
 const MAX_TOKENS_BY_MODEL = {
   'gpt-3.5-turbo': 4096,
@@ -250,10 +251,6 @@ function copyToClipboard(text) {
   document.body.removeChild(textarea);
 }
 
-function clearChatHistory() {
-  chatHistory.innerHTML = '';
-}
-
 document.getElementById('copy-button').addEventListener('click', () => {
   const latestResponse = chatHistory.lastElementChild.innerHTML;
   if (latestResponse) {
@@ -262,6 +259,10 @@ document.getElementById('copy-button').addEventListener('click', () => {
   } else {
     alert('No text to copy');
   }
+});
+
+clearHistoryButton.addEventListener('click', () => {
+  chatHistory.innerHTML = '';
 });
 
 systemRoleInput.value = localStorage.getItem('systemRole') || '';
