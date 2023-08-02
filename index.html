@@ -33,10 +33,10 @@
       <h3>API Key:</h3>
       <input type="password" id="api-key-input" placeholder="Enter your API key">
       <h3>API Endpoint:</h3>
-      <input id="api-endpoint-input" placeholder="Enter the API endpoint (optional)"> <br> <br> <br> <br> <br>
-      <button id="clear-history" style="margin-top: 10px;">Clear Chat History</button>
+      <input id="api-endpoint-input" placeholder="Enter the API endpoint (optional)"> <br> <br> <br> <br>
     </div>
     <button id="copy-button">Copy Latest Message</button>
+    <button id="clear-button">Clear Chat History</button>
     <div id="chat-history">
       <div id="ai-thinking" style="display: none;">
         <h4>AI is thinking...</h4>
@@ -73,9 +73,8 @@
           copyToClipboard(codeBlock.textContent);
           alert('Code copied to clipboard');
         }
-      }
-      else if (target.id === 'clear-history') {
-        chatHistory.innerHTML = '';
+      } else if (target.id === 'clear-button') {
+        clearChatHistory();
       }
     });
   </script>
