@@ -22,12 +22,12 @@ const MAX_TOKENS_BY_MODEL = {
 let messages = [
   {
     role: 'system',
-    content: '',
+    content: localStorage.getItem('systemRole') || '',
   },
 ];
 
-let apiKey = '';
-let apiEndpoint = '';
+let apiKey = localStorage.getItem('apiKey') || '';
+let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
 let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
 
 apiKeyInput.value = apiKey;
@@ -260,7 +260,9 @@ document.getElementById('copy-button').addEventListener('click', () => {
   }
 });
 
+systemRoleInput.value = localStorage.getItem('systemRole') || '';
 systemRoleInput.addEventListener('input', () => {
+  localStorage.setItem('systemRole', systemRoleInput.value);
   messages[0].content = systemRoleInput.value;
 });
 
