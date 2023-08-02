@@ -33,8 +33,8 @@
       <h3>API Key:</h3>
       <input type="password" id="api-key-input" placeholder="Enter your API key">
       <h3>API Endpoint:</h3>
-      <input id="api-endpoint-input" placeholder="Enter the API endpoint (optional)"> <br> <br> 
-      <button id="clear-button">Clear Chat History</button> <br> <br>
+      <input id="api-endpoint-input" placeholder="Enter the API endpoint (optional)"> <br> <br> <br> <br> <br>
+      <button id="clear-history" style="margin-top: 10px;">Clear Chat History</button>
     </div>
     <button id="copy-button">Copy Latest Message</button>
     <div id="chat-history">
@@ -74,8 +74,8 @@
           alert('Code copied to clipboard');
         }
       }
-      else if (target.id === 'clear-button') {
-        clearChatHistory();
+      else if (target.id === 'clear-history') {
+        chatHistory.innerHTML = '';
       }
     });
   </script>
