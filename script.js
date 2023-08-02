@@ -22,12 +22,12 @@ const MAX_TOKENS_BY_MODEL = {
 let messages = [
   {
     role: 'system',
-    content: localStorage.getItem('systemRole') || 'You are a helpful assistant.',
+    content: '',
   },
 ];
 
-let apiKey = localStorage.getItem('apiKey') || '';
-let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
+let apiKey = '';
+let apiEndpoint = '';
 let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
 
 apiKeyInput.value = apiKey;
@@ -218,8 +218,8 @@ async function sendMessage() {
   apiEndpoint = apiEndpointInput.value.trim();
   const message = messageInput.value.trim();
 
-  if (!apiKey || !message) {
-    alert('Please enter your API key and a message.');
+  if (!message) {
+    alert('Please enter a message.');
     return;
   }
 
@@ -260,9 +260,7 @@ document.getElementById('copy-button').addEventListener('click', () => {
   }
 });
 
-systemRoleInput.value = localStorage.getItem('systemRole') || 'You are a helpful assistant.';
 systemRoleInput.addEventListener('input', () => {
-  localStorage.setItem('systemRole', systemRoleInput.value);
   messages[0].content = systemRoleInput.value;
 });
 
