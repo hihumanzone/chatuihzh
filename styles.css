@@ -62,7 +62,7 @@ h4 {
   height: 410px;
   padding: 10px;
   border: 1px solid #2f6058;
-  border-radius: 5px;
+  border-radius: 0px;
   background-color: #191919;
 }
 
@@ -70,7 +70,7 @@ h4 {
 #api-endpoint-input,
 #system-role-input,
 #message-input {
-  margin-top: 10px;
+  margin-top: 0px;
   padding: 5px;
   border: 1px solid #2f6058;
   border-radius: 5px;
