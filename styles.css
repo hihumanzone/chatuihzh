@@ -42,6 +42,11 @@ h4 {
   border-radius: 3px;
 }
 
+#model-list li {
+  border: 1px solid black;
+  width: 100%;
+}
+
 #chat-container {
   display: flex;
   flex-direction: column;
@@ -183,4 +188,4 @@ td:empty {
   border-radius: 5px;
   padding: 5px 10px;
   margin-top: 5px;
-  }
+}
