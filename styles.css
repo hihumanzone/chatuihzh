@@ -43,7 +43,8 @@ h4 {
 }
 
 #model-list li {
-  border: 1px solid #454545;
+  margin-top: 4px;
+  border: 1px solid #62b2a4;
   width: 40%;
 }
 
