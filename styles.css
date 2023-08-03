@@ -70,7 +70,7 @@ h4 {
 #api-endpoint-input,
 #system-role-input,
 #message-input {
-  margin-top: 5px;
+  margin-top: 4px;
   padding: 5px;
   border: 1px solid #2f6058;
   border-radius: 5px;
@@ -88,7 +88,7 @@ h4 {
 #send-button,
 #copy-button,
 #clear-button{
-  margin-top: 4px;
+  margin-top: 8px;
   padding: 5px 10px;
   background-color: #000;
   color: #ffffff;
