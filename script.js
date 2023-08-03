@@ -83,72 +83,44 @@ function getTokenCount(text) {
 }
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
-  try {
-    const headers = {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    };
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${apiKey}`,
+  };
 
-    const maxTokens = MAX_TOKENS_BY_MODEL[selectedModel] || 4096;
+  const maxTokens = MAX_TOKENS_BY_MODEL[selectedModel] || 4096;
 
-    let tokenCount = getTokenCount(messages[0].content);
-    for (let i = 1; i < messages.length; i++) {
-      const messageTokenCount = getTokenCount(messages[i].content);
-      if (tokenCount + messageTokenCount > maxTokens) {
-        messages.splice(i);
-        break;
-      }
-      tokenCount += messageTokenCount;
+  let tokenCount = getTokenCount(messages[0].content);
+  for (let i = 1; i < messages.length; i++) {
+    const messageTokenCount = getTokenCount(messages[i].content);
+    if (tokenCount + messageTokenCount > maxTokens) {
+      messages.splice(i);
+      break;
     }
-
-    messages.push({
-      role: 'user',
-      content: message,
-    });
-
-    aiThinkingMsg.style.display = 'block';
-
-    const data = {
-      model: selectedModel,
-      messages: messages,
-    };
-
-    const response = await fetch(ENDPOINT, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(data),
-    });
-
-    const jsonResponse = await response.json();
-
-    aiThinkingMsg.style.display = 'none';
-
-    if (jsonResponse.choices && jsonResponse.choices.length > 0) {
-      const botResponse = jsonResponse.choices[0].message.content;
-      messages.push({
-        role: 'assistant',
-        content: botResponse,
-      });
-
-      createAndAppendMessage(botResponse, 'bot');
-    } else if (jsonResponse.error) {
-      const errorMessage = jsonResponse.error.message;
-      createAndAppendErrorMessage(errorMessage);
-    }
-  } catch (error) {
-    const errorMessage = error.message;
-    createAndAppendErrorMessage(errorMessage);
+    tokenCount += messageTokenCount;
   }
-}
 
-function createAndAppendErrorMessage(errorMessage) {
-  const message = document.createElement('div');
-  message.classList.add('message', 'error');
-  message.style.color = 'red';
-  message.textContent = errorMessage;
+  messages.push({
+    role: 'user',
+    content: message,
+  });
 
-  chatHistory.appendChild(message);
-  chatHistory.scrollTop = chatHistory.scrollHeight;
+  aiThinkingMsg.style.display = 'block';
+
+  const data = {
+    model: selectedModel,
+    messages: messages,
+  };
+
+  const response = await fetch(ENDPOINT, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify(data),
+  });
+
+  aiThinkingMsg.style.display = 'none';
+
+  return response.json();
 }
 
 function extractCodeBlocks(response) {
@@ -258,7 +230,15 @@ async function sendMessage() {
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
-  await getBotResponse(apiKey, apiEndpoint, message);
+  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
+
+  const botResponse = jsonResponse.choices[0].message.content;
+  messages.push({
+    role: 'assistant',
+    content: botResponse,
+  });
+
+  createAndAppendMessage(botResponse, 'bot');
 }
 
 function copyToClipboard(text) {
