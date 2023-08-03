@@ -180,7 +180,7 @@ function parseResponse(response) {
 }
 
 function parseTables(response) {
-  const tableRegex = /\n((?:\s*:?[\|:].*\|\n)+)\n/g;
+  const tableRegex = /\n((?:\s*:?[\|:].*?:?\|\n)+)\n/g;
   return response.replace(tableRegex, createTable);
 }
 
