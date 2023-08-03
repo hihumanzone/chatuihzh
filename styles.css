@@ -22,7 +22,7 @@ h2 {
   text-align: center;
   color: #ddeeec;
   font-size: 15px;
-  border: 0.8px solid #62b2a4;
+  border: 0.8px solid #267668;
   border-radius: 5px;
 }
 
@@ -45,7 +45,7 @@ h4 {
 #model-list li {
   margin-top: 4px;
   border: 0.6px solid #126254;
-  background-color: #03110F;
+  background-color: #0D1B19;
   border-radius: 5px;
   width: 40%;
 }
