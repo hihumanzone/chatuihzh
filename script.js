@@ -83,44 +83,72 @@ function getTokenCount(text) {
 }
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
-  const headers = {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${apiKey}`,
-  };
+  try {
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    };
 
-  const maxTokens = MAX_TOKENS_BY_MODEL[selectedModel] || 4096;
+    const maxTokens = MAX_TOKENS_BY_MODEL[selectedModel] || 4096;
 
-  let tokenCount = getTokenCount(messages[0].content);
-  for (let i = 1; i < messages.length; i++) {
-    const messageTokenCount = getTokenCount(messages[i].content);
-    if (tokenCount + messageTokenCount > maxTokens) {
-      messages.splice(i);
-      break;
+    let tokenCount = getTokenCount(messages[0].content);
+    for (let i = 1; i < messages.length; i++) {
+      const messageTokenCount = getTokenCount(messages[i].content);
+      if (tokenCount + messageTokenCount > maxTokens) {
+        messages.splice(i);
+        break;
+      }
+      tokenCount += messageTokenCount;
     }
-    tokenCount += messageTokenCount;
+
+    messages.push({
+      role: 'user',
+      content: message,
+    });
+
+    aiThinkingMsg.style.display = 'block';
+
+    const data = {
+      model: selectedModel,
+      messages: messages,
+    };
+
+    const response = await fetch(ENDPOINT, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(data),
+    });
+
+    const jsonResponse = await response.json();
+
+    aiThinkingMsg.style.display = 'none';
+
+    if (jsonResponse.choices && jsonResponse.choices.length > 0) {
+      const botResponse = jsonResponse.choices[0].message.content;
+      messages.push({
+        role: 'assistant',
+        content: botResponse,
+      });
+
+      createAndAppendMessage(botResponse, 'bot');
+    } else if (jsonResponse.error) {
+      const errorMessage = jsonResponse.error.message;
+      createAndAppendErrorMessage(errorMessage);
+    }
+  } catch (error) {
+    const errorMessage = error.message;
+    createAndAppendErrorMessage(errorMessage);
   }
+}
 
-  messages.push({
-    role: 'user',
-    content: message,
-  });
+function createAndAppendErrorMessage(errorMessage) {
+  const message = document.createElement('div');
+  message.classList.add('message', 'error');
+  message.style.color = 'red';
+  message.textContent = errorMessage;
 
-  aiThinkingMsg.style.display = 'block';
-
-  const data = {
-    model: selectedModel,
-    messages: messages,
-  };
-
-  const response = await fetch(ENDPOINT, {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify(data),
-  });
-
-  aiThinkingMsg.style.display = 'none';
-
-  return response.json();
+  chatHistory.appendChild(message);
+  chatHistory.scrollTop = chatHistory.scrollHeight;
 }
 
 function extractCodeBlocks(response) {
@@ -230,15 +258,7 @@ async function sendMessage() {
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
-  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
-
-  const botResponse = jsonResponse.choices[0].message.content;
-  messages.push({
-    role: 'assistant',
-    content: botResponse,
-  });
-
-  createAndAppendMessage(botResponse, 'bot');
+  await getBotResponse(apiKey, apiEndpoint, message);
 }
 
 function copyToClipboard(text) {
