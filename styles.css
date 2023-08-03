@@ -23,7 +23,6 @@ h2 {
   color: #ddeeec;
   font-size: 15px;
   border: 0.8px solid #62b2a4;
-  background-color: #03110F;
   border-radius: 5px;
 }
 
@@ -46,6 +45,7 @@ h4 {
 #model-list li {
   margin-top: 4px;
   border: 0.6px solid #126254;
+  background-color: #03110F;
   border-radius: 5px;
   width: 40%;
 }
