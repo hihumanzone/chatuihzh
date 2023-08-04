@@ -94,7 +94,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   for (let i = 1; i < messages.length; i++) {
     const messageTokenCount = getTokenCount(messages[i].content);
     if (tokenCount + messageTokenCount > maxTokens) {
-      messages.splice(i);
+      messages.splice(i, 1);
       break;
     }
     tokenCount += messageTokenCount;
