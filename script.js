@@ -63,18 +63,6 @@ function updateModelHeading() {
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
 
-function applyValues() {
-  apiKey = apiKeyInput.value.trim();
-  apiEndpoint = apiEndpointInput.value.trim();
-  const systemRoleValue = systemRoleInput.value.trim();
-  
-  localStorage.setItem('apiKey', apiKey);
-  localStorage.setItem('apiEndpoint', apiEndpoint);
-  localStorage.setItem('systemRole', systemRoleValue);
-  
-  messages[0].content = systemRoleValue;
-}
-
 const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
@@ -197,14 +185,17 @@ function createTable(match, table) {
 }
 
 async function sendMessage() {
-  applyValues();
-  
+  apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
   const message = messageInput.value.trim();
 
   if (!message) {
     alert('Please enter a message.');
     return;
   }
+
+  localStorage.setItem('apiKey', apiKey);
+  localStorage.setItem('apiEndpoint', apiEndpoint);
 
   createAndAppendMessage(message, 'user');
   messageInput.value = '';
@@ -251,6 +242,9 @@ document.getElementById('copy-button').addEventListener('click', () => {
 });
 
 systemRoleInput.value = localStorage.getItem('systemRole') || '';
-systemRoleInput.addEventListener('input', applyValues);
+systemRoleInput.addEventListener('input', () => {
+  localStorage.setItem('systemRole', systemRoleInput.value);
+  messages[0].content = systemRoleInput.value;
+});
 
 window.addEventListener('load', updateModelHeading);
