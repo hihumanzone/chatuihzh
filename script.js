@@ -15,11 +15,8 @@ let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
 apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
-
 messageInput.addEventListener('input', adjustHeight);
-
 messageInput.addEventListener('keydown', handleKeyDown);
-
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
 function adjustHeight() {
