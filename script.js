@@ -194,6 +194,9 @@ async function sendMessage() {
     return;
   }
 
+  localStorage.setItem('apiKey', apiKey);
+  localStorage.setItem('apiEndpoint', apiEndpoint);
+
   createAndAppendMessage(message, 'user');
   messageInput.value = '';
   messageInput.style.height = 'auto';
@@ -240,27 +243,8 @@ document.getElementById('copy-button').addEventListener('click', () => {
 
 systemRoleInput.value = localStorage.getItem('systemRole') || '';
 systemRoleInput.addEventListener('input', () => {
+  localStorage.setItem('systemRole', systemRoleInput.value);
   messages[0].content = systemRoleInput.value;
 });
-
-document.getElementById('system-role-save-button').addEventListener('click', saveSystemRole);
-
-function saveSystemRole() {
-  localStorage.setItem('systemRole', systemRoleInput.value);
-}
-
-document.getElementById('api-key-save-button').addEventListener('click', saveApiKey);
-
-function saveApiKey() {
-  apiKey = apiKeyInput.value.trim();
-  localStorage.setItem('apiKey', apiKey);
-}
-
-document.getElementById('api-endpoint-save-button').addEventListener('click', saveApiEndpoint);
-
-function saveApiEndpoint() {
-  apiEndpoint = apiEndpointInput.value.trim();
-  localStorage.setItem('apiEndpoint', apiEndpoint);
-}
 
 window.addEventListener('load', updateModelHeading);
