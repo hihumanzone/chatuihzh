@@ -247,4 +247,16 @@ systemRoleInput.addEventListener('input', () => {
   messages[0].content = systemRoleInput.value;
 });
 
+document.getElementById('system-role-save-button').addEventListener('click', () => {
+  localStorage.setItem('systemRole', systemRoleInput.value);
+});
+
+document.getElementById('api-key-save-button').addEventListener('click', () => {
+  localStorage.setItem('apiKey', apiKeyInput.value);
+});
+
+document.getElementById('api-endpoint-save-button').addEventListener('click', () => {
+  localStorage.setItem('apiEndpoint', apiEndpointInput.value);
+});
+
 window.addEventListener('load', updateModelHeading);
