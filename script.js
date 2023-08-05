@@ -6,13 +6,19 @@ const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 const codeBlockRegex = /```(.*?)```/gs;
-const role = localStorage.getItem('systemRole') || '';
-const messages = [{ role: 'system', content: role }];
+
+let messages = [
+  {
+    role: 'system',
+    content: localStorage.getItem('systemRole') || '',
+  },
+];
+
 let apiKey = localStorage.getItem('apiKey') || '';
 let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
 let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
-const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
 
+apiKeyInput.value = apiKey;
 apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
@@ -56,6 +62,8 @@ function updateModelHeading() {
   const modelHeading = document.querySelector('h1');
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
+
+const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
