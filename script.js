@@ -248,3 +248,15 @@ systemRoleInput.addEventListener('input', () => {
 });
 
 window.addEventListener('load', updateModelHeading);
+
+function saveInputsAndRefresh() {
+  apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
+
+  localStorage.setItem('apiKey', apiKey);
+  localStorage.setItem('apiEndpoint', apiEndpoint);
+
+  location.reload();
+}
+
+document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
