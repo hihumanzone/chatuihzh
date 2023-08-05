@@ -15,22 +15,21 @@ let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
 apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
-messageInput.addEventListener('input', adjustHeight);
-messageInput.addEventListener('keydown', handleKeyDown);
-document.getElementById('send-button').addEventListener('click', sendMessage);
 
-function adjustHeight() {
+messageInput.addEventListener('input', () => {
   messageInput.style.height = 'auto';
   messageInput.style.height = `${messageInput.scrollHeight}px`;
-}
+});
 
-function handleKeyDown(event) {
+messageInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     messageInput.value += '\n';
-    adjustHeight();
+    messageInput.style.height = `${messageInput.scrollHeight}px`;
   }
-}
+});
+
+document.getElementById('send-button').addEventListener('click', sendMessage);
 
 function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
