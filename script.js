@@ -6,33 +6,34 @@ const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 const codeBlockRegex = /```(.*?)```/gs;
-
 const role = localStorage.getItem('systemRole') || '';
 const messages = [{ role: 'system', content: role }];
-
 let apiKey = localStorage.getItem('apiKey') || '';
 let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
 let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
 
-apiKeyInput.value = apiKey;
 apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
 
-messageInput.addEventListener('input', () => {
+messageInput.addEventListener('input', adjustHeight);
+
+messageInput.addEventListener('keydown', handleKeyDown);
+
+document.getElementById('send-button').addEventListener('click', sendMessage);
+
+function adjustHeight() {
   messageInput.style.height = 'auto';
   messageInput.style.height = `${messageInput.scrollHeight}px`;
-});
+}
 
-messageInput.addEventListener('keydown', (event) => {
+function handleKeyDown(event) {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     messageInput.value += '\n';
-    messageInput.style.height = `${messageInput.scrollHeight}px`;
+    adjustHeight();
   }
-});
-
-document.getElementById('send-button').addEventListener('click', sendMessage);
+}
 
 function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
