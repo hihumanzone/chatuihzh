@@ -5,14 +5,13 @@ const messageInput = document.getElementById('message-input');
 const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
+
 const codeBlockRegex = /```(.*?)```/gs;
 
-let messages = [
-  {
-    role: 'system',
-    content: localStorage.getItem('systemRole') || '',
-  },
-];
+let messages = [{
+  role: 'system',
+  content: localStorage.getItem('systemRole') || '',
+}];
 
 let apiKey = localStorage.getItem('apiKey') || '';
 let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
@@ -23,10 +22,26 @@ apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
 
-messageInput.addEventListener('input', adjustInputHeight);
-messageInput.addEventListener('keydown', handleEnterKey);
-
+messageInput.addEventListener('input', handleInput);
+messageInput.addEventListener('keydown', handleKeyDown);
 document.getElementById('send-button').addEventListener('click', sendMessage);
+document.getElementById('copy-button').addEventListener('click', copyToClipboard);
+systemRoleInput.addEventListener('input', handleSystemRoleInput);
+
+const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
+
+function handleInput() {
+  messageInput.style.height = 'auto';
+  messageInput.style.height = `${messageInput.scrollHeight}px`;
+}
+
+function handleKeyDown(event) {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    messageInput.value += '\n';
+    messageInput.style.height = `${messageInput.scrollHeight}px`;
+  }
+}
 
 function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
@@ -34,7 +49,7 @@ function toggleModelMenu() {
 
 function selectModel(model) {
   const modelOptions = document.querySelectorAll('ul li');
-  modelOptions.forEach((option) => option.classList.remove('selected'));
+  modelOptions.forEach(option => option.classList.remove('selected'));
 
   const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
   if (selectedModelOption) {
@@ -52,8 +67,6 @@ function updateModelHeading() {
   const modelHeading = document.querySelector('h1');
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
-
-const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
@@ -87,9 +100,9 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 function extractCodeBlocks(response) {
   const codeBlocks = response.match(codeBlockRegex);
   if (codeBlocks) {
-    for (let i = 0; i < codeBlocks.length; i++) {
-      response = response.replace(codeBlocks[i], createCodeBlockUI(codeBlocks[i]));
-    }
+    codeBlocks.forEach(codeBlock => {
+      response = response.replace(codeBlock, createCodeBlockUI(codeBlock));
+    });
   }
   return response;
 }
@@ -151,23 +164,23 @@ function createTable(match, table) {
 
   const tableHeader = document.createElement('tr');
   const tableHeaderCells = rows[0].split('|').slice(1, -1);
-  for (let i = 0; i < tableHeaderCells.length; i++) {
+  tableHeaderCells.forEach(cell => {
     const th = document.createElement('th');
     th.classList.add('table-header');
-    th.textContent = tableHeaderCells[i].trim();
+    th.textContent = cell.trim();
     tableHeader.appendChild(th);
-  }
+  });
   tableElement.appendChild(tableHeader);
 
   for (let i = 2; i < rows.length; i++) {
     const row = document.createElement('tr');
     const tableCells = rows[i].split('|').slice(1, -1);
-    for (let j = 0; j < tableCells.length; j++) {
+    tableCells.forEach(cell => {
       const td = document.createElement('td');
       td.classList.add('table-data');
-      td.innerHTML = parseResponse(tableCells[j].trim());
+      td.innerHTML = parseResponse(cell.trim());
       row.appendChild(td);
-    }
+    });
     tableElement.appendChild(row);
   }
 
@@ -187,7 +200,7 @@ async function sendMessage() {
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
 
-  createAndAppendMessage(message, 'user');
+  await createAndAppendMessage(message, 'user');
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
@@ -199,55 +212,35 @@ async function sendMessage() {
     content: botResponse,
   });
 
-  createAndAppendMessage(botResponse, 'bot');
+  await createAndAppendMessage(botResponse, 'bot');
 }
 
-function copyToClipboard(text) {
-  const textarea = document.createElement('textarea');
-  textarea.value = text;
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand('copy');
-  document.body.removeChild(textarea);
-}
-
-function clearChatHistory() {
-  chatHistory.innerHTML = '';
-  messages = [
-    {
-      role: 'system',
-      content: localStorage.getItem('systemRole') || '',
-    },
-  ];
-}
-
-document.getElementById('copy-button').addEventListener('click', () => {
+function copyToClipboard() {
   const latestResponse = chatHistory.lastElementChild.innerHTML;
   if (latestResponse) {
-    copyToClipboard(latestResponse);
+    const textarea = document.createElement('textarea');
+    textarea.value = latestResponse;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
     alert('Text copied to clipboard');
   } else {
     alert('No text to copy');
   }
-});
+}
 
-systemRoleInput.value = localStorage.getItem('systemRole') || '';
-systemRoleInput.addEventListener('input', () => {
+function handleSystemRoleInput() {
   localStorage.setItem('systemRole', systemRoleInput.value);
   messages[0].content = systemRoleInput.value;
-});
+}
+
+function clearChatHistory() {
+  chatHistory.innerHTML = '';
+  messages = [{
+    role: 'system',
+    content: localStorage.getItem('systemRole') || '',
+  }];
+}
 
 window.addEventListener('load', updateModelHeading);
-
-function adjustInputHeight() {
-  messageInput.style.height = 'auto';
-  messageInput.style.height = `${messageInput.scrollHeight}px`;
-}
-
-function handleEnterKey(event) {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    messageInput.value += '\n';
-    adjustInputHeight();
-  }
-}
