@@ -63,8 +63,6 @@ function updateModelHeading() {
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
 
-const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
-
 async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
     'Content-Type': 'application/json',
@@ -83,7 +81,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     messages: messages,
   };
 
-  const response = await fetch(ENDPOINT, {
+  const response = await fetch(apiEndpoint, {
     method: 'POST',
     headers: headers,
     body: JSON.stringify(data),
