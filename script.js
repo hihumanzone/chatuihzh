@@ -7,12 +7,8 @@ const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 const codeBlockRegex = /```(.*?)```/gs;
 
-let messages = [
-  {
-    role: 'system',
-    content: localStorage.getItem('systemRole') || '',
-  },
-];
+const role = localStorage.getItem('systemRole') || '';
+const messages = [{ role: 'system', content: role }];
 
 let apiKey = localStorage.getItem('apiKey') || '';
 let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
