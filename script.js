@@ -6,17 +6,6 @@ const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 const codeBlockRegex = /```(.*?)```/gs;
-const MAX_TOKENS_BY_MODEL = {
-  'gpt-3.5-turbo': 4096,
-  'gpt-3.5-turbo-0613': 4096,
-  'gpt-3.5-turbo-16k': 16384,
-  'gpt-3.5-turbo-16k-0613': 16384,
-  'gpt-4-0613': 8192,
-  'gpt-4': 8192,
-  'gpt-4-32k': 32768,
-  'gpt-4-32k-0613': 32768,
-  'llama-2-70b-chat': 4096,
-};
 
 let messages = [
   {
@@ -76,28 +65,11 @@ function updateModelHeading() {
 
 const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
 
-function getTokenCount(text) {
-  const words = text.trim().split(/\s+/);
-  return words.length;
-}
-
 async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
   };
-
-  const maxTokens = MAX_TOKENS_BY_MODEL[selectedModel] || 4096;
-
-  let tokenCount = getTokenCount(messages[0].content);
-  for (let i = 1; i < messages.length; i++) {
-    const messageTokenCount = getTokenCount(messages[i].content);
-    if (tokenCount + messageTokenCount > maxTokens) {
-      messages.splice(i, 1);
-      break;
-    }
-    tokenCount += messageTokenCount;
-  }
 
   messages.push({
     role: 'user',
