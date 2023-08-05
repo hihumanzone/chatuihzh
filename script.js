@@ -36,7 +36,9 @@ messageInput.addEventListener('keydown', (event) => {
   }
 });
 
-document.getElementById('send-button').addEventListener('click', sendMessage);
+document.getElementById('send-button').addEventListener('click', async () => {
+  await sendMessage(apiKey, apiEndpoint);
+});
 
 function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
@@ -182,7 +184,7 @@ function createTable(match, table) {
   return tableElement.outerHTML;
 }
 
-async function sendMessage() {
+async function sendMessage(apiKey, apiEndpoint) {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
   const message = messageInput.value.trim();
