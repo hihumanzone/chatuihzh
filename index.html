@@ -34,8 +34,8 @@
       <input type="password" id="api-key-input" placeholder="Enter your API key">
       <button id="api-key-save-button">Save</button>
       <h3>API Endpoint:</h3>
-      <input id="api-endpoint-input" placeholder="Enter the API endpoint (optional)"> <br> <br> <br> <br>
-      <button id="api-endpoint-save-button">Save</button>
+      <input id="api-endpoint-input" placeholder="Enter the API endpoint (optional)">
+      <button id="api-endpoint-save-button">Save</button> <br> <br> <br> <br>
     </div>
     <button id="clear-button">Clear Chat History</button>
     <button id="copy-button">Copy Latest Message</button>
@@ -77,6 +77,12 @@
         }
       } else if (target.id === 'clear-button') {
         clearChatHistory();
+      } else if (target.id === 'api-key-save-button') {
+          saveApiKey();
+      } else if (target.id === 'api-endpoint-save-button') {
+          saveApiEndpoint();
+      } else if (target.id === 'system-role-save-button') {
+          saveSystemRole();
       }
     });
   </script>
