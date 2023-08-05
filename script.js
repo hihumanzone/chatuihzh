@@ -7,10 +7,12 @@ const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 const codeBlockRegex = /```(.*?)```/gs;
 
-let messages = [{
-  role: 'system',
-  content: localStorage.getItem('systemRole') || '',
-}];
+let messages = [
+  {
+    role: 'system',
+    content: localStorage.getItem('systemRole') || '',
+  },
+];
 
 let apiKey = localStorage.getItem('apiKey') || '';
 let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
@@ -21,26 +23,20 @@ apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
 
-messageInput.addEventListener('input', handleInput);
-messageInput.addEventListener('keydown', handleKeyDown);
-document.getElementById('send-button').addEventListener('click', sendMessage);
-document.getElementById('copy-button').addEventListener('click', copyToClipboard);
-systemRoleInput.addEventListener('input', handleSystemRoleInput);
-
-const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
-
-function handleInput() {
+messageInput.addEventListener('input', () => {
   messageInput.style.height = 'auto';
   messageInput.style.height = `${messageInput.scrollHeight}px`;
-}
+});
 
-function handleKeyDown(event) {
+messageInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     messageInput.value += '\n';
     messageInput.style.height = `${messageInput.scrollHeight}px`;
   }
-}
+});
+
+document.getElementById('send-button').addEventListener('click', sendMessage);
 
 function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
@@ -48,7 +44,7 @@ function toggleModelMenu() {
 
 function selectModel(model) {
   const modelOptions = document.querySelectorAll('ul li');
-  modelOptions.forEach(option => option.classList.remove('selected'));
+  modelOptions.forEach((option) => option.classList.remove('selected'));
 
   const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
   if (selectedModelOption) {
@@ -66,6 +62,8 @@ function updateModelHeading() {
   const modelHeading = document.querySelector('h1');
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
+
+const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
@@ -99,7 +97,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 function extractCodeBlocks(response) {
   const codeBlocks = response.match(codeBlockRegex);
   if (codeBlocks) {
-    codeBlocks.forEach(codeBlock => {
+    codeBlocks.forEach((codeBlock) => {
       response = response.replace(codeBlock, createCodeBlockUI(codeBlock));
     });
   }
@@ -163,7 +161,7 @@ function createTable(match, table) {
 
   const tableHeader = document.createElement('tr');
   const tableHeaderCells = rows[0].split('|').slice(1, -1);
-  tableHeaderCells.forEach(cell => {
+  tableHeaderCells.forEach((cell) => {
     const th = document.createElement('th');
     th.classList.add('table-header');
     th.textContent = cell.trim();
@@ -174,7 +172,7 @@ function createTable(match, table) {
   for (let i = 2; i < rows.length; i++) {
     const row = document.createElement('tr');
     const tableCells = rows[i].split('|').slice(1, -1);
-    tableCells.forEach(cell => {
+    tableCells.forEach((cell) => {
       const td = document.createElement('td');
       td.classList.add('table-data');
       td.innerHTML = parseResponse(cell.trim());
@@ -199,7 +197,7 @@ async function sendMessage() {
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
 
-  await createAndAppendMessage(message, 'user');
+  createAndAppendMessage(message, 'user');
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
@@ -211,35 +209,42 @@ async function sendMessage() {
     content: botResponse,
   });
 
-  await createAndAppendMessage(botResponse, 'bot');
+  createAndAppendMessage(botResponse, 'bot');
 }
 
-function copyToClipboard() {
-  const latestResponse = chatHistory.lastElementChild.innerHTML;
-  if (latestResponse) {
-    const textarea = document.createElement('textarea');
-    textarea.value = latestResponse;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-    alert('Text copied to clipboard');
-  } else {
-    alert('No text to copy');
-  }
-}
-
-function handleSystemRoleInput() {
-  localStorage.setItem('systemRole', systemRoleInput.value);
-  messages[0].content = systemRoleInput.value;
+function copyToClipboard(text) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
 }
 
 function clearChatHistory() {
   chatHistory.innerHTML = '';
-  messages = [{
-    role: 'system',
-    content: localStorage.getItem('systemRole') || '',
-  }];
+  messages = [
+    {
+      role: 'system',
+      content: localStorage.getItem('systemRole') || '',
+    },
+  ];
 }
+
+document.getElementById('copy-button').addEventListener('click', () => {
+  const latestResponse = chatHistory.lastElementChild.innerHTML;
+  if (latestResponse) {
+    copyToClipboard(latestResponse);
+    alert('Text copied to clipboard');
+  } else {
+    alert('No text to copy');
+  }
+});
+
+systemRoleInput.value = localStorage.getItem('systemRole') || '';
+systemRoleInput.addEventListener('input', () => {
+  localStorage.setItem('systemRole', systemRoleInput.value);
+  messages[0].content = systemRoleInput.value;
+});
 
 window.addEventListener('load', updateModelHeading);
