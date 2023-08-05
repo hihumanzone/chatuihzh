@@ -36,9 +36,7 @@ messageInput.addEventListener('keydown', (event) => {
   }
 });
 
-document.getElementById('send-button').addEventListener('click', async () => {
-  await sendMessage(apiKey, apiEndpoint);
-});
+document.getElementById('send-button').addEventListener('click', sendMessage);
 
 function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
@@ -65,6 +63,20 @@ function updateModelHeading() {
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
 
+function applyValues() {
+  apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
+  const systemRoleValue = systemRoleInput.value.trim();
+  
+  localStorage.setItem('apiKey', apiKey);
+  localStorage.setItem('apiEndpoint', apiEndpoint);
+  localStorage.setItem('systemRole', systemRoleValue);
+  
+  messages[0].content = systemRoleValue;
+}
+
+const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
+
 async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
     'Content-Type': 'application/json',
@@ -83,7 +95,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     messages: messages,
   };
 
-  const response = await fetch(apiEndpoint, {
+  const response = await fetch(ENDPOINT, {
     method: 'POST',
     headers: headers,
     body: JSON.stringify(data),
@@ -184,18 +196,15 @@ function createTable(match, table) {
   return tableElement.outerHTML;
 }
 
-async function sendMessage(apiKey, apiEndpoint) {
-  apiKey = apiKeyInput.value.trim();
-  apiEndpoint = apiEndpointInput.value.trim();
+async function sendMessage() {
+  applyValues();
+  
   const message = messageInput.value.trim();
 
   if (!message) {
     alert('Please enter a message.');
     return;
   }
-
-  localStorage.setItem('apiKey', apiKey);
-  localStorage.setItem('apiEndpoint', apiEndpoint);
 
   createAndAppendMessage(message, 'user');
   messageInput.value = '';
@@ -242,9 +251,6 @@ document.getElementById('copy-button').addEventListener('click', () => {
 });
 
 systemRoleInput.value = localStorage.getItem('systemRole') || '';
-systemRoleInput.addEventListener('input', () => {
-  localStorage.setItem('systemRole', systemRoleInput.value);
-  messages[0].content = systemRoleInput.value;
-});
+systemRoleInput.addEventListener('input', applyValues);
 
 window.addEventListener('load', updateModelHeading);
