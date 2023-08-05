@@ -106,6 +106,8 @@ h4 {
 
 #refresh-button{
   text-align: center;
+  width: 60%;
+  background-color: #2F0909;
 }
 
 .message {
