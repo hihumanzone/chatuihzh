@@ -15,7 +15,6 @@ const MAX_TOKENS_BY_MODEL = {
   'gpt-4': 8192,
   'gpt-4-32k': 32768,
   'gpt-4-32k-0613': 32768,
-  'claude-2-100k': 102400,
   'llama-2-70b-chat': 4096,
 };
 
