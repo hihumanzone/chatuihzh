@@ -23,18 +23,8 @@ apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
 
-messageInput.addEventListener('input', () => {
-  messageInput.style.height = 'auto';
-  messageInput.style.height = `${messageInput.scrollHeight}px`;
-});
-
-messageInput.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    messageInput.value += '\n';
-    messageInput.style.height = `${messageInput.scrollHeight}px`;
-  }
-});
+messageInput.addEventListener('input', adjustInputHeight);
+messageInput.addEventListener('keydown', handleEnterKey);
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
@@ -97,9 +87,9 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 function extractCodeBlocks(response) {
   const codeBlocks = response.match(codeBlockRegex);
   if (codeBlocks) {
-    codeBlocks.forEach((codeBlock) => {
-      response = response.replace(codeBlock, createCodeBlockUI(codeBlock));
-    });
+    for (let i = 0; i < codeBlocks.length; i++) {
+      response = response.replace(codeBlocks[i], createCodeBlockUI(codeBlocks[i]));
+    }
   }
   return response;
 }
@@ -161,23 +151,23 @@ function createTable(match, table) {
 
   const tableHeader = document.createElement('tr');
   const tableHeaderCells = rows[0].split('|').slice(1, -1);
-  tableHeaderCells.forEach((cell) => {
+  for (let i = 0; i < tableHeaderCells.length; i++) {
     const th = document.createElement('th');
     th.classList.add('table-header');
-    th.textContent = cell.trim();
+    th.textContent = tableHeaderCells[i].trim();
     tableHeader.appendChild(th);
-  });
+  }
   tableElement.appendChild(tableHeader);
 
   for (let i = 2; i < rows.length; i++) {
     const row = document.createElement('tr');
     const tableCells = rows[i].split('|').slice(1, -1);
-    tableCells.forEach((cell) => {
+    for (let j = 0; j < tableCells.length; j++) {
       const td = document.createElement('td');
       td.classList.add('table-data');
-      td.innerHTML = parseResponse(cell.trim());
+      td.innerHTML = parseResponse(tableCells[j].trim());
       row.appendChild(td);
-    });
+    }
     tableElement.appendChild(row);
   }
 
@@ -248,3 +238,16 @@ systemRoleInput.addEventListener('input', () => {
 });
 
 window.addEventListener('load', updateModelHeading);
+
+function adjustInputHeight() {
+  messageInput.style.height = 'auto';
+  messageInput.style.height = `${messageInput.scrollHeight}px`;
+}
+
+function handleEnterKey(event) {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    messageInput.value += '\n';
+    adjustInputHeight();
+  }
+}
