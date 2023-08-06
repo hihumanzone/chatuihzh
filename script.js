@@ -155,6 +155,8 @@ function parseResponse(response) {
   parsedResponse = parsedResponse.replace(heading3Regex, '<span style="font-size: 22px; font-weight: bold;">$1</span>');
   parsedResponse = parsedResponse.replace(heading4Regex, '<span style="font-size: 18px; font-weight: bold;">$1</span>');
 
+  parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '<i>$1</i>');
+
   return parsedResponse;
 }
 
