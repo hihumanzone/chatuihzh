@@ -28,24 +28,11 @@ messageInput.addEventListener('input', () => {
   messageInput.style.height = `${messageInput.scrollHeight}px`;
 });
 
-systemRoleInput.addEventListener('input', () => {
-  systemRoleInput.style.height = 'auto';
-  systemRoleInput.style.height = `${systemRoleInput.scrollHeight}px`;
-});
-
 messageInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     messageInput.value += '\n';
     messageInput.style.height = `${messageInput.scrollHeight}px`;
-  }
-});
-
-systemRoleInput.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    systemRoleInput.value += '\n';
-    systemRoleInput.style.height = `${systemRoleInput.scrollHeight}px`;
   }
 });
 
@@ -255,6 +242,10 @@ document.getElementById('copy-button').addEventListener('click', () => {
 });
 
 systemRoleInput.value = localStorage.getItem('systemRole') || '';
+systemRoleInput.addEventListener('input', () => {
+  localStorage.setItem('systemRole', systemRoleInput.value);
+  messages[0].content = systemRoleInput.value;
+});
 
 window.addEventListener('load', updateModelHeading);
 
