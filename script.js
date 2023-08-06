@@ -6,10 +6,10 @@ const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 const codeBlockRegex = /```(.*?)```/gs;
-const heading1Regex = /^#(.*?)$/gm;
-const heading2Regex = /^#{2}(.*?)$/gm;
-const heading3Regex = /^#{3}(.*?)$/gm;
-const heading4Regex = /^#{4}(.*?)$/gm;
+const heading1Regex = /^#\s(.+)/gm;
+const heading2Regex = /^##\s(.+)/gm;
+const heading3Regex = /^###\s(.+)/gm;
+const heading4Regex = /^####\s(.+)/gm;
 
 let messages = [
   {
@@ -108,14 +108,6 @@ function extractCodeBlocks(response) {
   return response;
 }
 
-function formatHeadings(response) {
-  response = response.replace(heading1Regex, '<span style="font-size: 30px;">$1</span>');
-  response = response.replace(heading2Regex, '<span style="font-size: 26px;">$1</span>');
-  response = response.replace(heading3Regex, '<span style="font-size: 22px;">$1</span>');
-  response = response.replace(heading4Regex, '<span style="font-size: 18px;">$1</span>');
-  return response;
-}
-
 function createCodeBlockUI(codeBlock) {
   const preElement = document.createElement('pre');
   preElement.textContent = codeBlock.replace(/```/g, '');
@@ -142,8 +134,6 @@ async function createAndAppendMessage(content, owner) {
     displayedText = extractCodeBlocks(displayedText);
   }
 
-  displayedText = formatHeadings(displayedText);
-
   const parsedContent = parseResponse(displayedText);
   message.innerHTML = parsedContent;
 
@@ -160,6 +150,10 @@ function parseResponse(response) {
   parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parseTables(parsedResponse);
+  parsedResponse = parsedResponse.replace(heading1Regex, '<span style="font-size: 30px; font-weight: bold;">$1</span>');
+  parsedResponse = parsedResponse.replace(heading2Regex, '<span style="font-size: 26px; font-weight: bold;">$1</span>');
+  parsedResponse = parsedResponse.replace(heading3Regex, '<span style="font-size: 22px; font-weight: bold;">$1</span>');
+  parsedResponse = parsedResponse.replace(heading4Regex, '<span style="font-size: 18px; font-weight: bold;">$1</span>');
 
   return parsedResponse;
 }
