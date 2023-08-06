@@ -146,6 +146,7 @@ function parseResponse(response) {
   parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parseTables(parsedResponse);
+  parsedResponse = parseHeadings(parsedResponse);
 
   return parsedResponse;
 }
@@ -182,6 +183,40 @@ function createTable(match, table) {
   }
 
   return tableElement.outerHTML;
+}
+
+function parseHeadings(response) {
+  const headingRegex = /^(#+)(.*)/gm;
+  return response.replace(headingRegex, createHeading);
+}
+
+function createHeading(match, hash, text) {
+  const headingLevel = hash.length;
+  let fontSize;
+
+  switch (headingLevel) {
+    case 1:
+      fontSize = '30px';
+      break;
+    case 2:
+      fontSize = '26px';
+      break;
+    case 3:
+      fontSize = '22px';
+      break;
+    case 4:
+      fontSize = '18px';
+      break;
+    default:
+      fontSize = 'inherit';
+  }
+
+  const headingElement = document.createElement(`h${headingLevel}`);
+  headingElement.textContent = text.trim();
+  headingElement.style.fontSize = fontSize;
+  headingElement.style.fontWeight = 'bold';
+
+  return headingElement.outerHTML;
 }
 
 async function sendMessage() {
