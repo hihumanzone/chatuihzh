@@ -28,7 +28,7 @@ function updateInputHeight() {
   messageInput.style.height = `${messageInput.scrollHeight}px`;
 }
 
-messageInput.addEventListener('keydown', updateInputHeight);
+messageInput.addEventListener('input', updateInputHeight);
 
 messageInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && !event.shiftKey) {
