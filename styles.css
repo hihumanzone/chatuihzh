@@ -76,6 +76,7 @@ h4 {
 #model-menu{
   border: 0.8px solid #267668;
   padding: 20px;
+  border-radius: 5px;
 }
 
 #api-key-input,
