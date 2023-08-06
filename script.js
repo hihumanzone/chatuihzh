@@ -135,7 +135,7 @@ async function createAndAppendMessage(content, owner) {
   }
 
   const parsedContent = parseResponse(displayedText);
-  message.innerHTML = parsedContent;
+  message.textContent = parsedContent;
 
   chatHistory.appendChild(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -146,7 +146,7 @@ async function createAndAppendMessage(content, owner) {
 function parseResponse(response) {
   let parsedResponse = response;
 
-  parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+  parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '**$1**');
   parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parseTables(parsedResponse);
@@ -155,7 +155,7 @@ function parseResponse(response) {
   parsedResponse = parsedResponse.replace(heading3Regex, '<span style="font-size: 22px; font-weight: bold;">$1</span>');
   parsedResponse = parsedResponse.replace(heading4Regex, '<span style="font-size: 18px; font-weight: bold;">$1</span>');
 
-  parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '<i>$1</i>');
+  parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '*$1*');
 
   return parsedResponse;
 }
@@ -242,7 +242,7 @@ function clearChatHistory() {
 }
 
 document.getElementById('copy-button').addEventListener('click', () => {
-  const latestResponse = chatHistory.lastElementChild.innerHTML;
+  const latestResponse = chatHistory.lastElementChild.textContent;
   if (latestResponse) {
     copyToClipboard(latestResponse);
     alert('Text copied to clipboard');
