@@ -24,7 +24,6 @@ selectModel(selectedModel);
 updateModelHeading();
 
 messageInput.addEventListener('input', () => {
-  messageInput.style.height = 'auto';
   messageInput.style.height = `${messageInput.scrollHeight}px`;
 });
 
