@@ -23,26 +23,33 @@ apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
 
-messageInput.addEventListener('input', adjustInputHeight);
+messageInput.addEventListener('input', () => {
+  messageInput.style.height = 'auto';
+  messageInput.style.height = `${messageInput.scrollHeight}px`;
+});
+
+systemRoleInput.addEventListener('input', () => {
+  systemRoleInput.style.height = 'auto';
+  systemRoleInput.style.height = `${systemRoleInput.scrollHeight}px`;
+});
+
 messageInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     messageInput.value += '\n';
-    adjustInputHeight();
+    messageInput.style.height = `${messageInput.scrollHeight}px`;
+  }
+});
+
+systemRoleInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    systemRoleInput.value += '\n';
+    systemRoleInput.style.height = `${systemRoleInput.scrollHeight}px`;
   }
 });
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
-
-function adjustInputHeight() {
-  adjustHeight(messageInput);
-  adjustHeight(systemRoleInput);
-}
-
-function adjustHeight(element) {
-  element.style.height = 'auto';
-  element.style.height = `${element.scrollHeight}px`;
-}
 
 function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
@@ -205,7 +212,7 @@ async function sendMessage() {
 
   createAndAppendMessage(message, 'user');
   messageInput.value = '';
-  adjustInputHeight();
+  messageInput.style.height = 'auto';
 
   const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
 
@@ -248,10 +255,6 @@ document.getElementById('copy-button').addEventListener('click', () => {
 });
 
 systemRoleInput.value = localStorage.getItem('systemRole') || '';
-systemRoleInput.addEventListener('input', () => {
-  localStorage.setItem('systemRole', systemRoleInput.value);
-  messages[0].content = systemRoleInput.value;
-});
 
 window.addEventListener('load', updateModelHeading);
 
