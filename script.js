@@ -13,12 +13,12 @@ const headingRegex = [
   /^####\s(.+)/gm
 ];
 
-let messages = [];
-
-const localStorageMessages = localStorage.getItem('messages');
-if (localStorageMessages) {
-  messages = JSON.parse(localStorageMessages);
-}
+let messages = [
+  {
+    role: 'system',
+    content: localStorage.getItem('systemRole') || '',
+  },
+];
 
 let apiKey = localStorage.getItem('apiKey') || '';
 let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
@@ -224,7 +224,6 @@ async function sendMessage() {
   });
 
   createAndAppendMessage(botResponse, 'bot');
-  localStorage.setItem('messages', JSON.stringify(messages));
 }
 
 function copyToClipboard(text) {
@@ -238,8 +237,12 @@ function copyToClipboard(text) {
 
 function clearChatHistory() {
   chatHistory.innerHTML = '';
-  messages = [];
-  localStorage.removeItem('messages');
+  messages = [
+    {
+      role: 'system',
+      content: localStorage.getItem('systemRole') || '',
+    },
+  ];
 }
 
 document.getElementById('copy-button').addEventListener('click', () => {
