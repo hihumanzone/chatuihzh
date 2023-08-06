@@ -6,10 +6,12 @@ const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 const codeBlockRegex = /```(.*?)```/gs;
-const heading1Regex = /^#\s(.+)/gm;
-const heading2Regex = /^##\s(.+)/gm;
-const heading3Regex = /^###\s(.+)/gm;
-const heading4Regex = /^####\s(.+)/gm;
+const headingRegex = [
+  /^#\s(.+)/gm,
+  /^##\s(.+)/gm,
+  /^###\s(.+)/gm,
+  /^####\s(.+)/gm
+];
 
 let messages = [
   {
@@ -150,10 +152,12 @@ function parseResponse(response) {
   parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parseTables(parsedResponse);
-  parsedResponse = parsedResponse.replace(heading1Regex, '<span style="font-size: 30px; font-weight: bold;">$1</span>');
-  parsedResponse = parsedResponse.replace(heading2Regex, '<span style="font-size: 26px; font-weight: bold;">$1</span>');
-  parsedResponse = parsedResponse.replace(heading3Regex, '<span style="font-size: 22px; font-weight: bold;">$1</span>');
-  parsedResponse = parsedResponse.replace(heading4Regex, '<span style="font-size: 18px; font-weight: bold;">$1</span>');
+  
+  headingRegex.forEach((regex, index) => {
+    const fontSize = 30 - (index * 4);
+    const fontWeight = index === 0 ? 'bold' : 'normal';
+    parsedResponse = parsedResponse.replace(regex, `<span style="font-size: ${fontSize}px; font-weight: ${fontWeight};">$1</span>`);
+  });
 
   parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '<i>$1</i>');
 
