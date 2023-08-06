@@ -23,15 +23,18 @@ apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
 
-messageInput.addEventListener('input', () => {
-  messageInput.style.height = `${messageInput.scrollHeight}px`;
-});
+const updateInputHeight = () => {
+  const scrollHeight = messageInput.scrollHeight;
+  messageInput.style.height = `${scrollHeight}px`;
+};
+
+messageInput.addEventListener('input', updateInputHeight);
 
 messageInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     messageInput.value += '\n';
-    messageInput.style.height = `${messageInput.scrollHeight}px`;
+    updateInputHeight();
   }
 });
 
