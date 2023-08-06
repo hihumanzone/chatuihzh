@@ -36,6 +36,13 @@ messageInput.addEventListener('keydown', (event) => {
   }
 });
 
+messageInput.addEventListener('keyup', (event) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    sendMessage();
+  }
+});
+
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
 function toggleModelMenu() {
