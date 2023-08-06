@@ -23,16 +23,32 @@ apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
 
+function adjustInputHeight(inputElement) {
+  inputElement.style.height = 'auto';
+  inputElement.style.height = `${inputElement.scrollHeight}px`;
+}
+
 messageInput.addEventListener('input', () => {
-  messageInput.style.height = 'auto';
-  messageInput.style.height = `${messageInput.scrollHeight}px`;
+  adjustInputHeight(messageInput);
 });
 
 messageInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     messageInput.value += '\n';
-    messageInput.style.height = `${messageInput.scrollHeight}px`;
+    adjustInputHeight(messageInput);
+  }
+});
+
+systemRoleInput.addEventListener('input', () => {
+  adjustInputHeight(systemRoleInput);
+});
+
+systemRoleInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    systemRoleInput.value += '\n';
+    adjustInputHeight(systemRoleInput);
   }
 });
 
