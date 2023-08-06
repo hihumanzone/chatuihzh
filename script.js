@@ -23,23 +23,26 @@ apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
 
-messageInput.addEventListener('input', () => {
-  messageInput.style.height = 'auto';
-  messageInput.style.height = `${messageInput.scrollHeight}px`;
-  systemRoleInput.style.height = 'auto';
-  systemRoleInput.style.height = `${systemRoleInput.scrollHeight}px`;
-});
-
+messageInput.addEventListener('input', adjustInputHeight);
 messageInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     messageInput.value += '\n';
-    messageInput.style.height = `${messageInput.scrollHeight}px`;
-    systemRoleInput.style.height = `${systemRoleInput.scrollHeight}px`;
+    adjustInputHeight();
   }
 });
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
+
+function adjustInputHeight() {
+  adjustHeight(messageInput);
+  adjustHeight(systemRoleInput);
+}
+
+function adjustHeight(element) {
+  element.style.height = 'auto';
+  element.style.height = `${element.scrollHeight}px`;
+}
 
 function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
@@ -202,8 +205,7 @@ async function sendMessage() {
 
   createAndAppendMessage(message, 'user');
   messageInput.value = '';
-  messageInput.style.height = 'auto';
-  systemRoleInput.style.height = 'auto';
+  adjustInputHeight();
 
   const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
 
