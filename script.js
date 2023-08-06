@@ -36,6 +36,8 @@ messageInput.addEventListener('keydown', (event) => {
   }
 });
 
+messageInput.classList.add('system-role-input');
+
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
 function toggleModelMenu() {
