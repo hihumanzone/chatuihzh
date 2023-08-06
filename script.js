@@ -6,7 +6,10 @@ const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 const codeBlockRegex = /```(.*?)```/gs;
-const headingRegex = /^(#+)\s(.+)/;
+const heading1Regex = /^#(.*?)$/gm;
+const heading2Regex = /^#{2}(.*?)$/gm;
+const heading3Regex = /^#{3}(.*?)$/gm;
+const heading4Regex = /^#{4}(.*?)$/gm;
 
 let messages = [
   {
@@ -105,6 +108,14 @@ function extractCodeBlocks(response) {
   return response;
 }
 
+function formatHeadings(response) {
+  response = response.replace(heading1Regex, '<span style="font-size: 30px;">$1</span>');
+  response = response.replace(heading2Regex, '<span style="font-size: 26px;">$1</span>');
+  response = response.replace(heading3Regex, '<span style="font-size: 22px;">$1</span>');
+  response = response.replace(heading4Regex, '<span style="font-size: 18px;">$1</span>');
+  return response;
+}
+
 function createCodeBlockUI(codeBlock) {
   const preElement = document.createElement('pre');
   preElement.textContent = codeBlock.replace(/```/g, '');
@@ -129,8 +140,9 @@ async function createAndAppendMessage(content, owner) {
 
   if (owner === 'bot') {
     displayedText = extractCodeBlocks(displayedText);
-    displayedText = extractHeadings(displayedText);
   }
+
+  displayedText = formatHeadings(displayedText);
 
   const parsedContent = parseResponse(displayedText);
   message.innerHTML = parsedContent;
@@ -184,29 +196,6 @@ function createTable(match, table) {
   }
 
   return tableElement.outerHTML;
-}
-
-function extractHeadings(response) {
-  const lines = response.split('\n');
-  let extractedLines = [];
-
-  for(let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const matches = line.match(headingRegex);
-
-    if(matches) {
-      const level = matches[1].length;
-      const text = matches[2];
-      const fontSize = (34 - (level * 4)) + 'px';
-
-      const headingElement = `<h${level} style="font-size: ${fontSize}; font-weight: bold; margin: 10px 0;">${text}</h${level}>`;
-      extractedLines.push(headingElement);
-    } else {
-      extractedLines.push(line);
-    }
-  }
-
-  return extractedLines.join('\n');
 }
 
 async function sendMessage() {
