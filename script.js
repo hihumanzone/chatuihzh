@@ -28,18 +28,11 @@ messageInput.addEventListener('input', () => {
   messageInput.style.height = `${messageInput.scrollHeight}px`;
 });
 
-messageInput.addEventListener('input', () => {
-  const lines = messageInput.value.split('\n');
-  messageInput.style.height = `${lines.length * 1.2}em`;
-});
-
-messageInput.addEventListener('keypress', (event) => {
+messageInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     messageInput.value += '\n';
-    messageInput.style.height = 'auto';
-    const lines = messageInput.value.split('\n');
-    messageInput.style.height = `${lines.length * 1.3}em`;
+    messageInput.style.height = `${messageInput.scrollHeight}px`;
   }
 });
 
