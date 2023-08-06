@@ -6,6 +6,7 @@ const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 const codeBlockRegex = /```(.*?)```/gs;
+const headingRegex = /^(#+)\s(.+)/;
 
 let messages = [
   {
@@ -128,6 +129,7 @@ async function createAndAppendMessage(content, owner) {
 
   if (owner === 'bot') {
     displayedText = extractCodeBlocks(displayedText);
+    displayedText = extractHeadings(displayedText);
   }
 
   const parsedContent = parseResponse(displayedText);
@@ -146,7 +148,6 @@ function parseResponse(response) {
   parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parseTables(parsedResponse);
-  parsedResponse = parseHeadings(parsedResponse);
 
   return parsedResponse;
 }
@@ -185,38 +186,27 @@ function createTable(match, table) {
   return tableElement.outerHTML;
 }
 
-function parseHeadings(response) {
-  const headingRegex = /^(#+)(.*)/gm;
-  return response.replace(headingRegex, createHeading);
-}
+function extractHeadings(response) {
+  const lines = response.split('\n');
+  let extractedLines = [];
 
-function createHeading(match, hash, text) {
-  const headingLevel = hash.length;
-  let fontSize;
+  for(let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const matches = line.match(headingRegex);
 
-  switch (headingLevel) {
-    case 1:
-      fontSize = '30px';
-      break;
-    case 2:
-      fontSize = '26px';
-      break;
-    case 3:
-      fontSize = '22px';
-      break;
-    case 4:
-      fontSize = '18px';
-      break;
-    default:
-      fontSize = 'inherit';
+    if(matches) {
+      const level = matches[1].length;
+      const text = matches[2];
+      const fontSize = (34 - (level * 4)) + 'px';
+
+      const headingElement = `<h${level} style="font-size: ${fontSize}; font-weight: bold; margin: 10px 0;">${text}</h${level}>`;
+      extractedLines.push(headingElement);
+    } else {
+      extractedLines.push(line);
+    }
   }
 
-  const headingElement = document.createElement(`h${headingLevel}`);
-  headingElement.textContent = text.trim();
-  headingElement.style.fontSize = fontSize;
-  headingElement.style.fontWeight = 'bold';
-
-  return headingElement.outerHTML;
+  return extractedLines.join('\n');
 }
 
 async function sendMessage() {
