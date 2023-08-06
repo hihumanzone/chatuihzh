@@ -1,38 +1,39 @@
-# Chat With GPT Models
+# Chat with GPT Models
 
-This website allows users to chat with GPT. Users can type their messages and receive responses from GPY in real-time.
-
-![Chatbot UI](./ss1.png)
-![Chatbot UI: Settings](./ss2.png)
-
-## Website
-
-Visit the website [here](https://chatuihzh.vercel.app/).
-
-## How to Use
-
-1. Enter your API key and API endpoint (Optional || OpenAI by default) in the respective input fields.
-2. Select a model from the "Switch Model" dropdown menu of "Settings".
-3. Enter your system role in the "System Role" input field.
-4. Type your message in the "Type your message" textarea.
-5. Click on the "Send" button to send your message.
-6. The chat history will appear in the chat history section.
-7. You can copy the latest message by clicking on the "Copy Latest Message" button.
+This repository contains the code for a web application that allows users to chat with GPT models. 
 
 ## Features
 
-- Users can switch between different GPT models.
-- Users can enter their system role and API key.
-- Users can copy the latest message.
-- The chat history is displayed in real-time.
-- Math equations can be rendered using MathJax library.
+- Users can select a GPT model to chat with from the settings menu.
+- Users can enter their API key and API endpoint to authenticate with the model.
+- Users can set their system role for the conversation.
+- Users can send messages and receive responses from the GPT model.
+- Users can clear the chat history.
+- Users can copy the latest message to the clipboard.
+
+## Usage
+
+To use this web application, follow these steps:
+
+1. Visit the [Chat with GPT Models](https://chatuihzh.vercel.app/) website.
+2. Enter your API key and API endpoint in the respective input fields.
+3. Optionally, set your system role in the system role input field.
+4. Select a GPT model from the model list.
+5. Start the conversation by typing a message in the message input field and pressing the "Send" button or the Enter key.
+6. The GPT model will provide a response, which will be displayed in the chat history.
+7. To copy the latest message, click the "Copy Latest Message" button.
+8. To clear the chat history, click the "Clear Chat History" button.
+
+## Screenshots
+
+![Screenshot 1](./ss1.png)
+![Screenshot 2](./ss2.png)
 
 ## Technologies Used
 
 - HTML
 - CSS
 - JavaScript
-- MathJax
 
 ## Contributors
 
