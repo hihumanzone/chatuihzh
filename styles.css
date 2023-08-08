@@ -158,7 +158,7 @@ td {
   padding: 5px;
   text-align: left;
   vertical-align: top;
-  border-bottom: 1px solid #555;
+  border: 1px solid #555;
 }
 
 th:first-child,
