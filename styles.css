@@ -74,9 +74,7 @@ h4 {
 }
 
 #model-menu{
-  border: 4px solid #391414;
   padding: 20px;
-  border-radius: 20px;
   margin-bottom: 30px;
   margin-top: 10px;
 }
@@ -93,7 +91,6 @@ h4 {
   padding: 5px;
   border: 1px solid #2f6058;
   border-radius: 5px;
-  outline: none;
   background-color: #0D1B19;
   color: #ffffff;
 }
