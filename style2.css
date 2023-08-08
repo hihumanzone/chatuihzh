@@ -34,6 +34,7 @@ h1 {
 
 h2 {
   font-size: 20px;
+  margin-bottom: 8px;
   cursor: pointer;
   text-align: center;
   border: 0.8px solid #000;
@@ -104,15 +105,17 @@ button {
 button#clear-button {
   margin-bottom: 10px;
   background-color: #f44336;
+  text-align: center;
 }
 
 button#copy-button {
   margin-bottom: 10px;
   margin-left: 10px;
+  text-align: center;
 }
 
 button#send-button {
-  margin-top: 10px;
+  margin-top: 0px;
 }
 
 /* Chat history styles */
