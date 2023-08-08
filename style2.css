@@ -94,7 +94,7 @@ textarea:focus {
 
 /* Button styles */
 button {
-  padding: 10px 20px;
+  padding: 0px 0px;
   background-color: #4caf50;
   color: #fff;
   border: none;
