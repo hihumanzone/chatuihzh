@@ -125,7 +125,6 @@ button#send-button {
   border: 1px solid #ccc;
   border-radius: 4px;
   max-height: 200px;
-  overflow-y: auto;
 }
 
 .message {
