@@ -135,10 +135,12 @@ button#send-button {
 .user .message {
   background-color: #66afe9;
   color: #fff;
+  text-align: right;
 }
 
 .bot .message {
   background-color: #f2f2f2;
+  text-align: left;
 }
 
 .message div {
