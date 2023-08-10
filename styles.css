@@ -113,6 +113,12 @@ h4 {
   color: #fefefe;
 }
 
+#about {
+    margin: 0 auto;
+    padding: 5px 10px;
+    margin-top: 0px;
+}
+
 #refresh-button {
   text-align: center;
   width: 100%;
