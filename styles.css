@@ -91,7 +91,7 @@ h4 {
   border: 1px solid #555;
   border-radius: 5px;
   background-color: #222;
-  color: #fefefe;
+  color: #181818;
 }
 
 #api-key-input,
@@ -106,7 +106,7 @@ h4 {
 #clear-button {
   margin-top: 6px;
   padding: 5px 10px;
-  background-color: #222;
+  background-color: #181818;
   border: 0.8px solid #555;
   border-radius: 5px;
   color: #fefefe;
@@ -115,7 +115,7 @@ h4 {
 #refresh-button {
   text-align: center;
   width: 100%;
-  background-color: #222;
+  background-color: #0E0E0E;
 }
 
 .message {
