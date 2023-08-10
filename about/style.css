@@ -19,8 +19,6 @@ h2 {
 }
 
 #container {
-  display: flex;
-  flex-direction: column;
   width: 60%;
   max-width: 700px;
   min-width: 300px;
