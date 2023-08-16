@@ -135,30 +135,6 @@ async function createAndAppendMessage(content, owner) {
 
   if (owner === 'bot') {
     displayedText = extractCodeBlocks(displayedText);
-
-    if (displayedText.startsWith('>') && displayedText.endsWith('\n')) {
-      const formattedText = displayedText.replace(/^>/gm, '');
-      const formattedMessage = document.createElement('div');
-      formattedMessage.classList.add('bot-response');
-      formattedMessage.innerHTML = parseResponse(formattedText);
-      message.appendChild(formattedMessage);
-      chatHistory.appendChild(message);
-      chatHistory.scrollTop = chatHistory.scrollHeight;
-      MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
-      return;
-    }
-
-    if (displayedText.startsWith('`') && displayedText.endsWith('`')) {
-      const formattedText = displayedText.substring(1, displayedText.length - 1);
-      const formattedMessage = document.createElement('div');
-      formattedMessage.classList.add('bot-response', 'code-response');
-      formattedMessage.innerHTML = parseResponse(formattedText);
-      message.appendChild(formattedMessage);
-      chatHistory.appendChild(message);
-      chatHistory.scrollTop = chatHistory.scrollHeight;
-      MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
-      return;
-    }
   }
 
   const parsedContent = parseResponse(displayedText);
@@ -240,6 +216,7 @@ async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
   const message = messageInput.value.trim();
+  let content = message;
 
   if (!message) {
     alert('Please enter a message.');
@@ -249,7 +226,15 @@ async function sendMessage() {
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
 
-  createAndAppendMessage(message, 'user');
+  if (message[0] == ">" && message.slice(-1) == "\n") {
+    content = `<span style="background-color: #222;">${message}</span>`;
+  }
+
+  if (content[0] == "`" && content.slice(-1) == "`") {
+    content = `<span style="background-color: #333;">${message}</span>`;
+  }
+
+  createAndAppendMessage(content, 'user');
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
@@ -262,53 +247,3 @@ async function sendMessage() {
   });
 
   createAndAppendMessage(botResponse, 'bot');
-}
-
-function copyToClipboard(text) {
-  const textarea = document.createElement('textarea');
-  textarea.value = text;
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand('copy');
-  document.body.removeChild(textarea);
-}
-
-function clearChatHistory() {
-  chatHistory.innerHTML = '';
-  messages = [
-    {
-      role: 'system',
-      content: localStorage.getItem('systemRole') || '',
-    },
-  ];
-}
-
-document.getElementById('copy-button').addEventListener('click', () => {
-  const latestResponse = chatHistory.lastElementChild.innerHTML;
-  if (latestResponse) {
-    copyToClipboard(latestResponse);
-    alert('Text copied to clipboard');
-  } else {
-    alert('No text to copy');
-  }
-});
-
-systemRoleInput.value = localStorage.getItem('systemRole') || '';
-systemRoleInput.addEventListener('input', () => {
-  localStorage.setItem('systemRole', systemRoleInput.value);
-  messages[0].content = systemRoleInput.value;
-});
-
-window.addEventListener('load', updateModelHeading);
-
-function saveInputsAndRefresh() {
-  apiKey = apiKeyInput.value.trim();
-  apiEndpoint = apiEndpointInput.value.trim();
-
-  localStorage.setItem('apiKey', apiKey);
-  localStorage.setItem('apiEndpoint', apiEndpoint);
-
-  location.reload();
-}
-
-document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
