@@ -135,6 +135,30 @@ async function createAndAppendMessage(content, owner) {
 
   if (owner === 'bot') {
     displayedText = extractCodeBlocks(displayedText);
+
+    if (displayedText.startsWith('>') && displayedText.endsWith('\n')) {
+      const formattedText = displayedText.replace(/^>/gm, '');
+      const formattedMessage = document.createElement('div');
+      formattedMessage.classList.add('bot-response');
+      formattedMessage.innerHTML = parseResponse(formattedText);
+      message.appendChild(formattedMessage);
+      chatHistory.appendChild(message);
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+      MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
+      return;
+    }
+
+    if (displayedText.startsWith('`') && displayedText.endsWith('`')) {
+      const formattedText = displayedText.substring(1, displayedText.length - 1);
+      const formattedMessage = document.createElement('div');
+      formattedMessage.classList.add('bot-response', 'code-response');
+      formattedMessage.innerHTML = parseResponse(formattedText);
+      message.appendChild(formattedMessage);
+      chatHistory.appendChild(message);
+      chatHistory.scrollTop = chatHistory.scrollHeight;
+      MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
+      return;
+    }
   }
 
   const parsedContent = parseResponse(displayedText);
