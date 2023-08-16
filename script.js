@@ -129,7 +129,7 @@ function createCodeBlockUI(codeBlock) {
 async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
-  
+
   let displayedText = content;
 
   if (owner === 'bot') {
