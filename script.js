@@ -132,17 +132,9 @@ async function createAndAppendMessage(content, owner) {
   message.classList.add('message', owner);
 
   let displayedText = content;
-  
+
   if (owner === 'bot') {
-    if (displayedText.startsWith('>')) {
-      message.style.backgroundColor = '#222';
-      message.style.borderColor = '#555';
-    } else {
-      displayedText = extractCodeBlocks(displayedText);
-      if (displayedText.startsWith('`') && displayedText.endsWith('`')) {
-        message.style.backgroundColor = '#333';
-      }
-    }
+    displayedText = extractCodeBlocks(displayedText);
   }
 
   const parsedContent = parseResponse(displayedText);
@@ -218,6 +210,142 @@ function createTable(match, table) {
   }
 
   return `\n${tableElement.outerHTML}\n`;
+}
+
+async function sendMessage() {
+  apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
+  const message = messageInput.value.trim();
+
+  if (!message) {
+    alert('Please enter a message.');
+    return;
+  }
+
+  localStorage.setItem('apiKey', apiKey);
+  localStorage.setItem('apiEndpoint', apiEndpoint);
+
+  createAndAppendMessage(message, 'user');
+  messageInput.value = '';
+  messageInput.style.height = 'auto';
+
+  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
+
+  const botResponse = jsonResponse.choices[0].message.content;
+  messages.push({
+    role: 'assistant',
+    content: botResponse,
+  });
+
+  createAndAppendMessage(botResponse, 'bot');
+}
+
+function copyToClipboard(text) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+}
+
+function clearChatHistory() {
+  chatHistory.innerHTML = '';
+  messages = [
+    {
+      role: 'system',
+      content: localStorage.getItem('systemRole') || '',
+    },
+  ];
+}
+
+document.getElementById('copy-button').addEventListener('click', () => {
+  const latestResponse = chatHistory.lastElementChild.innerHTML;
+  if (latestResponse) {
+    copyToClipboard(latestResponse);
+    alert('Text copied to clipboard');
+  } else {
+    alert('No text to copy');
+  }
+});
+
+systemRoleInput.value = localStorage.getItem('systemRole') || '';
+systemRoleInput.addEventListener('input', () => {
+  localStorage.setItem('systemRole', systemRoleInput.value);
+  messages[0].content = systemRoleInput.value;
+});
+
+window.addEventListener('load', updateModelHeading);
+
+function saveInputsAndRefresh() {
+  apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
+
+  localStorage.setItem('apiKey', apiKey);
+  localStorage.setItem('apiEndpoint', apiEndpoint);
+
+  location.reload();
+}
+
+document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
+
+function applyBlockquoteStyle(element) {
+  element.style.backgroundColor = '#222';
+  element.style.border = '1px solid #555';
+}
+
+async function createAndAppendMessage(content, owner) {
+  const message = document.createElement('div');
+  message.classList.add('message', owner);
+
+  let displayedText = content;
+
+  if (owner === 'bot') {
+    displayedText = extractCodeBlocks(displayedText);
+    if (displayedText.startsWith('>')) {
+      applyBlockquoteStyle(message);
+    }
+  }
+
+  const parsedContent = parseResponse(displayedText);
+  message.innerHTML = parsedContent;
+
+  chatHistory.appendChild(message);
+  chatHistory.scrollTop = chatHistory.scrollHeight;
+
+  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
+}
+
+function parseResponse(response) {
+  let parsedResponse = response;
+
+  const codeBlocks = parsedResponse.match(codeBlockRegex);
+  if (codeBlocks) {
+    codeBlocks.forEach((codeBlock, index) => {
+      parsedResponse = parsedResponse.replace(codeBlock, `CODEBLOCK${index}`);
+    });
+  }
+
+  parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+  parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+  parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+  parsedResponse = parseTables(parsedResponse);
+
+  headingRegex.forEach((regex, index) => {
+    const fontSize = 30 - (index * 4);
+    const fontWeight = index === 0 ? 'bold' : 'normal';
+    parsedResponse = parsedResponse.replace(regex, `<span style="font-size: ${fontSize}px; font-weight: ${fontWeight};">$1</span>`);
+  });
+
+  parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '<i>$1</i>');
+
+  if (codeBlocks) {
+    codeBlocks.forEach((codeBlock, index) => {
+      parsedResponse = parsedResponse.replace(`CODEBLOCK${index}`, createCodeBlockUI(codeBlock));
+    });
+  }
+
+  return parsedResponse;
 }
 
 async function sendMessage() {
