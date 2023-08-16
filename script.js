@@ -104,7 +104,8 @@ function extractCodeBlocks(response) {
   const codeBlocks = response.match(codeBlockRegex);
   if (codeBlocks) {
     codeBlocks.forEach((codeBlock) => {
-      response = response.replace(codeBlock, createCodeBlockUI(codeBlock));
+      const codeWithoutMarkdown = codeBlock.replace(/```/g, '');
+      response = response.replace(codeBlock, '```' + codeWithoutMarkdown + '```');
     });
   }
   return response;
@@ -112,11 +113,7 @@ function extractCodeBlocks(response) {
 
 function createCodeBlockUI(codeBlock) {
   const preElement = document.createElement('pre');
-  preElement.innerHTML = codeBlock.replace(/```/g, '');
-  
-  preElement.querySelectorAll('b, i').forEach(element => {
-    element.outerHTML = element.innerHTML;
-  });
+  preElement.textContent = codeBlock.replace(/```/g, '');
 
   const codeBlockElement = document.createElement('div');
   codeBlockElement.classList.add('code-block');
@@ -152,11 +149,18 @@ async function createAndAppendMessage(content, owner) {
 function parseResponse(response) {
   let parsedResponse = response;
 
+  const codeBlocks = parsedResponse.match(codeBlockRegex);
+  if (codeBlocks) {
+    codeBlocks.forEach((codeBlock, index) => {
+      parsedResponse = parsedResponse.replace(codeBlock, `CODEBLOCK${index}`);
+    });
+  }
+
   parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
   parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parseTables(parsedResponse);
-  
+
   headingRegex.forEach((regex, index) => {
     const fontSize = 30 - (index * 4);
     const fontWeight = index === 0 ? 'bold' : 'normal';
@@ -164,6 +168,12 @@ function parseResponse(response) {
   });
 
   parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '<i>$1</i>');
+
+  if (codeBlocks) {
+    codeBlocks.forEach((codeBlock, index) => {
+      parsedResponse = parsedResponse.replace(`CODEBLOCK${index}`, createCodeBlockUI(codeBlock));
+    });
+  }
 
   return parsedResponse;
 }
