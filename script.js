@@ -111,12 +111,12 @@ function extractCodeBlocks(response) {
 }
 
 function createCodeBlockUI(codeBlock) {
-  const preElement = document.createElement('pre');
-  preElement.textContent = codeBlock.replace(/```/g, '');
+  const codeElement = document.createElement('code');
+  codeElement.textContent = codeBlock.replace(/```/g, '');
 
-  const codeBlockElement = document.createElement('div');
+  const codeBlockElement = document.createElement('pre');
   codeBlockElement.classList.add('code-block');
-  codeBlockElement.appendChild(preElement);
+  codeBlockElement.appendChild(codeElement);
 
   const copyCodeButton = document.createElement('button');
   copyCodeButton.classList.add('copy-code-button');
@@ -129,7 +129,7 @@ function createCodeBlockUI(codeBlock) {
 async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
-
+  
   let displayedText = content;
 
   if (owner === 'bot') {
@@ -148,18 +148,20 @@ async function createAndAppendMessage(content, owner) {
 function parseResponse(response) {
   let parsedResponse = response;
 
-  parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-  parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
-  parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
-  parsedResponse = parseTables(parsedResponse);
-  
-  headingRegex.forEach((regex, index) => {
-    const fontSize = 30 - (index * 4);
-    const fontWeight = index === 0 ? 'bold' : 'normal';
-    parsedResponse = parsedResponse.replace(regex, `<span style="font-size: ${fontSize}px; font-weight: ${fontWeight};">$1</span>`);
-  });
+  if (!parsedResponse.startsWith('<code>')) {
+    parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+    parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+    parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+    parsedResponse = parseTables(parsedResponse);
 
-  parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '<i>$1</i>');
+    headingRegex.forEach((regex, index) => {
+      const fontSize = 30 - (index * 4);
+      const fontWeight = index === 0 ? 'bold' : 'normal';
+      parsedResponse = parsedResponse.replace(regex, `<span style="font-size: ${fontSize}px; font-weight: ${fontWeight};">$1</span>`);
+    });
+
+    parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '<i>$1</i>');
+  }
 
   return parsedResponse;
 }
