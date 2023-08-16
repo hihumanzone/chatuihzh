@@ -140,23 +140,6 @@ async function createAndAppendMessage(content, owner) {
   const parsedContent = parseResponse(displayedText);
   message.innerHTML = parsedContent;
 
-  if (owner === 'bot') {
-    const firstChildElement = message.firstChild;
-    if (firstChildElement && firstChildElement.nodeType === Node.TEXT_NODE) {
-      const text = firstChildElement.textContent;
-      const style = {};
-
-      if (text.startsWith('`')) {
-        style.backgroundColor = '#333';
-      } else if (text.startsWith('>')) {
-        style.backgroundColor = '#222';
-        style.borderColor = '#555';
-      }
-
-      applyStyle(message, style);
-    }
-  }
-
   chatHistory.appendChild(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
 
@@ -305,8 +288,3 @@ function saveInputsAndRefresh() {
 }
 
 document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
-
-function applyStyle(element, style) {
-  element.style.backgroundColor = style.backgroundColor || '';
-  element.style.borderColor = style.borderColor || '';
-}
