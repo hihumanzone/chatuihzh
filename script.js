@@ -137,6 +137,8 @@ async function createAndAppendMessage(content, owner) {
     displayedText = extractCodeBlocks(displayedText);
   }
 
+  displayedText = handleBackgroundColors(displayedText);
+
   const parsedContent = parseResponse(displayedText);
   message.innerHTML = parsedContent;
 
@@ -144,6 +146,14 @@ async function createAndAppendMessage(content, owner) {
   chatHistory.scrollTop = chatHistory.scrollHeight;
 
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
+}
+
+function handleBackgroundColors(text) {
+  if (text.startsWith('>') && text.endsWith('\n')) {
+    return `<div style="background-color: #222;">${text}</div>`;
+  }
+
+  return text.replace(/`(.*?)`/g, '<span style="background-color: #333;">$1</span>');
 }
 
 function parseResponse(response) {
@@ -216,7 +226,6 @@ async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
   const message = messageInput.value.trim();
-  let content = message;
 
   if (!message) {
     alert('Please enter a message.');
@@ -226,15 +235,7 @@ async function sendMessage() {
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
 
-  if (message[0] == ">" && message.slice(-1) == "\n") {
-    content = `<span style="background-color: #222;">${message}</span>`;
-  }
-
-  if (content[0] == "`" && content.slice(-1) == "`") {
-    content = `<span style="background-color: #333;">${message}</span>`;
-  }
-
-  createAndAppendMessage(content, 'user');
+  createAndAppendMessage(message, 'user');
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
@@ -247,3 +248,53 @@ async function sendMessage() {
   });
 
   createAndAppendMessage(botResponse, 'bot');
+}
+
+function copyToClipboard(text) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+}
+
+function clearChatHistory() {
+  chatHistory.innerHTML = '';
+  messages = [
+    {
+      role: 'system',
+      content: localStorage.getItem('systemRole') || '',
+    },
+  ];
+}
+
+document.getElementById('copy-button').addEventListener('click', () => {
+  const latestResponse = chatHistory.lastElementChild.innerHTML;
+  if (latestResponse) {
+    copyToClipboard(latestResponse);
+    alert('Text copied to clipboard');
+  } else {
+    alert('No text to copy');
+  }
+});
+
+systemRoleInput.value = localStorage.getItem('systemRole') || '';
+systemRoleInput.addEventListener('input', () => {
+  localStorage.setItem('systemRole', systemRoleInput.value);
+  messages[0].content = systemRoleInput.value;
+});
+
+window.addEventListener('load', updateModelHeading);
+
+function saveInputsAndRefresh() {
+  apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
+
+  localStorage.setItem('apiKey', apiKey);
+  localStorage.setItem('apiEndpoint', apiEndpoint);
+
+  location.reload();
+}
+
+document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
