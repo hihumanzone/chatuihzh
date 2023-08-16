@@ -132,12 +132,18 @@ async function createAndAppendMessage(content, owner) {
   message.classList.add('message', owner);
 
   let displayedText = content;
-
+  
   if (owner === 'bot') {
-    displayedText = extractCodeBlocks(displayedText);
+    if (displayedText.startsWith('>')) {
+      message.style.backgroundColor = '#222';
+      message.style.borderColor = '#555';
+    } else {
+      displayedText = extractCodeBlocks(displayedText);
+      if (displayedText.startsWith('`') && displayedText.endsWith('`')) {
+        message.style.backgroundColor = '#333';
+      }
+    }
   }
-
-  displayedText = handleBackgroundColors(displayedText);
 
   const parsedContent = parseResponse(displayedText);
   message.innerHTML = parsedContent;
@@ -146,14 +152,6 @@ async function createAndAppendMessage(content, owner) {
   chatHistory.scrollTop = chatHistory.scrollHeight;
 
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
-}
-
-function handleBackgroundColors(text) {
-  if (text.startsWith('>') && text.endsWith('\n')) {
-    return `<div style="background-color: #222;">${text}</div>`;
-  }
-
-  return text.replace(/`(.*?)`/g, '<span style="background-color: #333;">$1</span>');
 }
 
 function parseResponse(response) {
