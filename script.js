@@ -209,7 +209,7 @@ function createTable(match, table) {
     tableElement.appendChild(row);
   }
 
-  return tableElement.outerHTML;
+  return `\n${tableElement.outerHTML}\n`;
 }
 
 async function sendMessage() {
