@@ -26,9 +26,9 @@ To use this web application, follow these steps:
 
 ## Screenshots
 
-![Screenshot 1](./ss1.jpg)
-![Screenshot 2](./ss2.jpg)
-![Screenshot 3](./ss3.jpg)
+![Screenshot 1](img/ss1.jpg)
+![Screenshot 2](img/ss2.jpg)
+![Screenshot 3](img/ss3.jpg)
 
 ## Technologies Used
 
