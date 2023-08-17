@@ -216,3 +216,13 @@ td:empty {
   margin-top: 5px;
   color: #fefefe;
 }
+
+.inline-code-block {
+  border: 0.5px solid #ccc;
+  background-color: #f5f5f5;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 14px;
+  color: #333;
+}
