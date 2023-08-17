@@ -167,7 +167,7 @@ function parseResponse(response) {
       parsedResponse = parsedResponse.replace(codeBlock, `CODEBLOCK${index}`);
     });
   }
-  
+
   const inlineCodeBlocks = parsedResponse.match(inlineCodeBlockRegex);
   if (inlineCodeBlocks) {
     inlineCodeBlocks.forEach((codeBlock, index) => {
@@ -187,14 +187,14 @@ function parseResponse(response) {
   });
 
   parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '<i>$1</i>');
-  parsedResponse = parsedResponse.replace(/^&gt;\s(.*?)$/gm, '<div class="blockquote">$1</div>');
+  parsedResponse = parsedResponse.replace(/^>\s(.*?)$/gm, '<div class="blockquote">$1</div>');
 
   if (codeBlocks) {
     codeBlocks.forEach((codeBlock, index) => {
       parsedResponse = parsedResponse.replace(`CODEBLOCK${index}`, createCodeBlockUI(codeBlock));
     });
   }
-  
+
   if (inlineCodeBlocks) {
     inlineCodeBlocks.forEach((codeBlock, index) => {
       parsedResponse = parsedResponse.replace(`INLINECODEBLOCK${index}`, createInlineCodeBlockUI(codeBlock));
