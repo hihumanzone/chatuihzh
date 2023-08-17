@@ -1,171 +1,340 @@
-let initialState = {
-    apiKey: localStorage.getItem('apiKey'),
-    apiEndpoint: localStorage.getItem('apiEndpoint'),
-    selectedModel: localStorage.getItem('selectedModel') || 'gpt-3.5-turbo',
-    systemRole: localStorage.getItem('systemRole') || '',
-    modelHeading: document.getElementById('model-heading')
+const chatHistory = document.getElementById('chat-history');
+const apiKeyInput = document.getElementById('api-key-input');
+const apiEndpointInput = document.getElementById('api-endpoint-input');
+const messageInput = document.getElementById('message-input');
+const modelMenu = document.getElementById('model-menu');
+const aiThinkingMsg = document.getElementById('ai-thinking');
+const systemRoleInput = document.getElementById('system-role-input');
+const codeBlockRegex = /```[\s\S]*?```/gs;
+const inlineCodeBlockRegex = /`(.*?)`/gs;
+const headingRegex = [
+  /^#\s(.+)/gm,
+  /^##\s(.+)/gm,
+  /^###\s(.+)/gm,
+  /^####\s(.+)/gm
+];
+
+const elements = {
+  chatHistory,
+  apiKeyInput,
+  apiEndpointInput,
+  messageInput,
+  modelMenu,
+  aiThinkingMsg,
+  systemRoleInput
 };
 
-const endpoint = apiEndpointInput.value || 'https://free.churchless.tech/v1/chat/completions';
-const re = {
-    codeBlock: /```[\s\S]*?```/gs,
-    inlineCodeBlock: /`(.*?)`/gs,
-    heading: [/^#\s(.+)/gm, /^##\s(.+)/gm, /^###\s(.+)/gm, /^####\s(.+)/gm]
+let state = {
+  messages: [
+    {
+      role: 'system',
+      content: localStorage.getItem('systemRole') || '',
+    },
+  ],
+  apiKey: localStorage.getItem('apiKey') || '',
+  apiEndpoint: localStorage.getItem('apiEndpoint') || '',
+  selectedModel: localStorage.getItem('selectedModel') || 'gpt-3.5-turbo',
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-    const messageInput = document.getElementById('message-input');
-    messageInput.addEventListener('keypress', resizeInput, false);
-    messageInput.addEventListener('keydown', (e) => (e.key === 'Enter' && !e.shiftKey) && resizeInput.call(this), false);
+elements.apiKeyInput.value = state.apiKey;
+elements.apiEndpointInput.value = state.apiEndpoint;
+selectModel(state.selectedModel);
+updateModelHeading();
+
+elements.messageInput.addEventListener('input', () => {
+  elements.messageInput.style.height = 'auto';
+  elements.messageInput.style.height = `${elements.messageInput.scrollHeight}px`;
 });
 
-const chatMessage = {
-    sendMessage: async (event) => {
-        event.preventDefault();
-        let content = messageInput.value.trim();
-        createAndAppendMessage(content, 'user');
-        messageInput.value = '';
-        resizeInput.call(messageInput);
-    },
-    createAndAppendMessage: async (content, owner) => {
-        const message = document.createElement('div');
-        message.classList.add('message', owner);
-        let displayedText = owner === 'bot' ? content.replace(/</g, "<").replace(/>/g, ">") : content;
-        displayedText = owner === 'bot' ? extractCodeBlocks(displayedText) : displayedText;
-        message.innerHTML = parseResponse(displayedText);
-        chatHistory.appendChild(message);
-        chatHistory.scrollTop = chatHistory.scrollHeight;
-    },
-    resizeInput: () => {
-        this.style.height = `${this.scrollHeight}px`;
-    }
-};
+elements.messageInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    elements.messageInput.value += '\n';
+    elements.messageInput.style.height = `${elements.messageInput.scrollHeight}px`;
+  }
+});
 
-const modelMenu = {
-    selectModel: (model) => {
-        const options = document.querySelectorAll('ul li');
-        options.forEach(option => option.classList.remove('selected'));
-        const chosenOption = Array.from(options).find(option => option.dataset.model === model);
-        toggleMenuHandler(chosenOption);
-    },
-    toggleModelMenu: () => { modelMenu.style.display = toggleDisplay(modelMenu.style.display); },
-    toggleMenuHandler: async (option) => {
-        option.classList.add('selected');
-        localStorage.setItem('selectedModel', initialState.selectedModel);
-        modelMenu.style.display = toggleDisplay(modelMenu.style.display);
-        updateHeader();
-    },
-    updateHeader: () => { initialState.modelHeading.textContent = `Chat with ${initialState.selectedModel}`; }
-};
+document.getElementById('send-button').addEventListener('click', sendMessage);
 
-function replaceCodeBlocks(response, codeBlocks, name) {
-    return codeBlocks.reduce((res, c, i) => res.replace(c, `${name}${i}`), response);
+function toggleModelMenu() {
+  elements.modelMenu.style.display = elements.modelMenu.style.display === 'none' ? 'block' : 'none';
+}
+
+elements.modelMenu.addEventListener('click', function(event) {
+  if (event.target.tagName === 'LI') {
+    const modelOptions = document.querySelectorAll('ul li');
+    modelOptions.forEach((option) => option.classList.remove('selected'));
+    
+    event.target.classList.add('selected');
+    
+    state.selectedModel = event.target.getAttribute('data-model');
+    localStorage.setItem('selectedModel', state.selectedModel);
+    
+    toggleModelMenu();
+    updateModelHeading();
+  }
+});
+
+function updateModelHeading() {
+  const modelHeading = document.querySelector('h1');
+  modelHeading.textContent = `Chat with ${state.selectedModel}`;
+}
+
+const ENDPOINT = state.apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
+
+async function getBotResponse(apiKey, apiEndpoint, message) {
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${apiKey}`,
+  };
+
+  state.messages.push({
+    role: 'user',
+    content: message,
+  });
+
+  elements.aiThinkingMsg.style.display = 'block';
+
+  const data = {
+    model: state.selectedModel,
+    messages: state.messages,
+  };
+
+  const response = await fetch(ENDPOINT, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify(data),
+  });
+
+  elements.aiThinkingMsg.style.display = 'none';
+
+  return response.json();
+}
+
+function extractCodeBlocks(response) {
+  const codeBlocks = response.match(codeBlockRegex);
+  if (codeBlocks) {
+    response = codeBlocks.reduce((acc, codeBlock) => {
+      const codeWithoutMarkdown = codeBlock.replace(/```/g, '');
+      return acc.replace(codeBlock, '```' + codeWithoutMarkdown + '```');
+    }, response);
+  }
+  
+  const inlineCodeBlocks = response.match(inlineCodeBlockRegex);
+  if (inlineCodeBlocks) {
+    response = inlineCodeBlocks.reduce((acc, inlineCodeBlock) => {
+      const codeWithoutMarkdown = inlineCodeBlock.replace(/`/g, '');
+      return acc.replace(inlineCodeBlock, '`' + codeWithoutMarkdown + '`');
+    }, response);
+  }
+
+  return response;
+}
+
+function createCodeBlockUI(codeBlock) {
+  const preElement = document.createElement('pre');
+  preElement.textContent = codeBlock.replace(/```/g, '');
+
+  const codeBlockElement = document.createElement('div');
+  codeBlockElement.classList.add('code-block');
+  codeBlockElement.appendChild(preElement);
+
+  const copyCodeButton = document.createElement('button');
+  copyCodeButton.classList.add('copy-code-button');
+  copyCodeButton.textContent = 'Copy The Code';
+  codeBlockElement.appendChild(copyCodeButton);
+
+  return codeBlockElement.outerHTML;
+}
+
+function createInlineCodeBlockUI(codeBlock) {
+  const spanElement = document.createElement('span');
+  spanElement.textContent = codeBlock.replace(/`/g, '');
+
+  const inlineCodeBlockElement = document.createElement('span');
+  inlineCodeBlockElement.classList.add('inline-code-block');
+  inlineCodeBlockElement.appendChild(spanElement);
+
+  return inlineCodeBlockElement.outerHTML;
+}
+
+async function createAndAppendMessage(content, owner) {
+  const message = document.createElement('div');
+  message.classList.add('message', owner);
+
+  let displayedText = owner === 'bot' ? content.replace(/</g, "&lt;").replace(/>/g, "&gt;") : content;
+
+  if (owner === 'bot') {
+    displayedText = extractCodeBlocks(displayedText);
+  }
+
+  const parsedContent = parseResponse(displayedText);
+  message.innerHTML = parsedContent;
+
+  elements.chatHistory.appendChild(message);
+  elements.chatHistory.scrollTop = elements.chatHistory.scrollHeight;
+
+  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
 }
 
 function parseResponse(response) {
-    let parsedResponse = response;
-    const codeBlocks = parsedResponse.match(codeBlockRegex) || [];
-    const inlineCodeBlocks = parsedResponse.match(inlineCodeBlockRegex) || [];
+  let parsedResponse = response;
 
-    const pairRegex = {
-        "\\*\\*(.*?)\\*\\*": "<b>$1</b>",
-        "\\$\\$(.*?)\\$\\$": '<span class="mathjax-latex">\\($1\\)</span>',
-        "\\$(.*?)\\$": '<span class="mathjax-latex">\\($1\\)</span>',
-        "^>\\s(.*?)$": '<div class="blockquote">$1</div>',
-        "\\*(.*?)\\*": '<i>$1</i>',
-    };
+  const codeBlocks = parsedResponse.match(codeBlockRegex);
+  const inlineCodeBlocks = parsedResponse.match(inlineCodeBlockRegex);
 
-    parsedResponse = replaceCodeBlocks(parsedResponse, codeBlocks, 'CODEBLOCK');
-    parsedResponse = replaceCodeBlocks(parsedResponse, inlineCodeBlocks, 'INLINECODEBLOCK');
+  if (codeBlocks) {
+    parsedResponse = codeBlocks.reduce((acc, codeBlock, index) => {
+      return acc.replace(codeBlock, `CODEBLOCK${index}`);
+    }, parsedResponse);
+  }
 
-    Object.entries(pairRegex).forEach(([key, value]) => parsedResponse = parsedResponse.replace(new RegExp(key, 'gm'), value));
+  if (inlineCodeBlocks) {
+    parsedResponse = inlineCodeBlocks.reduce((acc, inlineCodeBlock, index) => {
+      return acc.replace(inlineCodeBlock, `INLINECODEBLOCK${index}`);
+    }, parsedResponse);
+  }
 
-    parsedResponse = parseTables(parsedResponse);
+  parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+  parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+  parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+  parsedResponse = parseTables(parsedResponse);
 
-    headingRegex.forEach((regex, index) => {
-        const style = `font-size: ${30 - index * 4}px; font-weight: ${index === 0 ? 'bold' : 'normal'};`;
-        parsedResponse = parsedResponse.replace(regex, `<span style="${style}">$1</span>`);
-    });
+  headingRegex.forEach((regex, index) => {
+    const fontSize = 30 - (index * 4);
+    const fontWeight = index === 0 ? 'bold' : 'normal';
+    parsedResponse = parsedResponse.replace(regex, `<span style="font-size: ${fontSize}px; font-weight: ${fontWeight};">$1</span>`);
+  });
 
-    parsedResponse = replaceCodeBlocks(parsedResponse, codeBlocks, 'CODEBLOCK', createCodeBlockUI);
-    parsedResponse = replaceCodeBlocks(parsedResponse, inlineCodeBlocks, 'INLINECODEBLOCK', createInlineCodeBlockUI);
+  parsedResponse = parsedResponse.replace(/^>\s(.*?)$/gm, '<div class="blockquote">$1</div>');
+  parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '<i>$1</i>');
 
-    return parsedResponse;
+  if (codeBlocks) {
+    parsedResponse = codeBlocks.reduce((acc, codeBlock, index) => {
+      return acc.replace(`CODEBLOCK${index}`, createCodeBlockUI(codeBlock));
+    }, parsedResponse);
+  }
+  
+  if (inlineCodeBlocks) {
+    parsedResponse = inlineCodeBlocks.reduce((acc, inlineCodeBlock, index) => {
+      return acc.replace(`INLINECODEBLOCK${index}`, createInlineCodeBlockUI(inlineCodeBlock));
+    }, parsedResponse);
+  }
+
+  return parsedResponse;
 }
 
 function parseTables(response) {
-    const tableRegex = /\n((?:\s*:?[\|:].*?:?\|\n)+)\n/g;
-    return response.replace(tableRegex, createTable);
+  const tableRegex = /\n((?:\s*:?[\|:].*?:?\|\n)+)\n/g;
+  return response.replace(tableRegex, createTable);
 }
 
 function createTable(match, table) {
-    const rows = table.trim().split('\n');
-    const tableHtml = ['<table>'];
+  const rows = table.trim().split('\n');
+  const tableElement = document.createElement('table');
 
-    const createCell = (tag, cellValue) => `<${tag} class='table-${tag === "th" ? "header" : "data"}'>${parseResponse(cellValue.trim())}</${tag}>`;
+  const tableHeader = document.createElement('tr');
+  const tableHeaderCells = rows[0].split('|').slice(1, -1);
+  tableHeaderCells.forEach((cell) => {
+    const th = document.createElement('th');
+    th.classList.add('table-header');
+    th.textContent = cell.trim();
+    tableHeader.appendChild(th);
+  });
+  tableElement.appendChild(tableHeader);
 
-    const headerCells = rows[0].split('|').slice(1, -1);
-    const tableHeader = `<tr>${headerCells.map(cell => createCell("th", cell)).join('')}</tr>`;
-    tableHtml.push(tableHeader);
+  for (let i = 2; i < rows.length; i++) {
+    const row = document.createElement('tr');
+    const tableCells = rows[i].split('|').slice(1, -1);
+    tableCells.forEach((cell) => {
+      const td = document.createElement('td');
+      td.classList.add('table-data');
+      td.innerHTML = parseResponse(cell.trim());
+      row.appendChild(td);
+    });
+    tableElement.appendChild(row);
+  }
 
-    for (let i = 2; i < rows.length; i++) {
-        const row = `<tr>${rows[i].split('|').slice(1, -1).map(cell => createCell("td", cell)).join('')}</tr>`;
-        tableHtml.push(row);
-    }
-
-    tableHtml.push('</table>');
-
-    return `\n${tableHtml.join('')}\n`;
+  return `\n${tableElement.outerHTML}\n`;
 }
 
-const LocalStorageService = {
-    get: (key, defaultValue = '') => localStorage.getItem(key) || defaultValue,
-
-    set: (key, value) => localStorage.setItem(key, value),
-};
-
 async function sendMessage() {
-    const [apiKey, apiEndpoint, message] = ['apiKey', 'apiEndpoint', 'message'].map(id => document.getElementById(id).value.trim());
+  state.apiKey = elements.apiKeyInput.value.trim();
+  state.apiEndpoint = elements.apiEndpointInput.value.trim();
+  const message = elements.messageInput.value.trim();
 
-    if (!message) {
-        return alert('Please enter a message.');
-    }
+  if (!message) {
+    alert('Please enter a message.');
+    return;
+  }
 
-    ['apiKey', 'apiEndpoint'].forEach(key => LocalStorageService.set(key, eval(key)));
+  localStorage.setItem('apiKey', state.apiKey);
+  localStorage.setItem('apiEndpoint', state.apiEndpoint);
 
-    createAndAppendMessage(message, 'user');
-    document.getElementById('message').value = '';
+  createAndAppendMessage(message, 'user');
+  elements.messageInput.value = '';
+  elements.messageInput.style.height = 'auto';
 
-    const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
-    const botResponse = jsonResponse.choices[0].message.content;
+  const jsonResponse = await getBotResponse(state.apiKey, state.apiEndpoint, message);
 
-    messages.push({ role: 'assistant', content: botResponse });
-    createAndAppendMessage(botResponse, 'bot');
+  const botResponse = jsonResponse.choices[0].message.content;
+  state.messages.push({
+    role: 'assistant',
+    content: botResponse,
+  });
+
+  createAndAppendMessage(botResponse, 'bot');
+}
+
+function copyToClipboard(text) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+}
+
+function clearChatHistory() {
+  elements.chatHistory.innerHTML = '';
+  state = {
+    messages: [
+      {
+        role: 'system',
+        content: localStorage.getItem('systemRole') || '',
+      },
+    ],
+    apiKey: '',
+    apiEndpoint: ''
+  };
 }
 
 document.getElementById('copy-button').addEventListener('click', () => {
-    const latestResponse = chatHistory.lastElementChild?.innerHTML;
-
-    if (latestResponse) {
-        navigator.clipboard.writeText(latestResponse)
-            .then(() => alert('Text copied to clipboard'))
-            .catch(() => alert('Failed to copy text to clipboard'));
-    } else {
-        alert('No text to copy');
-    }
+  const latestResponse = elements.chatHistory.lastElementChild.innerHTML;
+  if (latestResponse) {
+    copyToClipboard(latestResponse);
+    alert('Text copied to clipboard');
+  } else {
+    alert('No text to copy');
+  }
 });
 
-document.getElementById('systemRole').addEventListener('input', ({ target: { value } }) => {
-    LocalStorageService.set('systemRole', value);
-    messages[0].content = value;
+elements.systemRoleInput.value = localStorage.getItem('systemRole') || '';
+elements.systemRoleInput.addEventListener('input', () => {
+  localStorage.setItem('systemRole', elements.systemRoleInput.value);
+  state.messages[0].content = elements.systemRoleInput.value;
 });
 
 window.addEventListener('load', updateModelHeading);
 
-const saveInputsAndRefresh = () => {
-    ['apiKey', 'apiEndpoint'].forEach(key => LocalStorageService.set(key, document.getElementById(key).value.trim()));
+function saveInputsAndRefresh() {
+  state.apiKey = elements.apiKeyInput.value.trim();
+  state.apiEndpoint = elements.apiEndpointInput.value.trim();
 
-    location.reload();
+  localStorage.setItem('apiKey', state.apiKey);
+  localStorage.setItem('apiEndpoint', state.apiEndpoint);
+
+  location.reload();
 }
 
 document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
