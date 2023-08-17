@@ -7,43 +7,31 @@ const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 const codeBlockRegex = /```[\s\S]*?```/gs;
 const inlineCodeBlockRegex = /`(.*?)`/gs;
-const headingRegex = [
-  /^#\s(.+)/gm,
-  /^##\s(.+)/gm,
-  /^###\s(.+)/gm,
-  /^####\s(.+)/gm
-];
-
-let messages = [
-  {
-    role: 'system',
-    content: localStorage.getItem('systemRole') || '',
-  },
-];
-
-let apiKey = localStorage.getItem('apiKey') || '';
-let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
+const headingRegex = [/^#\s(.+)/gm, /^##\s(.+)/gm, /^###\s(.+)/gm, /^####\s(.+)/gm];
+const messages = [{ role: 'system', content: localStorage.getItem('systemRole') || '' }];
+const apiKey = localStorage.getItem('apiKey') || '';
+const apiEndpoint = localStorage.getItem('apiEndpoint') || '';
 let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
-
 apiKeyInput.value = apiKey;
 apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
+messageInput.addEventListener('input', resizeMessageInput);
+messageInput.addEventListener('keydown', handleKeyDown);
+document.getElementById('send-button').addEventListener('click', sendMessage);
 
-messageInput.addEventListener('input', () => {
+function resizeMessageInput() {
   messageInput.style.height = 'auto';
   messageInput.style.height = `${messageInput.scrollHeight}px`;
-});
+}
 
-messageInput.addEventListener('keydown', (event) => {
+function handleKeyDown(event) {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     messageInput.value += '\n';
-    messageInput.style.height = `${messageInput.scrollHeight}px`;
+    resizeMessageInput();
   }
-});
-
-document.getElementById('send-button').addEventListener('click', sendMessage);
+}
 
 function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
@@ -52,15 +40,12 @@ function toggleModelMenu() {
 function selectModel(model) {
   const modelOptions = document.querySelectorAll('ul li');
   modelOptions.forEach((option) => option.classList.remove('selected'));
-
   const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
   if (selectedModelOption) {
     selectedModelOption.classList.add('selected');
   }
-
   selectedModel = model;
   localStorage.setItem('selectedModel', selectedModel);
-
   toggleModelMenu();
   updateModelHeading();
 }
@@ -87,7 +72,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 
   const data = {
     model: selectedModel,
-    messages: messages,
+    messages,
   };
 
   const response = await fetch(ENDPOINT, {
@@ -102,21 +87,15 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 }
 
 function extractCodeBlocks(response) {
-  const codeBlocks = response.match(codeBlockRegex);
-  if (codeBlocks) {
-    codeBlocks.forEach((codeBlock) => {
-      const codeWithoutMarkdown = codeBlock.replace(/```/g, '');
-      response = response.replace(codeBlock, '```' + codeWithoutMarkdown + '```');
-    });
-  }
-  
-  const inlineCodeBlocks = response.match(inlineCodeBlockRegex);
-  if (inlineCodeBlocks) {
-    inlineCodeBlocks.forEach((inlineCodeBlock) => {
-      const codeWithoutMarkdown = inlineCodeBlock.replace(/`/g, '');
-      response = response.replace(inlineCodeBlock, '`' + codeWithoutMarkdown + '`');
-    });
-  }
+  response = response.replace(codeBlockRegex, (codeBlock) => {
+    const codeWithoutMarkdown = codeBlock.replace(/```/g, '');
+    return '```' + codeWithoutMarkdown + '```';
+  });
+
+  response = response.replace(inlineCodeBlockRegex, (inlineCodeBlock) => {
+    const codeWithoutMarkdown = inlineCodeBlock.replace(/`/g, '');
+    return '`' + codeWithoutMarkdown + '`';
+  });
 
   return response;
 }
@@ -152,8 +131,7 @@ async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
 
-  let displayedText = owner === 'bot' ? content.replace(/</g, "&lt;").replace(/>/g, "&gt;") : content;
-
+  let displayedText = owner === 'bot' ? content.replace(/</g, '&lt;').replace(/>/g, '&gt;') : content;
   if (owner === 'bot') {
     displayedText = extractCodeBlocks(displayedText);
   }
@@ -169,29 +147,13 @@ async function createAndAppendMessage(content, owner) {
 
 function parseResponse(response) {
   let parsedResponse = response;
-
-  const codeBlocks = parsedResponse.match(codeBlockRegex);
-  const inlineCodeBlocks = parsedResponse.match(inlineCodeBlockRegex);
-
-  if (codeBlocks) {
-    codeBlocks.forEach((codeBlock, index) => {
-      parsedResponse = parsedResponse.replace(codeBlock, `CODEBLOCK${index}`);
-    });
-  }
-
-  if (inlineCodeBlocks) {
-    inlineCodeBlocks.forEach((inlineCodeBlock, index) => {
-      parsedResponse = parsedResponse.replace(inlineCodeBlock, `INLINECODEBLOCK${index}`);
-    });
-  }
-
   parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
   parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parseTables(parsedResponse);
 
   headingRegex.forEach((regex, index) => {
-    const fontSize = 30 - (index * 4);
+    const fontSize = 30 - index * 4;
     const fontWeight = index === 0 ? 'bold' : 'normal';
     parsedResponse = parsedResponse.replace(regex, `<span style="font-size: ${fontSize}px; font-weight: ${fontWeight};">$1</span>`);
   });
@@ -199,17 +161,8 @@ function parseResponse(response) {
   parsedResponse = parsedResponse.replace(/^>\s(.*?)$/gm, '<div class="blockquote">$1</div>');
   parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '<i>$1</i>');
 
-  if (codeBlocks) {
-    codeBlocks.forEach((codeBlock, index) => {
-      parsedResponse = parsedResponse.replace(`CODEBLOCK${index}`, createCodeBlockUI(codeBlock));
-    });
-  }
-  
-  if (inlineCodeBlocks) {
-    inlineCodeBlocks.forEach((inlineCodeBlock, index) => {
-      parsedResponse = parsedResponse.replace(`INLINECODEBLOCK${index}`, createInlineCodeBlockUI(inlineCodeBlock));
-    });
-  }
+  parsedResponse = parsedResponse.replace(codeBlockRegex, createCodeBlockUI);
+  parsedResponse = parsedResponse.replace(inlineCodeBlockRegex, createInlineCodeBlockUI);
 
   return parsedResponse;
 }
@@ -249,12 +202,12 @@ function createTable(match, table) {
 }
 
 async function sendMessage() {
-  apiKey = apiKeyInput.value.trim();
-  apiEndpoint = apiEndpointInput.value.trim();
+  const apiKey = apiKeyInput.value.trim();
+  const apiEndpoint = apiEndpointInput.value.trim();
   const message = messageInput.value.trim();
 
-  if (!message) {
-    alert('Please enter a message.');
+  if (!apiKey || !apiEndpoint || !message) {
+    alert('Please enter a valid API key, API endpoint, and message.');
     return;
   }
 
@@ -263,7 +216,7 @@ async function sendMessage() {
 
   createAndAppendMessage(message, 'user');
   messageInput.value = '';
-  messageInput.style.height = 'auto';
+  resizeMessageInput();
 
   const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
 
@@ -287,12 +240,8 @@ function copyToClipboard(text) {
 
 function clearChatHistory() {
   chatHistory.innerHTML = '';
-  messages = [
-    {
-      role: 'system',
-      content: localStorage.getItem('systemRole') || '',
-    },
-  ];
+  messages.length = 1;
+  messages[0].content = systemRoleInput.value || '';
 }
 
 document.getElementById('copy-button').addEventListener('click', () => {
@@ -314,8 +263,8 @@ systemRoleInput.addEventListener('input', () => {
 window.addEventListener('load', updateModelHeading);
 
 function saveInputsAndRefresh() {
-  apiKey = apiKeyInput.value.trim();
-  apiEndpoint = apiEndpointInput.value.trim();
+  const apiKey = apiKeyInput.value.trim();
+  const apiEndpoint = apiEndpointInput.value.trim();
 
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
