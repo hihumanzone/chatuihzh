@@ -6,7 +6,7 @@ const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 const codeBlockRegex = /```[\s\S]*?```/gs;
-const inlineCodeBlockRegex = /`(.*?)`/gs;
+const inlineCodeBlockRegex = /`((?!```).*?)`/gs;
 const headingRegex = [
   /^#\s(.+)/gm,
   /^##\s(.+)/gm,
@@ -102,25 +102,23 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 }
 
 function extractCodeBlocks(response) {
-  let output = response;
-
-  const codeBlocks = output.match(codeBlockRegex);
+  const codeBlocks = response.match(codeBlockRegex);
   if (codeBlocks) {
-    output = codeBlocks.reduce((acc, codeBlock) => {
-      const codeWithoutMarkdown = codeBlock.replace(/```/g, "");
-      return acc.replace(codeBlock, "```" + codeWithoutMarkdown + "```");
-    }, output);
+    response = codeBlocks.reduce((acc, codeBlock) => {
+      const codeWithoutMarkdown = codeBlock.replace(/```/g, '');
+      return acc.replace(codeBlock, '```' + codeWithoutMarkdown + '```');
+    }, response);
   }
-
-  const inlineCodeBlocks = output.match(inlineCodeBlockRegex);
+  
+  const inlineCodeBlocks = response.match(inlineCodeBlockRegex);
   if (inlineCodeBlocks) {
-    output = inlineCodeBlocks.reduce((acc, inlineCodeBlock) => {
-      const codeWithoutMarkdown = inlineCodeBlock.replace(/`/g, "");
-      return acc.replace(inlineCodeBlock, "`" + codeWithoutMarkdown + "`");
-    }, output);
+    response = inlineCodeBlocks.reduce((acc, inlineCodeBlock) => {
+      const codeWithoutMarkdown = inlineCodeBlock.replace(/`/g, '');
+      return acc.replace(inlineCodeBlock, '`' + codeWithoutMarkdown + '`');
+    }, response);
   }
 
-  return output;
+  return response;
 }
 
 function createCodeBlockUI(codeBlock) {
@@ -158,6 +156,8 @@ async function createAndAppendMessage(content, owner) {
 
   if (owner === 'bot') {
     displayedText = extractCodeBlocks(displayedText);
+    displayedText = displayedText.replace(codeBlockRegex, createCodeBlockUI);
+    displayedText = displayedText.replace(inlineCodeBlockRegex, createInlineCodeBlockUI);
   }
 
   const parsedContent = parseResponse(displayedText);
