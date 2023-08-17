@@ -226,3 +226,12 @@ td:empty {
   font-size: 14px;
   color: #333;
 }
+
+.blockquote {
+  background-color: #181818;
+  border-left: 8px solid #444;
+  padding-left: 16px;
+  padding-right: 16px;
+  color: white;
+  margin-bottom: 16px;
+}
