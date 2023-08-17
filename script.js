@@ -5,13 +5,13 @@ const messageInput = document.getElementById('message-input');
 const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
-const codeBlockRegex = /```[\s\S]*?```/gs;
+const codeBlockRegex = /```(.*?)```/gs;
 const inlineCodeBlockRegex = /`(.*?)`/gs;
 const headingRegex = [
   /^#\s(.+)/gm,
   /^##\s(.+)/gm,
   /^###\s(.+)/gm,
-  /^####\s(.+)/gm
+  /^####\s(.+)/gm,
 ];
 
 let messages = [
@@ -121,31 +121,13 @@ function extractCodeBlocks(response) {
   return response;
 }
 
-function createCodeBlockUI(codeBlock) {
-  const preElement = document.createElement('pre');
-  preElement.textContent = codeBlock.replace(/```/g, '');
-
-  const codeBlockElement = document.createElement('div');
-  codeBlockElement.classList.add('code-block');
-  codeBlockElement.appendChild(preElement);
-
-  const copyCodeButton = document.createElement('button');
-  copyCodeButton.classList.add('copy-code-button');
-  copyCodeButton.textContent = 'Copy The Code';
-  codeBlockElement.appendChild(copyCodeButton);
-
-  return codeBlockElement.outerHTML;
-}
-
-function createInlineCodeBlockUI(codeBlock) {
+function createInlineCodeBlockUI(inlineCodeBlock) {
   const spanElement = document.createElement('span');
-  spanElement.textContent = codeBlock.replace(/`/g, '');
+  spanElement.textContent = inlineCodeBlock.replace(/`/g, '');
 
-  const inlineCodeBlockElement = document.createElement('div');
-  inlineCodeBlockElement.classList.add('inline-code-block');
-  inlineCodeBlockElement.appendChild(spanElement);
+  spanElement.classList.add('inline-code-block');
 
-  return inlineCodeBlockElement.outerHTML;
+  return spanElement.outerHTML;
 }
 
 async function createAndAppendMessage(content, owner) {
@@ -171,14 +153,13 @@ function parseResponse(response) {
   let parsedResponse = response;
 
   const codeBlocks = parsedResponse.match(codeBlockRegex);
-  const inlineCodeBlocks = parsedResponse.match(inlineCodeBlockRegex);
-
   if (codeBlocks) {
     codeBlocks.forEach((codeBlock, index) => {
       parsedResponse = parsedResponse.replace(codeBlock, `CODEBLOCK${index}`);
     });
   }
 
+  const inlineCodeBlocks = parsedResponse.match(inlineCodeBlockRegex);
   if (inlineCodeBlocks) {
     inlineCodeBlocks.forEach((inlineCodeBlock, index) => {
       parsedResponse = parsedResponse.replace(inlineCodeBlock, `INLINECODEBLOCK${index}`);
