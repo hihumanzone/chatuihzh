@@ -187,6 +187,7 @@ function parseResponse(response) {
   });
 
   parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '<i>$1</i>');
+  parsedResponse = parsedResponse.replace(/^&gt;\s(.*?)$/gm, '<div class="blockquote">$1</div>');
 
   if (codeBlocks) {
     codeBlocks.forEach((codeBlock, index) => {
