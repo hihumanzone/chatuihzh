@@ -134,7 +134,7 @@ function createCodeBlockUI(codeBlock) {
   copyCodeButton.textContent = 'Copy The Code';
   codeBlockElement.appendChild(copyCodeButton);
 
-  return codeBlockElement.outerHTML;
+  return `\n${codeBlockElement.outerHTML}\n`;
 }
 
 function createInlineCodeBlockUI(codeBlock) {
