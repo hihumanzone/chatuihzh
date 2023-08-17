@@ -141,7 +141,7 @@ function createInlineCodeBlockUI(codeBlock) {
   const spanElement = document.createElement('span');
   spanElement.textContent = codeBlock.replace(/`/g, '');
 
-  const inlineCodeBlockElement = document.createElement('div');
+  const inlineCodeBlockElement = document.createElement('span');
   inlineCodeBlockElement.classList.add('inline-code-block');
   inlineCodeBlockElement.appendChild(spanElement);
 
