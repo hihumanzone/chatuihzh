@@ -104,18 +104,18 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 function extractCodeBlocks(response) {
   const codeBlocks = response.match(codeBlockRegex);
   if (codeBlocks) {
-    codeBlocks.forEach((codeBlock) => {
+    response = codeBlocks.reduce((acc, codeBlock) => {
       const codeWithoutMarkdown = codeBlock.replace(/```/g, '');
-      response = response.replace(codeBlock, '```' + codeWithoutMarkdown + '```');
-    });
+      return acc.replace(codeBlock, '```' + codeWithoutMarkdown + '```');
+    }, response);
   }
   
   const inlineCodeBlocks = response.match(inlineCodeBlockRegex);
   if (inlineCodeBlocks) {
-    inlineCodeBlocks.forEach((inlineCodeBlock) => {
+    response = inlineCodeBlocks.reduce((acc, inlineCodeBlock) => {
       const codeWithoutMarkdown = inlineCodeBlock.replace(/`/g, '');
-      response = response.replace(inlineCodeBlock, '`' + codeWithoutMarkdown + '`');
-    });
+      return acc.replace(inlineCodeBlock, '`' + codeWithoutMarkdown + '`');
+    }, response);
   }
 
   return response;
@@ -174,15 +174,15 @@ function parseResponse(response) {
   const inlineCodeBlocks = parsedResponse.match(inlineCodeBlockRegex);
 
   if (codeBlocks) {
-    codeBlocks.forEach((codeBlock, index) => {
-      parsedResponse = parsedResponse.replace(codeBlock, `CODEBLOCK${index}`);
-    });
+    parsedResponse = codeBlocks.reduce((acc, codeBlock, index) => {
+      return acc.replace(codeBlock, `CODEBLOCK${index}`);
+    }, parsedResponse);
   }
 
   if (inlineCodeBlocks) {
-    inlineCodeBlocks.forEach((inlineCodeBlock, index) => {
-      parsedResponse = parsedResponse.replace(inlineCodeBlock, `INLINECODEBLOCK${index}`);
-    });
+    parsedResponse = inlineCodeBlocks.reduce((acc, inlineCodeBlock, index) => {
+      return acc.replace(inlineCodeBlock, `INLINECODEBLOCK${index}`);
+    }, parsedResponse);
   }
 
   parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -200,15 +200,15 @@ function parseResponse(response) {
   parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '<i>$1</i>');
 
   if (codeBlocks) {
-    codeBlocks.forEach((codeBlock, index) => {
-      parsedResponse = parsedResponse.replace(`CODEBLOCK${index}`, createCodeBlockUI(codeBlock));
-    });
+    parsedResponse = codeBlocks.reduce((acc, codeBlock, index) => {
+      return acc.replace(`CODEBLOCK${index}`, createCodeBlockUI(codeBlock));
+    }, parsedResponse);
   }
   
   if (inlineCodeBlocks) {
-    inlineCodeBlocks.forEach((inlineCodeBlock, index) => {
-      parsedResponse = parsedResponse.replace(`INLINECODEBLOCK${index}`, createInlineCodeBlockUI(inlineCodeBlock));
-    });
+    parsedResponse = inlineCodeBlocks.reduce((acc, inlineCodeBlock, index) => {
+      return acc.replace(`INLINECODEBLOCK${index}`, createInlineCodeBlockUI(inlineCodeBlock));
+    }, parsedResponse);
   }
 
   return parsedResponse;
