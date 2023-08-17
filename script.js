@@ -1,9 +1,18 @@
+const chatHistory = document.getElementById('chat-history');
 const apiKeyInput = document.getElementById('api-key-input');
 const apiEndpointInput = document.getElementById('api-endpoint-input');
 const messageInput = document.getElementById('message-input');
 const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
+const codeBlockRegex = /```[\s\S]*?```/gs;
+const inlineCodeBlockRegex = /`(.*?)`/gs;
+const headingRegex = [
+  /^#\s(.+)/gm,
+  /^##\s(.+)/gm,
+  /^###\s(.+)/gm,
+  /^####\s(.+)/gm
+];
 
 let messages = [
   {
@@ -35,21 +44,6 @@ messageInput.addEventListener('keydown', (event) => {
 });
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
-
-modelMenu.addEventListener('click', function(event) {
-  if (event.target.tagName === 'LI') {
-    const modelOptions = document.querySelectorAll('ul li');
-    modelOptions.forEach((option) => option.classList.remove('selected'));
-    
-    event.target.classList.add('selected');
-    
-    selectedModel = event.target.getAttribute('data-model');
-    localStorage.setItem('selectedModel', selectedModel);
-    
-    toggleModelMenu();
-    updateModelHeading();
-  }
-});
 
 function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
