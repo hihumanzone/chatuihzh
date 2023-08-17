@@ -6,7 +6,6 @@ const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 const codeBlockRegex = /```(.*?)```/gs;
-const inlineCodeBlockRegex = /`(.*?)`/gs;
 const headingRegex = [
   /^#\s(.+)/gm,
   /^##\s(.+)/gm,
@@ -106,7 +105,7 @@ function extractCodeBlocks(response) {
   if (codeBlocks) {
     codeBlocks.forEach((codeBlock) => {
       const codeWithoutMarkdown = codeBlock.replace(/```/g, '');
-      response = response.replace(codeBlock, codeWithoutMarkdown);
+      response = response.replace(codeBlock, '```' + codeWithoutMarkdown + '```');
     });
   }
   return response;
@@ -124,17 +123,6 @@ function createCodeBlockUI(codeBlock) {
   copyCodeButton.classList.add('copy-code-button');
   copyCodeButton.textContent = 'Copy The Code';
   codeBlockElement.appendChild(copyCodeButton);
-
-  return codeBlockElement.outerHTML;
-}
-
-function createInlineCodeBlockUI(codeBlock) {
-  const codeElement = document.createElement('code');
-  codeElement.textContent = codeBlock.replace(/`/g, '');
-
-  const codeBlockElement = document.createElement('span');
-  codeBlockElement.classList.add('inline-code-block');
-  codeBlockElement.appendChild(codeElement);
 
   return codeBlockElement.outerHTML;
 }
@@ -168,13 +156,6 @@ function parseResponse(response) {
     });
   }
 
-  const inlineCodeBlocks = parsedResponse.match(inlineCodeBlockRegex);
-  if (inlineCodeBlocks) {
-    inlineCodeBlocks.forEach((codeBlock, index) => {
-      parsedResponse = parsedResponse.replace(codeBlock, `INLINECODEBLOCK${index}`);
-    });
-  }
-
   parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
   parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
@@ -186,18 +167,12 @@ function parseResponse(response) {
     parsedResponse = parsedResponse.replace(regex, `<span style="font-size: ${fontSize}px; font-weight: ${fontWeight};">$1</span>`);
   });
 
-  parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '<i>$1</i>');
   parsedResponse = parsedResponse.replace(/^>\s(.*?)$/gm, '<div class="blockquote">$1</div>');
+  parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '<i>$1</i>');
 
   if (codeBlocks) {
     codeBlocks.forEach((codeBlock, index) => {
       parsedResponse = parsedResponse.replace(`CODEBLOCK${index}`, createCodeBlockUI(codeBlock));
-    });
-  }
-
-  if (inlineCodeBlocks) {
-    inlineCodeBlocks.forEach((codeBlock, index) => {
-      parsedResponse = parsedResponse.replace(`INLINECODEBLOCK${index}`, createInlineCodeBlockUI(codeBlock));
     });
   }
 
