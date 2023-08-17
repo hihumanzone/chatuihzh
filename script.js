@@ -6,6 +6,7 @@ const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 const codeBlockRegex = /```(.*?)```/gs;
+const inlineCodeBlockRegex = /`(.*?)`/gs;
 const headingRegex = [
   /^#\s(.+)/gm,
   /^##\s(.+)/gm,
@@ -127,6 +128,17 @@ function createCodeBlockUI(codeBlock) {
   return codeBlockElement.outerHTML;
 }
 
+function createInlineCodeBlockUI(codeBlock) {
+  const codeElement = document.createElement('code');
+  codeElement.textContent = codeBlock.replace(/`/g, '');
+
+  const codeBlockElement = document.createElement('span');
+  codeBlockElement.classList.add('inline-code-block');
+  codeBlockElement.appendChild(codeElement);
+
+  return codeBlockElement.outerHTML;
+}
+
 async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
@@ -155,6 +167,13 @@ function parseResponse(response) {
       parsedResponse = parsedResponse.replace(codeBlock, `CODEBLOCK${index}`);
     });
   }
+  
+  const inlineCodeBlocks = parsedResponse.match(inlineCodeBlockRegex);
+  if (inlineCodeBlocks) {
+    inlineCodeBlocks.forEach((codeBlock, index) => {
+      parsedResponse = parsedResponse.replace(codeBlock, `INLINECODEBLOCK${index}`);
+    });
+  }
 
   parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
   parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
@@ -172,6 +191,12 @@ function parseResponse(response) {
   if (codeBlocks) {
     codeBlocks.forEach((codeBlock, index) => {
       parsedResponse = parsedResponse.replace(`CODEBLOCK${index}`, createCodeBlockUI(codeBlock));
+    });
+  }
+  
+  if (inlineCodeBlocks) {
+    inlineCodeBlocks.forEach((codeBlock, index) => {
+      parsedResponse = parsedResponse.replace(`INLINECODEBLOCK${index}`, createInlineCodeBlockUI(codeBlock));
     });
   }
 
