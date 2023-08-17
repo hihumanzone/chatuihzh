@@ -102,23 +102,25 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 }
 
 function extractCodeBlocks(response) {
-  const codeBlocks = response.match(codeBlockRegex);
+  let output = response;
+
+  const codeBlocks = output.match(codeBlockRegex);
   if (codeBlocks) {
-    response = codeBlocks.reduce((acc, codeBlock) => {
-      const codeWithoutMarkdown = codeBlock.replace(/```/g, '');
-      return acc.replace(codeBlock, '```' + codeWithoutMarkdown + '```');
-    }, response);
-  }
-  
-  const inlineCodeBlocks = response.match(inlineCodeBlockRegex);
-  if (inlineCodeBlocks) {
-    response = inlineCodeBlocks.reduce((acc, inlineCodeBlock) => {
-      const codeWithoutMarkdown = inlineCodeBlock.replace(/`/g, '');
-      return acc.replace(inlineCodeBlock, '`' + codeWithoutMarkdown + '`');
-    }, response);
+    output = codeBlocks.reduce((acc, codeBlock) => {
+      const codeWithoutMarkdown = codeBlock.replace(/```/g, "");
+      return acc.replace(codeBlock, "```" + codeWithoutMarkdown + "```");
+    }, output);
   }
 
-  return response;
+  const inlineCodeBlocks = output.match(inlineCodeBlockRegex);
+  if (inlineCodeBlocks) {
+    output = inlineCodeBlocks.reduce((acc, inlineCodeBlock) => {
+      const codeWithoutMarkdown = inlineCodeBlock.replace(/`/g, "");
+      return acc.replace(inlineCodeBlock, "`" + codeWithoutMarkdown + "`");
+    }, output);
+  }
+
+  return output;
 }
 
 function createCodeBlockUI(codeBlock) {
