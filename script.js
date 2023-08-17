@@ -5,7 +5,8 @@ const messageInput = document.getElementById('message-input');
 const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
-const codeBlockRegex = /```(.*?)```/gs;
+const codeBlockRegex = /```[\s\S]*?```/gs;
+const inlineCodeBlockRegex = /`(.*?)`/gs;
 const headingRegex = [
   /^#\s(.+)/gm,
   /^##\s(.+)/gm,
@@ -108,6 +109,15 @@ function extractCodeBlocks(response) {
       response = response.replace(codeBlock, '```' + codeWithoutMarkdown + '```');
     });
   }
+  
+  const inlineCodeBlocks = response.match(inlineCodeBlockRegex);
+  if (inlineCodeBlocks) {
+    inlineCodeBlocks.forEach((inlineCodeBlock) => {
+      const codeWithoutMarkdown = inlineCodeBlock.replace(/`/g, '');
+      response = response.replace(inlineCodeBlock, '`' + codeWithoutMarkdown + '`');
+    });
+  }
+
   return response;
 }
 
@@ -125,6 +135,17 @@ function createCodeBlockUI(codeBlock) {
   codeBlockElement.appendChild(copyCodeButton);
 
   return codeBlockElement.outerHTML;
+}
+
+function createInlineCodeBlockUI(codeBlock) {
+  const spanElement = document.createElement('span');
+  spanElement.textContent = codeBlock.replace(/`/g, '');
+
+  const inlineCodeBlockElement = document.createElement('div');
+  inlineCodeBlockElement.classList.add('inline-code-block');
+  inlineCodeBlockElement.appendChild(spanElement);
+
+  return inlineCodeBlockElement.outerHTML;
 }
 
 async function createAndAppendMessage(content, owner) {
@@ -150,9 +171,17 @@ function parseResponse(response) {
   let parsedResponse = response;
 
   const codeBlocks = parsedResponse.match(codeBlockRegex);
+  const inlineCodeBlocks = parsedResponse.match(inlineCodeBlockRegex);
+
   if (codeBlocks) {
     codeBlocks.forEach((codeBlock, index) => {
       parsedResponse = parsedResponse.replace(codeBlock, `CODEBLOCK${index}`);
+    });
+  }
+
+  if (inlineCodeBlocks) {
+    inlineCodeBlocks.forEach((inlineCodeBlock, index) => {
+      parsedResponse = parsedResponse.replace(inlineCodeBlock, `INLINECODEBLOCK${index}`);
     });
   }
 
@@ -173,6 +202,12 @@ function parseResponse(response) {
   if (codeBlocks) {
     codeBlocks.forEach((codeBlock, index) => {
       parsedResponse = parsedResponse.replace(`CODEBLOCK${index}`, createCodeBlockUI(codeBlock));
+    });
+  }
+  
+  if (inlineCodeBlocks) {
+    inlineCodeBlocks.forEach((inlineCodeBlock, index) => {
+      parsedResponse = parsedResponse.replace(`INLINECODEBLOCK${index}`, createInlineCodeBlockUI(inlineCodeBlock));
     });
   }
 
