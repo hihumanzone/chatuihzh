@@ -106,7 +106,7 @@ function extractCodeBlocks(response) {
   if (codeBlocks) {
     codeBlocks.forEach((codeBlock) => {
       const codeWithoutMarkdown = codeBlock.replace(/```/g, '');
-      response = response.replace(codeBlock, '```' + codeWithoutMarkdown + '```');
+      response = response.replace(codeBlock, codeWithoutMarkdown);
     });
   }
   return response;
