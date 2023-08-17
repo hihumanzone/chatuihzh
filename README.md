@@ -33,3 +33,9 @@ Visit [this link](https://chatuihzh.vercel.app/) to access the chat interface.
 
 ## Note
 Please ensure you have the necessary permissions and API limits before interacting with the OpenAI models.
+
+## Contributors
+
+- [hihumanzone](https://github.com/hihumanzone) Discord: ho0e (emoo man)
+
+Feel free to contribute to this project by creating pull requests or submitting issues.
