@@ -6,7 +6,7 @@ const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 const codeBlockRegex = /```[\s\S]*?```/gs;
-const inlineCodeBlockRegex = /`((?!```).*?)`/gs;
+const inlineCodeBlockRegex = /`(.*?)`/gs;
 const headingRegex = [
   /^#\s(.+)/gm,
   /^##\s(.+)/gm,
@@ -134,7 +134,7 @@ function createCodeBlockUI(codeBlock) {
   copyCodeButton.textContent = 'Copy The Code';
   codeBlockElement.appendChild(copyCodeButton);
 
-  return `\n${codeBlockElement.outerHTML}\n`;
+  return codeBlockElement.outerHTML;
 }
 
 function createInlineCodeBlockUI(codeBlock) {
@@ -156,8 +156,6 @@ async function createAndAppendMessage(content, owner) {
 
   if (owner === 'bot') {
     displayedText = extractCodeBlocks(displayedText);
-    displayedText = displayedText.replace(codeBlockRegex, createCodeBlockUI);
-    displayedText = displayedText.replace(inlineCodeBlockRegex, createInlineCodeBlockUI);
   }
 
   const parsedContent = parseResponse(displayedText);
