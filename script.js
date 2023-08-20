@@ -1,5 +1,4 @@
 const getElementById = (id) => document.getElementById(id);
-
 const chatHistory = getElementById('chat-history');
 const apiKeyInput = getElementById('api-key-input');
 const apiEndpointInput = getElementById('api-endpoint-input');
@@ -8,8 +7,6 @@ const modelMenu = getElementById('model-menu');
 const aiThinkingMsg = getElementById('ai-thinking');
 const systemRoleInput = getElementById('system-role-input');
 const codeBlockRegex = /```[\s\S]*?```/gs;
-const codeBlockStartRegex = /```(?:[^\n]+)?\n/g;
-const codeBlockEndRegex = /```\n/g;
 const headingRegex = [
   /^#\s(.+)/gm,
   /^##\s(.+)/gm,
@@ -136,16 +133,10 @@ async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
 
-  let displayedText = owner === 'bot' ? content.replace(/</g, "&lt;").replace(/>/g, "&gt;") : content;
+  let displayedText = owner === 'bot' && !content.match(codeBlockRegex) ? content.replace(/</g, "&lt;").replace(/>/g, "&gt;") : content;
 
   if (owner === 'bot') {
-    let codeBlocks = matchAll(displayedText, codeBlockRegex);
-    if (codeBlocks) {
-      codeBlocks.forEach((block) => {
-        let codeWithoutMarkdown = block[0].replace(codeBlockStartRegex, '').replace(codeBlockEndRegex, '');
-        displayedText = displayedText.replace(block[0], '```' + codeWithoutMarkdown + '```');
-      });
-    }
+    displayedText = extractCodeBlocks(displayedText);
   }
 
   const parsedContent = parseResponse(displayedText);
@@ -155,15 +146,6 @@ async function createAndAppendMessage(content, owner) {
   chatHistory.scrollTop = chatHistory.scrollHeight;
 
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
-}
-
-function matchAll(string, regex) {
-  let matches = [];
-  let match;
-  while ((match = regex.exec(string))) {
-    matches.push(match);
-  }
-  return matches;
 }
 
 function parseResponse(response) {
