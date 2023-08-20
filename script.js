@@ -1,10 +1,10 @@
-const chatHistory = document.getElementById('chat-history');
-const apiKeyInput = document.getElementById('api-key-input');
-const apiEndpointInput = document.getElementById('api-endpoint-input');
-const messageInput = document.getElementById('message-input');
-const modelMenu = document.getElementById('model-menu');
-const aiThinkingMsg = document.getElementById('ai-thinking');
-const systemRoleInput = document.getElementById('system-role-input');
+const chatHistory = getElementById('chat-history');
+const apiKeyInput = getElementById('api-key-input');
+const apiEndpointInput = getElementById('api-endpoint-input');
+const messageInput = getElementById('message-input');
+const modelMenu = getElementById('model-menu');
+const aiThinkingMsg = getElementById('ai-thinking');
+const systemRoleInput = getElementById('system-role-input');
 const codeBlockRegex = /```[\s\S]*?```/gs;
 const inlineCodeBlockRegex = /`(.*?)`/gs;
 const headingRegex = [
@@ -35,25 +35,19 @@ messageInput.addEventListener('input', () => {
   messageInput.style.height = `${messageInput.scrollHeight}px`;
 });
 
-messageInput.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    messageInput.value += '\n';
-    messageInput.style.height = `${messageInput.scrollHeight}px`;
-  }
-});
+messageInput.addEventListener('keydown', handleEnterKey);
 
-document.getElementById('send-button').addEventListener('click', sendMessage);
+getElementById('send-button').addEventListener('click', sendMessage);
 
 function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
 }
 
 function selectModel(model) {
-  const modelOptions = document.querySelectorAll('ul li');
+  const modelOptions = getElementsByTagName('ul li');
   modelOptions.forEach((option) => option.classList.remove('selected'));
 
-  const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
+  const selectedModelOption = getElementBySelector(`ul li[data-model="${model}"]`);
   if (selectedModelOption) {
     selectedModelOption.classList.add('selected');
   }
@@ -66,7 +60,7 @@ function selectModel(model) {
 }
 
 function updateModelHeading() {
-  const modelHeading = document.querySelector('h1');
+  const modelHeading = getElementBySelector('h1');
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
 
@@ -295,7 +289,7 @@ function clearChatHistory() {
   ];
 }
 
-document.getElementById('copy-button').addEventListener('click', () => {
+getElementById('copy-button').addEventListener('click', () => {
   const latestResponse = chatHistory.lastElementChild.innerHTML;
   if (latestResponse) {
     copyToClipboard(latestResponse);
@@ -323,4 +317,4 @@ function saveInputsAndRefresh() {
   location.reload();
 }
 
-document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
+getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
