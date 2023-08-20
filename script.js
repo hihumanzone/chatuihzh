@@ -46,11 +46,11 @@ messageInput.addEventListener('keydown', (event) => {
 
 getElementById('send-button').addEventListener('click', sendMessage);
 
-const toggleModelMenu = () => {
+function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
-};
+}
 
-const selectModel = (model) => {
+function selectModel(model) {
   const modelOptions = document.querySelectorAll('ul li');
   modelOptions.forEach((option) => option.classList.remove('selected'));
 
@@ -64,16 +64,16 @@ const selectModel = (model) => {
 
   toggleModelMenu();
   updateModelHeading();
-};
+}
 
-const updateModelHeading = () => {
+function updateModelHeading() {
   const modelHeading = document.querySelector('h1');
   modelHeading.textContent = `Chat with ${selectedModel}`;
-};
+}
 
 const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
 
-const getBotResponse = async (apiKey, apiEndpoint, message) => {
+async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
@@ -100,9 +100,9 @@ const getBotResponse = async (apiKey, apiEndpoint, message) => {
   aiThinkingMsg.style.display = 'none';
 
   return response.json();
-};
+}
 
-const extractCodeBlocks = (response) => {
+function extractCodeBlocks(response) {
   const codeBlocks = response.match(codeBlockRegex);
   if (codeBlocks) {
     response = codeBlocks.reduce((acc, codeBlock) => {
@@ -112,9 +112,9 @@ const extractCodeBlocks = (response) => {
   }
 
   return response;
-};
+}
 
-const createCodeBlockUI = (codeBlock) => {
+function createCodeBlockUI(codeBlock) {
   const preElement = document.createElement('pre');
   preElement.textContent = codeBlock.replace(/```/g, '');
 
@@ -128,9 +128,9 @@ const createCodeBlockUI = (codeBlock) => {
   codeBlockElement.appendChild(copyCodeButton);
 
   return codeBlockElement.outerHTML;
-};
+}
 
-const createAndAppendMessage = async (content, owner) => {
+async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
 
@@ -147,9 +147,9 @@ const createAndAppendMessage = async (content, owner) => {
   chatHistory.scrollTop = chatHistory.scrollHeight;
 
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
-};
+}
 
-const parseResponse = (response) => {
+function parseResponse(response) {
   let parsedResponse = response;
 
   const codeBlocks = parsedResponse.match(codeBlockRegex);
@@ -181,14 +181,14 @@ const parseResponse = (response) => {
   }
 
   return parsedResponse;
-};
+}
 
-const parseTables = (response) => {
+function parseTables(response) {
   const tableRegex = /\n((?:\s*:?[\|:].*?:?\|\n)+)\n/g;
   return response.replace(tableRegex, createTable);
-};
+}
 
-const createTable = (match, table) => {
+function createTable(match, table) {
   const rows = table.trim().split('\n');
   const tableElement = document.createElement('table');
 
@@ -215,9 +215,9 @@ const createTable = (match, table) => {
   }
 
   return `\n${tableElement.outerHTML}\n`;
-};
+}
 
-const sendMessage = async () => {
+async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
   const message = messageInput.value.trim();
@@ -230,7 +230,7 @@ const sendMessage = async () => {
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
 
-  await createAndAppendMessage(message, 'user');
+  createAndAppendMessage(message, 'user');
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
@@ -243,18 +243,18 @@ const sendMessage = async () => {
   });
 
   createAndAppendMessage(botResponse, 'bot');
-};
+}
 
-const copyToClipboard = (text) => {
+function copyToClipboard(text) {
   const textarea = document.createElement('textarea');
   textarea.value = text;
   document.body.appendChild(textarea);
   textarea.select();
   document.execCommand('copy');
   document.body.removeChild(textarea);
-};
+}
 
-const clearChatHistory = () => {
+function clearChatHistory() {
   chatHistory.innerHTML = '';
   messages = [
     {
@@ -262,7 +262,7 @@ const clearChatHistory = () => {
       content: localStorage.getItem('systemRole') || '',
     },
   ];
-};
+}
 
 getElementById('copy-button').addEventListener('click', () => {
   const latestResponse = chatHistory.lastElementChild.innerHTML;
@@ -282,7 +282,7 @@ systemRoleInput.addEventListener('input', () => {
 
 window.addEventListener('load', updateModelHeading);
 
-const saveInputsAndRefresh = () => {
+function saveInputsAndRefresh() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
 
@@ -290,6 +290,6 @@ const saveInputsAndRefresh = () => {
   localStorage.setItem('apiEndpoint', apiEndpoint);
 
   location.reload();
-};
+}
 
 getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
