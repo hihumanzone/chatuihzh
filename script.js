@@ -173,7 +173,7 @@ function parseResponse(response) {
     parsedResponse = parsedResponse.replace(regex, `<span style="font-size: ${fontSize}px; font-weight: ${fontWeight};">$1</span>`);
   });
 
-  parsedResponse = parsedResponse.replace(/^&gt;\s(.*?)$/gm, '<div class="blockquote">$1</div>');
+  parsedResponse = parsedResponse.replace(/>\s(.*?)$/gm, '<div class="blockquote">$1</div>');
   parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '<i>$1</i>');
 
   if (codeBlocks) {
