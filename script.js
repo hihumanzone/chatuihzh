@@ -1,27 +1,27 @@
 const getElementById = (id) => document.getElementById(id);
 
-const chatHistory = getElementById('chat-history');
-const apiKeyInput = getElementById('api-key-input');
-const apiEndpointInput = getElementById('api-endpoint-input');
-const messageInput = getElementById('message-input');
-const modelMenu = getElementById('model-menu');
-const aiThinkingMsg = getElementById('ai-thinking');
-const systemRoleInput = getElementById('system-role-input');
-const codeBlockRegex = /```[\s\S]*?```/gs;
-const headingRegex = [
-  /^#\s(.+)/gm,
-  /^##\s(.+)/gm,
-  /^###\s(.+)/gm,
-  /^####\s(.+)/gm
-];
-const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
+const [
+  chatHistory, apiKeyInput, apiEndpointInput,
+  messageInput, modelMenu, aiThinkingMsg,
+  systemRoleInput, sendButton, copyButton,
+  refreshButton
+] = [
+  'chat-history', 'api-key-input', 'api-endpoint-input',
+  'message-input', 'model-menu', 'ai-thinking',
+  'system-role-input', 'send-button', 'copy-button',
+  'refresh-button'
+].map(getElementById);
 
-let messages = [
-  {
-    role: 'system',
-    content: localStorage.getItem('systemRole') || '',
-  },
-];
+const CONFIG = {
+  ENDPOINT: apiEndpoint || 'https://free.churchless.tech/v1/chat/completions',
+  HEADING_REGEX: [/^#\s(.+)/gm, /^##\s(.+)/gm, /^###\s(.+)/gm, /^####\s(.+)/gm],
+  BLOCK_REGEX: /```[\s\S]*?```/gs
+};
+
+let messages = [{
+  role: 'system',
+  content: localStorage.getItem('systemRole') || '',
+}];
 
 let apiKey = localStorage.getItem('apiKey') || '';
 let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
@@ -32,18 +32,25 @@ apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
 
-messageInput.addEventListener('input', () => {
+messageInput.addEventListener('input', adjustHeightToScroll);
+messageInput.addEventListener('keydown', addNewLine);
+sendButton.addEventListener('click', sendMessage);
+copyButton.addEventListener('click', copyLatestResponse);
+refreshButton.addEventListener('click', saveInputsAndRefresh);
+window.addEventListener('load', updateModelHeading);
+
+function adjustHeightToScroll() {
   messageInput.style.height = 'auto';
   messageInput.style.height = `${messageInput.scrollHeight}px`;
-});
+}
 
-messageInput.addEventListener('keydown', (event) => {
+function addNewLine(event) {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
     messageInput.value += '\n';
-    messageInput.style.height = `${messageInput.scrollHeight}px`;
+    adjustHeightToScroll();
   }
-});
+}
 
 getElementById('send-button').addEventListener('click', sendMessage);
 
@@ -90,7 +97,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     messages: messages,
   };
 
-  const response = await fetch(ENDPOINT, {
+  const response = await fetch(CONFIG.ENDPOINT, {
     method: 'POST',
     headers: headers,
     body: JSON.stringify(data),
@@ -102,7 +109,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 }
 
 function extractCodeBlocks(response) {
-  const codeBlocks = response.match(codeBlockRegex);
+  const codeBlocks = response.match(CONFIG.BLOCK_REGEX);
   if (codeBlocks) {
     response = codeBlocks.reduce((acc, codeBlock) => {
       const codeWithoutMarkdown = codeBlock.replace(/```/g, '');
@@ -151,7 +158,7 @@ async function createAndAppendMessage(content, owner) {
 function parseResponse(response) {
   let parsedResponse = response;
 
-  const codeBlocks = parsedResponse.match(codeBlockRegex);
+  const codeBlocks = parsedResponse.match(CONFIG.BLOCK_REGEX);
 
   if (codeBlocks) {
     parsedResponse = codeBlocks.reduce((acc, codeBlock, index) => {
@@ -164,7 +171,7 @@ function parseResponse(response) {
   parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parseTables(parsedResponse);
 
-  headingRegex.forEach((regex, index) => {
+  CONFIG.HEADING_REGEX.forEach((regex, index) => {
     const fontSize = 30 - (index * 4);
     const fontWeight = index === 0 ? 'bold' : 'normal';
     parsedResponse = parsedResponse.replace(regex, `<span style="font-size: ${fontSize}px; font-weight: ${fontWeight};">$1</span>`);
@@ -255,12 +262,10 @@ function copyToClipboard(text) {
 
 function clearChatHistory() {
   chatHistory.innerHTML = '';
-  messages = [
-    {
-      role: 'system',
-      content: localStorage.getItem('systemRole') || '',
-    },
-  ];
+  messages = [{
+    role: 'system',
+    content: localStorage.getItem('systemRole') || '',
+  }];
 }
 
 getElementById('copy-button').addEventListener('click', () => {
