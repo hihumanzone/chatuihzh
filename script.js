@@ -6,7 +6,7 @@ const modelMenu = getElementById('model-menu');
 const aiThinkingMsg = getElementById('ai-thinking');
 const systemRoleInput = getElementById('system-role-input');
 const codeBlockRegex = /```[\s\S]*?```/gs;
-
+const inlineCodeBlockRegex = /`(.*?)`/gs;
 const headingRegex = [
   /^#\s(.+)/gm,
   /^##\s(.+)/gm,
@@ -103,11 +103,18 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 
 function extractCodeBlocks(response) {
   const codeBlocks = response.match(codeBlockRegex);
-
   if (codeBlocks) {
     response = codeBlocks.reduce((acc, codeBlock) => {
       const codeWithoutMarkdown = codeBlock.replace(/```/g, '');
       return acc.replace(codeBlock, '```' + codeWithoutMarkdown + '```');
+    }, response);
+  }
+  
+  const inlineCodeBlocks = response.match(inlineCodeBlockRegex);
+  if (inlineCodeBlocks) {
+    response = inlineCodeBlocks.reduce((acc, inlineCodeBlock) => {
+      const codeWithoutMarkdown = inlineCodeBlock.replace(/`/g, '');
+      return acc.replace(inlineCodeBlock, '`' + codeWithoutMarkdown + '`');
     }, response);
   }
 
@@ -128,6 +135,17 @@ function createCodeBlockUI(codeBlock) {
   codeBlockElement.appendChild(copyCodeButton);
 
   return codeBlockElement.outerHTML;
+}
+
+function createInlineCodeBlockUI(codeBlock) {
+  const spanElement = document.createElement('span');
+  spanElement.textContent = codeBlock.replace(/`/g, '');
+
+  const inlineCodeBlockElement = document.createElement('span');
+  inlineCodeBlockElement.classList.add('inline-code-block');
+  inlineCodeBlockElement.appendChild(spanElement);
+
+  return inlineCodeBlockElement.outerHTML;
 }
 
 async function createAndAppendMessage(content, owner) {
@@ -153,10 +171,17 @@ function parseResponse(response) {
   let parsedResponse = response;
 
   const codeBlocks = parsedResponse.match(codeBlockRegex);
+  const inlineCodeBlocks = parsedResponse.match(inlineCodeBlockRegex);
 
   if (codeBlocks) {
     parsedResponse = codeBlocks.reduce((acc, codeBlock, index) => {
       return acc.replace(codeBlock, `CODEBLOCK${index}`);
+    }, parsedResponse);
+  }
+
+  if (inlineCodeBlocks) {
+    parsedResponse = inlineCodeBlocks.reduce((acc, inlineCodeBlock, index) => {
+      return acc.replace(inlineCodeBlock, `INLINECODEBLOCK${index}`);
     }, parsedResponse);
   }
 
@@ -177,6 +202,12 @@ function parseResponse(response) {
   if (codeBlocks) {
     parsedResponse = codeBlocks.reduce((acc, codeBlock, index) => {
       return acc.replace(`CODEBLOCK${index}`, createCodeBlockUI(codeBlock));
+    }, parsedResponse);
+  }
+  
+  if (inlineCodeBlocks) {
+    parsedResponse = inlineCodeBlocks.reduce((acc, inlineCodeBlock, index) => {
+      return acc.replace(`INLINECODEBLOCK${index}`, createInlineCodeBlockUI(inlineCodeBlock));
     }, parsedResponse);
   }
 
