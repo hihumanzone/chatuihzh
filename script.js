@@ -1,80 +1,64 @@
 const getElementById = (id) => document.getElementById(id);
+const getLocalStorage = (key, defaultVal = '') => localStorage.getItem(key) || defaultVal;
+const setLocalStorage = (key, value) => localStorage.setItem(key, value);
+const setElemValue = (elem, value) => { elem.value = value; }
 
-const chatHistory = getElementById('chat-history');
-const apiKeyInput = getElementById('api-key-input');
-const apiEndpointInput = getElementById('api-endpoint-input');
-const messageInput = getElementById('message-input');
-const modelMenu = getElementById('model-menu');
-const aiThinkingMsg = getElementById('ai-thinking');
-const systemRoleInput = getElementById('system-role-input');
+const UI = {
+    chatHistory: getElementById('chat-history'),
+    apiKeyInput: getElementById('api-key-input'),
+    apiEndpointInput: getElementById('api-endpoint-input'),
+    messageInput: getElementById('message-input'),
+    modelMenu: getElementById('model-menu'),
+    aiThinkingMsg: getElementById('ai-thinking'),
+    systemRoleInput: getElementById('system-role-input')
+};
+
 const codeBlockRegex = /```[\s\S]*?```/gs;
 const headingRegex = [
-  /^#\s(.+)/gm,
-  /^##\s(.+)/gm,
-  /^###\s(.+)/gm,
-  /^####\s(.+)/gm
+    /^#\s(.+)/gm,
+    /^##\s(.+)/gm,
+    /^###\s(.+)/gm,
+    /^####\s(.+)/gm
 ];
 
 let messages = [
-  {
-    role: 'system',
-    content: localStorage.getItem('systemRole') || '',
-  },
+    {
+        role: 'system',
+        content: getLocalStorage('systemRole'),
+    },
 ];
-
-let apiKey = localStorage.getItem('apiKey') || '';
-let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
-let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
-
-apiKeyInput.value = apiKey;
-apiEndpointInput.value = apiEndpoint;
-selectModel(selectedModel);
-updateModelHeading();
-
-messageInput.addEventListener('input', () => {
-  messageInput.style.height = 'auto';
-  messageInput.style.height = `${messageInput.scrollHeight}px`;
-});
-
-messageInput.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    messageInput.value += '\n';
-    messageInput.style.height = `${messageInput.scrollHeight}px`;
-  }
-});
-
-getElementById('send-button').addEventListener('click', sendMessage);
-
-function toggleModelMenu() {
-  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
-}
-
-function selectModel(model) {
-  const modelOptions = document.querySelectorAll('ul li');
-  modelOptions.forEach((option) => option.classList.remove('selected'));
-
-  const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
-  if (selectedModelOption) {
-    selectedModelOption.classList.add('selected');
-  }
-
-  selectedModel = model;
-  localStorage.setItem('selectedModel', selectedModel);
-
-  toggleModelMenu();
-  updateModelHeading();
-}
-
-function updateModelHeading() {
-  const modelHeading = document.querySelector('h1');
-  modelHeading.textContent = `Chat with ${selectedModel}`;
-}
-
+let apiKey = getLocalStorage('apiKey');
+let apiEndpoint = getLocalStorage('apiEndpoint');
+let selectedModel = getLocalStorage('selectedModel', 'gpt-3.5-turbo');
 const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
 
-async function getBotResponse(apiKey, apiEndpoint, message) {
-  const headers = {
+const initializeValues = () => {
+    setElemValue(UI.apiKeyInput, apiKey);
+    setElemValue(UI.apiEndpointInput, apiEndpoint);
+    selectModel(selectedModel);
+    updateModelHeading();
+}
+
+const toggleModelMenu = () => {
+    UI.modelMenu.style.display = UI.modelMenu.style.display === 'none' ? 'block' : 'none';
+}
+
+const selectModel = (model) => {
+    document.querySelectorAll('ul li').forEach(option => option.classList.remove('selected'));
+    const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
+    selectedModelOption && selectedModelOption.classList.add('selected');
+    selectedModel = model;
+    setLocalStorage('selectedModel', selectedModel);
+    toggleModelMenu();
+    updateModelHeading();
+}
+
+const updateModelHeading = () => {
+    document.querySelector('h1').textContent = `Chat with ${selectedModel}`;
+}
+
+const getBotResponse = async (apiKey, apiEndpoint, message) => {
+const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
   };
@@ -102,8 +86,8 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   return response.json();
 }
 
-function extractCodeBlocks(response) {
-  const codeBlocks = response.match(codeBlockRegex);
+const extractCodeBlocks = (response) => {
+const codeBlocks = response.match(codeBlockRegex);
   if (codeBlocks) {
     response = codeBlocks.reduce((acc, codeBlock) => {
       const codeWithoutMarkdown = codeBlock.replace(/```/g, '');
@@ -114,7 +98,7 @@ function extractCodeBlocks(response) {
   return response;
 }
 
-function createCodeBlockUI(codeBlock) {
+const createCodeBlockUI = (codeBlock) => {
   const preElement = document.createElement('pre');
   preElement.textContent = codeBlock.replace(/```/g, '');
 
@@ -130,8 +114,8 @@ function createCodeBlockUI(codeBlock) {
   return codeBlockElement.outerHTML;
 }
 
-async function createAndAppendMessage(content, owner) {
-  const message = document.createElement('div');
+const createAndAppendMessage = async (content, owner) => {
+const message = document.createElement('div');
   message.classList.add('message', owner);
 
   let displayedText = owner === 'bot' ? content.replace(/</g, "&lt;").replace(/>/g, "&gt;") : content;
@@ -149,7 +133,7 @@ async function createAndAppendMessage(content, owner) {
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
 }
 
-function parseResponse(response) {
+const parseResponse = (response) => {
   let parsedResponse = response;
 
   const codeBlocks = parsedResponse.match(codeBlockRegex);
@@ -183,13 +167,13 @@ function parseResponse(response) {
   return parsedResponse;
 }
 
-function parseTables(response) {
+const parseTables = (response) => {
   const tableRegex = /\n((?:\s*:?[\|:].*?:?\|\n)+)\n/g;
   return response.replace(tableRegex, createTable);
 }
 
-function createTable(match, table) {
-  const rows = table.trim().split('\n');
+const createTable = (match, table) => {
+const rows = table.trim().split('\n');
   const tableElement = document.createElement('table');
 
   const tableHeader = document.createElement('tr');
@@ -217,8 +201,8 @@ function createTable(match, table) {
   return `\n${tableElement.outerHTML}\n`;
 }
 
-async function sendMessage() {
-  apiKey = apiKeyInput.value.trim();
+const sendMessage = async () => {
+apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
   const message = messageInput.value.trim();
 
@@ -245,7 +229,7 @@ async function sendMessage() {
   createAndAppendMessage(botResponse, 'bot');
 }
 
-function copyToClipboard(text) {
+const copyToClipboard = (text) => {
   const textarea = document.createElement('textarea');
   textarea.value = text;
   document.body.appendChild(textarea);
@@ -254,7 +238,7 @@ function copyToClipboard(text) {
   document.body.removeChild(textarea);
 }
 
-function clearChatHistory() {
+const clearChatHistory = () => {
   chatHistory.innerHTML = '';
   messages = [
     {
@@ -263,33 +247,48 @@ function clearChatHistory() {
     },
   ];
 }
+}
 
-getElementById('copy-button').addEventListener('click', () => {
-  const latestResponse = chatHistory.lastElementChild.innerHTML;
-  if (latestResponse) {
-    copyToClipboard(latestResponse);
-    alert('Text copied to clipboard');
-  } else {
-    alert('No text to copy');
-  }
+UI.messageInput.addEventListener('input', () => {
+    UI.messageInput.style.height = 'auto';
+    UI.messageInput.style.height = `${UI.messageInput.scrollHeight}px`;
 });
 
-systemRoleInput.value = localStorage.getItem('systemRole') || '';
-systemRoleInput.addEventListener('input', () => {
-  localStorage.setItem('systemRole', systemRoleInput.value);
-  messages[0].content = systemRoleInput.value;
+UI.messageInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        UI.messageInput.value += '\n';
+        UI.messageInput.style.height = `${UI.messageInput.scrollHeight}px`;
+    }
+});
+
+getElementById('send-button').addEventListener('click', sendMessage);
+getElementById('copy-button').addEventListener('click', () => {
+    const latestResponse = UI.chatHistory.lastElementChild.innerHTML;
+    if (latestResponse) {
+        copyToClipboard(latestResponse);
+        alert('Text copied to clipboard');
+    } else {
+        alert('No text to copy');
+    }
+});
+
+UI.systemRoleInput.value = getLocalStorage('systemRole');
+UI.systemRoleInput.addEventListener('input', () => {
+    setLocalStorage('systemRole', UI.systemRoleInput.value);
+    messages[0].content = UI.systemRoleInput.value;
 });
 
 window.addEventListener('load', updateModelHeading);
 
-function saveInputsAndRefresh() {
-  apiKey = apiKeyInput.value.trim();
-  apiEndpoint = apiEndpointInput.value.trim();
-
-  localStorage.setItem('apiKey', apiKey);
-  localStorage.setItem('apiEndpoint', apiEndpoint);
-
-  location.reload();
+const saveInputsAndRefresh = () => {
+    apiKey = UI.apiKeyInput.value.trim();
+    apiEndpoint = UI.apiEndpointInput.value.trim();
+    setLocalStorage('apiKey', apiKey);
+    setLocalStorage('apiEndpoint', apiEndpoint);
+    location.reload();
 }
 
 getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
+
+initializeValues();
