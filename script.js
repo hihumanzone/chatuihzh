@@ -14,6 +14,7 @@ const headingRegex = [
   /^###\s(.+)/gm,
   /^####\s(.+)/gm
 ];
+const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
 
 let messages = [
   {
@@ -70,8 +71,6 @@ function updateModelHeading() {
   const modelHeading = document.querySelector('h1');
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
-
-const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
