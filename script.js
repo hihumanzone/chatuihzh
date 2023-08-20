@@ -134,7 +134,7 @@ async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
 
-  let displayedText = owner === 'bot' ? content.replace(/</g, "&lt;").replace(/>/g, "&gt;") : content;
+  let displayedText = content;
 
   if (owner === 'bot') {
     displayedText = extractCodeBlocks(displayedText);
