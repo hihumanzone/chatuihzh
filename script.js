@@ -1,3 +1,7 @@
+function getElementById(id) {
+  return document.getElementById(id);
+}
+
 const chatHistory = getElementById('chat-history');
 const apiKeyInput = getElementById('api-key-input');
 const apiEndpointInput = getElementById('api-endpoint-input');
@@ -35,7 +39,13 @@ messageInput.addEventListener('input', () => {
   messageInput.style.height = `${messageInput.scrollHeight}px`;
 });
 
-messageInput.addEventListener('keydown', handleEnterKey);
+messageInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    messageInput.value += '\n';
+    messageInput.style.height = `${messageInput.scrollHeight}px`;
+  }
+});
 
 getElementById('send-button').addEventListener('click', sendMessage);
 
@@ -44,10 +54,10 @@ function toggleModelMenu() {
 }
 
 function selectModel(model) {
-  const modelOptions = getElementsByTagName('ul li');
+  const modelOptions = document.querySelectorAll('ul li');
   modelOptions.forEach((option) => option.classList.remove('selected'));
 
-  const selectedModelOption = getElementBySelector(`ul li[data-model="${model}"]`);
+  const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
   if (selectedModelOption) {
     selectedModelOption.classList.add('selected');
   }
@@ -60,7 +70,7 @@ function selectModel(model) {
 }
 
 function updateModelHeading() {
-  const modelHeading = getElementBySelector('h1');
+  const modelHeading = document.querySelector('h1');
   modelHeading.textContent = `Chat with ${selectedModel}`;
 }
 
