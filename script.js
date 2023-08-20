@@ -14,7 +14,6 @@ const headingRegex = [
   /^###\s(.+)/gm,
   /^####\s(.+)/gm
 ];
-const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
 
 let messages = [
   {
@@ -47,11 +46,11 @@ messageInput.addEventListener('keydown', (event) => {
 
 getElementById('send-button').addEventListener('click', sendMessage);
 
-function toggleModelMenu() {
+const toggleModelMenu = () => {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
-}
+};
 
-function selectModel(model) {
+const selectModel = (model) => {
   const modelOptions = document.querySelectorAll('ul li');
   modelOptions.forEach((option) => option.classList.remove('selected'));
 
@@ -65,14 +64,16 @@ function selectModel(model) {
 
   toggleModelMenu();
   updateModelHeading();
-}
+};
 
-function updateModelHeading() {
+const updateModelHeading = () => {
   const modelHeading = document.querySelector('h1');
   modelHeading.textContent = `Chat with ${selectedModel}`;
-}
+};
 
-async function getBotResponse(apiKey, apiEndpoint, message) {
+const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
+
+const getBotResponse = async (apiKey, apiEndpoint, message) => {
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
@@ -99,9 +100,9 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   aiThinkingMsg.style.display = 'none';
 
   return response.json();
-}
+};
 
-function extractCodeBlocks(response) {
+const extractCodeBlocks = (response) => {
   const codeBlocks = response.match(codeBlockRegex);
   if (codeBlocks) {
     response = codeBlocks.reduce((acc, codeBlock) => {
@@ -111,9 +112,9 @@ function extractCodeBlocks(response) {
   }
 
   return response;
-}
+};
 
-function createCodeBlockUI(codeBlock) {
+const createCodeBlockUI = (codeBlock) => {
   const preElement = document.createElement('pre');
   preElement.textContent = codeBlock.replace(/```/g, '');
 
@@ -127,9 +128,9 @@ function createCodeBlockUI(codeBlock) {
   codeBlockElement.appendChild(copyCodeButton);
 
   return codeBlockElement.outerHTML;
-}
+};
 
-async function createAndAppendMessage(content, owner) {
+const createAndAppendMessage = async (content, owner) => {
   const message = document.createElement('div');
   message.classList.add('message', owner);
 
@@ -146,9 +147,9 @@ async function createAndAppendMessage(content, owner) {
   chatHistory.scrollTop = chatHistory.scrollHeight;
 
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
-}
+};
 
-function parseResponse(response) {
+const parseResponse = (response) => {
   let parsedResponse = response;
 
   const codeBlocks = parsedResponse.match(codeBlockRegex);
@@ -180,14 +181,14 @@ function parseResponse(response) {
   }
 
   return parsedResponse;
-}
+};
 
-function parseTables(response) {
+const parseTables = (response) => {
   const tableRegex = /\n((?:\s*:?[\|:].*?:?\|\n)+)\n/g;
   return response.replace(tableRegex, createTable);
-}
+};
 
-function createTable(match, table) {
+const createTable = (match, table) => {
   const rows = table.trim().split('\n');
   const tableElement = document.createElement('table');
 
@@ -214,9 +215,9 @@ function createTable(match, table) {
   }
 
   return `\n${tableElement.outerHTML}\n`;
-}
+};
 
-async function sendMessage() {
+const sendMessage = async () => {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
   const message = messageInput.value.trim();
@@ -229,7 +230,7 @@ async function sendMessage() {
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
 
-  createAndAppendMessage(message, 'user');
+  await createAndAppendMessage(message, 'user');
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
@@ -242,18 +243,18 @@ async function sendMessage() {
   });
 
   createAndAppendMessage(botResponse, 'bot');
-}
+};
 
-function copyToClipboard(text) {
+const copyToClipboard = (text) => {
   const textarea = document.createElement('textarea');
   textarea.value = text;
   document.body.appendChild(textarea);
   textarea.select();
   document.execCommand('copy');
   document.body.removeChild(textarea);
-}
+};
 
-function clearChatHistory() {
+const clearChatHistory = () => {
   chatHistory.innerHTML = '';
   messages = [
     {
@@ -261,7 +262,7 @@ function clearChatHistory() {
       content: localStorage.getItem('systemRole') || '',
     },
   ];
-}
+};
 
 getElementById('copy-button').addEventListener('click', () => {
   const latestResponse = chatHistory.lastElementChild.innerHTML;
@@ -281,7 +282,7 @@ systemRoleInput.addEventListener('input', () => {
 
 window.addEventListener('load', updateModelHeading);
 
-function saveInputsAndRefresh() {
+const saveInputsAndRefresh = () => {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
 
@@ -289,6 +290,6 @@ function saveInputsAndRefresh() {
   localStorage.setItem('apiEndpoint', apiEndpoint);
 
   location.reload();
-}
+};
 
 getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
