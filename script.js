@@ -6,6 +6,7 @@ const modelMenu = getElementById('model-menu');
 const aiThinkingMsg = getElementById('ai-thinking');
 const systemRoleInput = getElementById('system-role-input');
 const codeBlockRegex = /```[\s\S]*?```/gs;
+
 const headingRegex = [
   /^#\s(.+)/gm,
   /^##\s(.+)/gm,
@@ -102,6 +103,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 
 function extractCodeBlocks(response) {
   const codeBlocks = response.match(codeBlockRegex);
+
   if (codeBlocks) {
     response = codeBlocks.reduce((acc, codeBlock) => {
       const codeWithoutMarkdown = codeBlock.replace(/```/g, '');
