@@ -1,10 +1,11 @@
-const chatHistory = document.getElementById('chat-history');
-const apiKeyInput = document.getElementById('api-key-input');
-const apiEndpointInput = document.getElementById('api-endpoint-input');
-const messageInput = document.getElementById('message-input');
-const modelMenu = document.getElementById('model-menu');
-const aiThinkingMsg = document.getElementById('ai-thinking');
-const systemRoleInput = document.getElementById('system-role-input');
+const getElementById = (id) => document.getElementById(id);
+const chatHistory = getElementById('chat-history');
+const apiKeyInput = getElementById('api-key-input');
+const apiEndpointInput = getElementById('api-endpoint-input');
+const messageInput = getElementById('message-input');
+const modelMenu = getElementById('model-menu');
+const aiThinkingMsg = getElementById('ai-thinking');
+const systemRoleInput = getElementById('system-role-input');
 const codeBlockRegex = /```(.*?)```/gs;
 const headingRegex = [
   /^#\s(.+)/gm,
@@ -42,7 +43,7 @@ messageInput.addEventListener('keydown', (event) => {
   }
 });
 
-document.getElementById('send-button').addEventListener('click', sendMessage);
+getElementById('send-button').addEventListener('click', sendMessage);
 
 function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
@@ -103,11 +104,12 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 function extractCodeBlocks(response) {
   const codeBlocks = response.match(codeBlockRegex);
   if (codeBlocks) {
-    codeBlocks.forEach((codeBlock) => {
+    response = codeBlocks.reduce((acc, codeBlock) => {
       const codeWithoutMarkdown = codeBlock.replace(/```/g, '');
-      response = response.replace(codeBlock, '```' + codeWithoutMarkdown + '```');
-    });
+      return acc.replace(codeBlock, '```' + codeWithoutMarkdown + '```');
+    }, response);
   }
+
   return response;
 }
 
@@ -131,18 +133,13 @@ async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
 
-  let displayedText = content;
-  
+let displayedText = content;
+if (!content.match(codeBlockRegex)) {
+  displayedText = content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
   if (owner === 'bot') {
-    if (displayedText.startsWith('>')) {
-      message.style.backgroundColor = '#222';
-      message.style.borderColor = '#555';
-    } else {
-      displayedText = extractCodeBlocks(displayedText);
-      if (displayedText.startsWith('`') && displayedText.endsWith('`')) {
-        message.style.backgroundColor = '#333';
-      }
-    }
+    displayedText = extractCodeBlocks(displayedText);
   }
 
   const parsedContent = parseResponse(displayedText);
@@ -158,10 +155,11 @@ function parseResponse(response) {
   let parsedResponse = response;
 
   const codeBlocks = parsedResponse.match(codeBlockRegex);
+
   if (codeBlocks) {
-    codeBlocks.forEach((codeBlock, index) => {
-      parsedResponse = parsedResponse.replace(codeBlock, `CODEBLOCK${index}`);
-    });
+    parsedResponse = codeBlocks.reduce((acc, codeBlock, index) => {
+      return acc.replace(codeBlock, `CODEBLOCK${index}`);
+    }, parsedResponse);
   }
 
   parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -175,12 +173,13 @@ function parseResponse(response) {
     parsedResponse = parsedResponse.replace(regex, `<span style="font-size: ${fontSize}px; font-weight: ${fontWeight};">$1</span>`);
   });
 
+  parsedResponse = parsedResponse.replace(/>\s(.*?)$/gm, '<div class="blockquote">$1</div>');
   parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '<i>$1</i>');
 
   if (codeBlocks) {
-    codeBlocks.forEach((codeBlock, index) => {
-      parsedResponse = parsedResponse.replace(`CODEBLOCK${index}`, createCodeBlockUI(codeBlock));
-    });
+    parsedResponse = codeBlocks.reduce((acc, codeBlock, index) => {
+      return acc.replace(`CODEBLOCK${index}`, createCodeBlockUI(codeBlock));
+    }, parsedResponse);
   }
 
   return parsedResponse;
@@ -267,7 +266,7 @@ function clearChatHistory() {
   ];
 }
 
-document.getElementById('copy-button').addEventListener('click', () => {
+getElementById('copy-button').addEventListener('click', () => {
   const latestResponse = chatHistory.lastElementChild.innerHTML;
   if (latestResponse) {
     copyToClipboard(latestResponse);
@@ -295,4 +294,4 @@ function saveInputsAndRefresh() {
   location.reload();
 }
 
-document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
+getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
