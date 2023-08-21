@@ -6,12 +6,12 @@ const messageInput = getElementById('message-input');
 const modelMenu = getElementById('model-menu');
 const aiThinkingMsg = getElementById('ai-thinking');
 const systemRoleInput = getElementById('system-role-input');
-const codeBlockRegex = /```[\s\S]*?```/gs;
+const codeBlockRegex = /```[\\\\s\\\\S]*?```/gs;
 const headingRegex = [
-  /^#\s(.+)/gm,
-  /^##\s(.+)/gm,
-  /^###\s(.+)/gm,
-  /^####\s(.+)/gm
+  /^#\\s(.+)/gm,
+  /^##\\s(.+)/gm,
+  /^###\\s(.+)/gm,
+  /^####\\s(.+)/gm
 ];
 
 let messages = [
