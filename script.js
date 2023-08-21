@@ -1,11 +1,10 @@
-const getElementById = (id) => document.getElementById(id);
-const chatHistory = getElementById('chat-history');
-const apiKeyInput = getElementById('api-key-input');
-const apiEndpointInput = getElementById('api-endpoint-input');
-const messageInput = getElementById('message-input');
-const modelMenu = getElementById('model-menu');
-const aiThinkingMsg = getElementById('ai-thinking');
-const systemRoleInput = getElementById('system-role-input');
+const chatHistory = document.getElementById('chat-history');
+const apiKeyInput = document.getElementById('api-key-input');
+const apiEndpointInput = document.getElementById('api-endpoint-input');
+const messageInput = document.getElementById('message-input');
+const modelMenu = document.getElementById('model-menu');
+const aiThinkingMsg = document.getElementById('ai-thinking');
+const systemRoleInput = document.getElementById('system-role-input');
 const codeBlockRegex = /```(.*?)```/gs;
 const headingRegex = [
   /^#\s(.+)/gm,
@@ -43,11 +42,10 @@ messageInput.addEventListener('keydown', (event) => {
   }
 });
 
-getElementById('send-button').addEventListener('click', sendMessage);
+document.getElementById('send-button').addEventListener('click', sendMessage);
 
 function toggleModelMenu() {
-  const displayValue = modelMenu.style.display;
-  modelMenu.style.display = displayValue === 'none' ? 'block' : 'none';
+  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
 }
 
 function selectModel(model) {
@@ -105,20 +103,17 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 function extractCodeBlocks(response) {
   const codeBlocks = response.match(codeBlockRegex);
   if (codeBlocks) {
-    response = codeBlocks.reduce((acc, codeBlock) => {
+    codeBlocks.forEach((codeBlock) => {
       const codeWithoutMarkdown = codeBlock.replace(/```/g, '');
-      return acc.replace(codeBlock, '```' + codeWithoutMarkdown + '```');
-    }, response);
+      response = response.replace(codeBlock, '```' + codeWithoutMarkdown + '```');
+    });
   }
-
   return response;
 }
 
 function createCodeBlockUI(codeBlock) {
-  const codeWithoutMarkdown = codeBlock.replace(/```/g, '');
-
   const preElement = document.createElement('pre');
-  preElement.textContent = codeWithoutMarkdown;
+  preElement.textContent = codeBlock.replace(/```/g, '');
 
   const codeBlockElement = document.createElement('div');
   codeBlockElement.classList.add('code-block');
@@ -129,11 +124,6 @@ function createCodeBlockUI(codeBlock) {
   copyCodeButton.textContent = 'Copy The Code';
   codeBlockElement.appendChild(copyCodeButton);
 
-  copyCodeButton.addEventListener('click', () => {
-    copyToClipboard(codeWithoutMarkdown);
-    alert('Text copied to clipboard');
-  });
-
   return codeBlockElement.outerHTML;
 }
 
@@ -142,12 +132,17 @@ async function createAndAppendMessage(content, owner) {
   message.classList.add('message', owner);
 
   let displayedText = content;
-  if (!content.match(codeBlockRegex)) {
-    displayedText = content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  }
-
+  
   if (owner === 'bot') {
-    displayedText = extractCodeBlocks(displayedText);
+    if (displayedText.startsWith('>')) {
+      message.style.backgroundColor = '#222';
+      message.style.borderColor = '#555';
+    } else {
+      displayedText = extractCodeBlocks(displayedText);
+      if (displayedText.startsWith('`') && displayedText.endsWith('`')) {
+        message.style.backgroundColor = '#333';
+      }
+    }
   }
 
   const parsedContent = parseResponse(displayedText);
@@ -163,11 +158,10 @@ function parseResponse(response) {
   let parsedResponse = response;
 
   const codeBlocks = parsedResponse.match(codeBlockRegex);
-
   if (codeBlocks) {
-    parsedResponse = codeBlocks.reduce((acc, codeBlock, index) => {
-      return acc.replace(codeBlock, `CODEBLOCK${index}`);
-    }, parsedResponse);
+    codeBlocks.forEach((codeBlock, index) => {
+      parsedResponse = parsedResponse.replace(codeBlock, `CODEBLOCK${index}`);
+    });
   }
 
   parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -178,16 +172,15 @@ function parseResponse(response) {
   headingRegex.forEach((regex, index) => {
     const fontSize = 30 - (index * 4);
     const fontWeight = index === 0 ? 'bold' : 'normal';
-    parsedResponse = parsedResponse.replace(regex, `<span style="font-size: ${fontSize}px; font-weight: ${fontWeight};">$1</span></span>`);
+    parsedResponse = parsedResponse.replace(regex, `<span style="font-size: ${fontSize}px; font-weight: ${fontWeight};">$1</span>`);
   });
 
-  parsedResponse = parsedResponse.replace(/>\s(.*?)$/gm, '<div class="blockquote">$1</div>');
   parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '<i>$1</i>');
 
   if (codeBlocks) {
-    parsedResponse = codeBlocks.reduce((acc, codeBlock, index) => {
-      return acc.replace(`CODEBLOCK${index}`, createCodeBlockUI(codeBlock));
-    }, parsedResponse);
+    codeBlocks.forEach((codeBlock, index) => {
+      parsedResponse = parsedResponse.replace(`CODEBLOCK${index}`, createCodeBlockUI(codeBlock));
+    });
   }
 
   return parsedResponse;
@@ -274,7 +267,7 @@ function clearChatHistory() {
   ];
 }
 
-getElementById('copy-button').addEventListener('click', () => {
+document.getElementById('copy-button').addEventListener('click', () => {
   const latestResponse = chatHistory.lastElementChild.innerHTML;
   if (latestResponse) {
     copyToClipboard(latestResponse);
@@ -302,4 +295,4 @@ function saveInputsAndRefresh() {
   location.reload();
 }
 
-getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
+document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
