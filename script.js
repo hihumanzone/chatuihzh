@@ -170,7 +170,7 @@ function parseResponse(response) {
   headingRegex.forEach((regex, index) => {
     const fontSize = 30 - (index * 4);
     const fontWeight = index === 0 ? 'bold' : 'normal';
-    parsedResponse = parsedResponse.replace(regex, `<span style="font-size: ${fontSize}px; font-weight: ${fontWeight};">$1</span>`);
+    parsedResponse = parsedResponse.replace(regex, `<span style="font-size: ${fontSize}px; font-weight: ${fontWeight};">$1</span></span>`);
   });
 
   parsedResponse = parsedResponse.replace(/>\s(.*?)$/gm, '<div class="blockquote">$1</div>');
