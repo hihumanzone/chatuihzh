@@ -46,7 +46,8 @@ messageInput.addEventListener('keydown', (event) => {
 getElementById('send-button').addEventListener('click', sendMessage);
 
 function toggleModelMenu() {
-  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
+  const displayValue = modelMenu.style.display;
+  modelMenu.style.display = displayValue === 'none' ? 'block' : 'none';
 }
 
 function selectModel(model) {
@@ -114,8 +115,10 @@ function extractCodeBlocks(response) {
 }
 
 function createCodeBlockUI(codeBlock) {
+  const codeWithoutMarkdown = codeBlock.replace(/```/g, '');
+
   const preElement = document.createElement('pre');
-  preElement.textContent = codeBlock.replace(/```/g, '');
+  preElement.textContent = codeWithoutMarkdown;
 
   const codeBlockElement = document.createElement('div');
   codeBlockElement.classList.add('code-block');
@@ -126,6 +129,11 @@ function createCodeBlockUI(codeBlock) {
   copyCodeButton.textContent = 'Copy The Code';
   codeBlockElement.appendChild(copyCodeButton);
 
+  copyCodeButton.addEventListener('click', () => {
+    copyToClipboard(codeWithoutMarkdown);
+    alert('Text copied to clipboard');
+  });
+
   return codeBlockElement.outerHTML;
 }
 
@@ -133,10 +141,10 @@ async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
 
-let displayedText = content;
-if (!content.match(codeBlockRegex)) {
-  displayedText = content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
+  let displayedText = content;
+  if (!content.match(codeBlockRegex)) {
+    displayedText = content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
 
   if (owner === 'bot') {
     displayedText = extractCodeBlocks(displayedText);
