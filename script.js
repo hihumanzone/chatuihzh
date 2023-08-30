@@ -1,3 +1,4 @@
+// Get references to DOM elements
 const chatHistory = document.getElementById('chat-history');
 const apiKeyInput = document.getElementById('api-key-input');
 const apiEndpointInput = document.getElementById('api-endpoint-input');
@@ -6,99 +7,84 @@ const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 
-let messages = [
-  {
-    role: 'system',
-    content: localStorage.getItem('systemRole') || '',
-  },
-];
+// Initialize variables
+let messages = [];
+let apiKey = '';
+let apiEndpoint = '';
+let selectedModel = 'gpt-3.5-turbo';
 
-let apiKey = localStorage.getItem('apiKey') || '';
-let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
-let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
-
-apiKeyInput.value = apiKey;
-apiEndpointInput.value = apiEndpoint;
-selectModel(selectedModel);
-updateModelHeading();
-
-messageInput.addEventListener('input', () => {
-  messageInput.style.height = 'auto';
-  messageInput.style.height = `${messageInput.scrollHeight}px`;
-});
-
-messageInput.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    messageInput.value += '\n';
-    messageInput.style.height = `${messageInput.scrollHeight}px`;
-  }
-});
-
+// Add event listeners
+messageInput.addEventListener('input', handleInputChange);
+messageInput.addEventListener('keydown', handleKeyDown);
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
-function toggleModelMenu() {
-  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
+// Function to handle input change
+function handleInputChange() {
+  this.style.height = 'auto';
+  this.style.height = `${this.scrollHeight}px`;
 }
 
-function selectModel(model) {
-  const modelOptions = document.querySelectorAll('ul li');
-  modelOptions.forEach((option) => option.classList.remove('selected'));
+// Function to handle key down
+function handleKeyDown(event) {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    this.value += '\n';
+    this.style.height = `${this.scrollHeight}px`;
+  }
+}
 
-  const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
-  if (selectedModelOption) {
-    selectedModelOption.classList.add('selected');
+// Function to send message
+async function sendMessage() {
+  // Check if API key and endpoint are set
+  if (!apiKey || !apiEndpoint) {
+    alert('API key and endpoint must be set before sending a message.');
+    return;
   }
 
-  selectedModel = model;
-  localStorage.setItem('selectedModel', selectedModel);
+  // Create and append user message
+  const message = messageInput.value.trim();
+  createAndAppendMessage(message, 'user');
+  messageInput.value = '';
+  messageInput.style.height = 'auto';
 
-  toggleModelMenu();
-  updateModelHeading();
+  // Send request to server
+  try {
+    const response = await fetch('/api/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message,
+        apiKey,
+        apiEndpoint,
+        selectedModel,
+      }),
+    });
+
+    // Parse response from server
+    const jsonResponse = await response.json();
+    console.log(jsonResponse);
+
+    // Create and append bot response
+    const botResponse = jsonResponse.choices[0].message.content;
+    messages.push({
+      role: 'assistant',
+      content: botResponse,
+    });
+    createAndAppendMessage(botResponse, 'bot');
+  } catch (error) {
+    console.error(error);
+  }
 }
 
-function updateModelHeading() {
-  const modelHeading = document.querySelector('h1');
-  modelHeading.textContent = `Chat with ${selectedModel}`;
-}
-
-const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
-
-async function getBotResponse(apiKey, apiEndpoint, message) {
-  const headers = {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${apiKey}`,
-  };
-
-  messages.push({
-    role: 'user',
-    content: message,
-  });
-
-  aiThinkingMsg.style.display = 'block';
-
-  const data = {
-    model: selectedModel,
-    messages: messages,
-  };
-
-  const response = await fetch(ENDPOINT, {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify(data),
-  });
-
-  aiThinkingMsg.style.display = 'none';
-
-  return response.json();
-}
-
-async function createAndAppendMessage(content, owner) {
+// Function to create and append message
+function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
 
   let displayedText = content;
-  
+
   if (owner === 'bot') {
     if (displayedText.startsWith('>')) {
       message.style.backgroundColor = '#222';
@@ -115,6 +101,7 @@ async function createAndAppendMessage(content, owner) {
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
 }
 
+// Function to parse response
 function parseResponse(response) {
   let parsedResponse = response;
 
@@ -125,11 +112,13 @@ function parseResponse(response) {
   return parsedResponse;
 }
 
+// Function to parse tables
 function parseTables(response) {
   const tableRegex = /\n((?:\s*:?[\|:].*?:?\|\n)+)\n/g;
   return response.replace(tableRegex, createTable);
 }
 
+// Function to create table
 function createTable(match, table) {
   const rows = table.trim().split('\n');
   const tableElement = document.createElement('table');
@@ -156,37 +145,10 @@ function createTable(match, table) {
     tableElement.appendChild(row);
   }
 
-  return `\n${tableElement.outerHTML}\n`;
+  return `<br />${tableElement.outerHTML}<br />`;
 }
 
-async function sendMessage() {
-  apiKey = apiKeyInput.value.trim();
-  apiEndpoint = apiEndpointInput.value.trim();
-  const message = messageInput.value.trim();
-
-  if (!message) {
-    alert('Please enter a message.');
-    return;
-  }
-
-  localStorage.setItem('apiKey', apiKey);
-  localStorage.setItem('apiEndpoint', apiEndpoint);
-
-  createAndAppendMessage(message, 'user');
-  messageInput.value = '';
-  messageInput.style.height = 'auto';
-
-  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
-
-  const botResponse = jsonResponse.choices[0].message.content;
-  messages.push({
-    role: 'assistant',
-    content: botResponse,
-  });
-
-  createAndAppendMessage(botResponse, 'bot');
-}
-
+// Function to copy to clipboard
 function copyToClipboard(text) {
   const textarea = document.createElement('textarea');
   textarea.value = text;
@@ -196,16 +158,13 @@ function copyToClipboard(text) {
   document.body.removeChild(textarea);
 }
 
+// Function to clear chat history
 function clearChatHistory() {
   chatHistory.innerHTML = '';
-  messages = [
-    {
-      role: 'system',
-      content: localStorage.getItem('systemRole') || '',
-    },
-  ];
+  messages = [];
 }
 
+// Event listener for copy button click
 document.getElementById('copy-button').addEventListener('click', () => {
   const latestResponse = chatHistory.lastElementChild.innerHTML;
   if (latestResponse) {
@@ -216,22 +175,5 @@ document.getElementById('copy-button').addEventListener('click', () => {
   }
 });
 
-systemRoleInput.value = localStorage.getItem('systemRole') || '';
-systemRoleInput.addEventListener('input', () => {
-  localStorage.setItem('systemRole', systemRoleInput.value);
-  messages[0].content = systemRoleInput.value;
-});
-
-window.addEventListener('load', updateModelHeading);
-
-function saveInputsAndRefresh() {
-  apiKey = apiKeyInput.value.trim();
-  apiEndpoint = apiEndpointInput.value.trim();
-
-  localStorage.setItem('apiKey', apiKey);
-  localStorage.setItem('apiEndpoint', apiEndpoint);
-
-  location.reload();
-}
-
-document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
+// Event listener for clear chat history button click
+document.getElementById('clear-button').addEventListener('click', clearChatHistory);
