@@ -1,90 +1,76 @@
-// Get references to DOM elements
-const chatHistory = document.getElementById('chat-history');
-const apiKeyInput = document.getElementById('api-key-input');
-const apiEndpointInput = document.getElementById('api-endpoint-input');
-const messageInput = document.getElementById('message-input');
-const modelMenu = document.getElementById('model-menu');
-const aiThinkingMsg = document.getElementById('ai-thinking');
-const systemRoleInput = document.getElementById('system-role-input');
+let messages = [
+  {
+    role: 'system',
+    content: localStorage.getItem('systemRole') || '',
+  },
+];
 
-// Initialize variables
-let messages = [];
-let apiKey = '';
-let apiEndpoint = '';
-let selectedModel = 'gpt-3.5-turbo';
+let apiKey = localStorage.getItem('apiKey') || '';
+let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
+let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
 
-// Add event listeners
-messageInput.addEventListener('input', handleInputChange);
-messageInput.addEventListener('keydown', handleKeyDown);
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
-// Function to handle input change
-function handleInputChange() {
-  this.style.height = 'auto';
-  this.style.height = `${this.scrollHeight}px`;
+function toggleModelMenu() {
+  let modelMenu = document.getElementById('model-menu');
+  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
 }
 
-// Function to handle key down
-function handleKeyDown(event) {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    this.value += '\n';
-    this.style.height = `${this.scrollHeight}px`;
+function selectModel(model) {
+  let modelHeading = document.querySelector('h1');
+  let modelOptions = document.querySelectorAll('ul li');
+  let selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
+  modelOptions.forEach((option) => option.classList.remove('selected'));
+
+  if (selectedModelOption) {
+    selectedModelOption.classList.add('selected');
   }
+
+  selectedModel = model;
+  localStorage.setItem('selectedModel', selectedModel);
+  toggleModelMenu();
+  modelHeading.textContent = `Chat with ${selectedModel}`;
 }
 
-// Function to send message
-async function sendMessage() {
-  // Check if API key and endpoint are set
-  if (!apiKey || !apiEndpoint) {
-    alert('API key and endpoint must be set before sending a message.');
-    return;
-  }
+const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
 
-  // Create and append user message
-  const message = messageInput.value.trim();
-  createAndAppendMessage(message, 'user');
-  messageInput.value = '';
-  messageInput.style.height = 'auto';
+async function getBotResponse(apiKey, apiEndpoint, message) {
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${apiKey}`,
+  };
 
-  // Send request to server
-  try {
-    const response = await fetch('/api/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message,
-        apiKey,
-        apiEndpoint,
-        selectedModel,
-      }),
-    });
+  let aiThinkingMsg = document.getElementById('ai-thinking');
+  aiThinkingMsg.style.display = 'block';
 
-    // Parse response from server
-    const jsonResponse = await response.json();
-    console.log(jsonResponse);
+  messages.push({
+    role: 'user',
+    content: message,
+  });
 
-    // Create and append bot response
-    const botResponse = jsonResponse.choices[0].message.content;
-    messages.push({
-      role: 'assistant',
-      content: botResponse,
-    });
-    createAndAppendMessage(botResponse, 'bot');
-  } catch (error) {
-    console.error(error);
-  }
+  const data = {
+    model: selectedModel,
+    messages: messages,
+  };
+
+  const response = await fetch(ENDPOINT, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify(data),
+  });
+
+  aiThinkingMsg.style.display = 'none';
+
+  return response.json();
 }
 
-// Function to create and append message
-function createAndAppendMessage(content, owner) {
-  const message = document.createElement('div');
+async function createAndAppendMessage(content, owner) {
+  let chatHistory = document.getElementById('chat-history');
+  let message = document.createElement('div');
   message.classList.add('message', owner);
 
   let displayedText = content;
-
+  
   if (owner === 'bot') {
     if (displayedText.startsWith('>')) {
       message.style.backgroundColor = '#222';
@@ -101,71 +87,51 @@ function createAndAppendMessage(content, owner) {
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
 }
 
-// Function to parse response
-function parseResponse(response) {
-  let parsedResponse = response;
+async function sendMessage() {
+  let apiKeyInput = document.getElementById('api-key-input');
+  let apiEndpointInput = document.getElementById('api-endpoint-input');
+  let messageInput = document.getElementById('message-input');
 
-  parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
-  parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
-  parsedResponse = parseTables(parsedResponse);
+  apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
+  const message = messageInput.value.trim();
 
-  return parsedResponse;
-}
-
-// Function to parse tables
-function parseTables(response) {
-  const tableRegex = /\n((?:\s*:?[\|:].*?:?\|\n)+)\n/g;
-  return response.replace(tableRegex, createTable);
-}
-
-// Function to create table
-function createTable(match, table) {
-  const rows = table.trim().split('\n');
-  const tableElement = document.createElement('table');
-
-  const tableHeader = document.createElement('tr');
-  const tableHeaderCells = rows[0].split('|').slice(1, -1);
-  tableHeaderCells.forEach((cell) => {
-    const th = document.createElement('th');
-    th.classList.add('table-header');
-    th.textContent = cell.trim();
-    tableHeader.appendChild(th);
-  });
-  tableElement.appendChild(tableHeader);
-
-  for (let i = 2; i < rows.length; i++) {
-    const row = document.createElement('tr');
-    const tableCells = rows[i].split('|').slice(1, -1);
-    tableCells.forEach((cell) => {
-      const td = document.createElement('td');
-      td.classList.add('table-data');
-      td.innerHTML = parseResponse(cell.trim());
-      row.appendChild(td);
-    });
-    tableElement.appendChild(row);
+  if (!message) {
+    alert('Please enter a message.');
+    return;
   }
 
-  return `<br />${tableElement.outerHTML}<br />`;
+  localStorage.setItem('apiKey', apiKey);
+  localStorage.setItem('apiEndpoint', apiEndpoint);
+
+  createAndAppendMessage(message, 'user');
+  messageInput.value = '';
+  messageInput.style.height = 'auto';
+
+  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
+
+  const botResponse = jsonResponse.choices[0].message.content;
+  messages.push({
+    role: 'assistant',
+    content: botResponse,
+  });
+
+  createAndAppendMessage(botResponse, 'bot');
 }
 
-// Function to copy to clipboard
-function copyToClipboard(text) {
-  const textarea = document.createElement('textarea');
-  textarea.value = text;
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand('copy');
-  document.body.removeChild(textarea);
-}
-
-// Function to clear chat history
 function clearChatHistory() {
+  let chatHistory = document.getElementById('chat-history');
   chatHistory.innerHTML = '';
-  messages = [];
+  messages = [
+    {
+      role: 'system',
+      content: localStorage.getItem('systemRole') || '',
+    },
+  ];
 }
 
-// Event listener for copy button click
 document.getElementById('copy-button').addEventListener('click', () => {
+  let chatHistory = document.getElementById('chat-history');
   const latestResponse = chatHistory.lastElementChild.innerHTML;
   if (latestResponse) {
     copyToClipboard(latestResponse);
@@ -175,5 +141,17 @@ document.getElementById('copy-button').addEventListener('click', () => {
   }
 });
 
-// Event listener for clear chat history button click
-document.getElementById('clear-button').addEventListener('click', clearChatHistory);
+document.getElementById('refresh-button').addEventListener('click', function () {
+
+  let apiKeyInput = document.getElementById('api-key-input');
+  let apiEndpointInput = document.getElementById('api-endpoint-input');
+
+  apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
+
+  localStorage.setItem('apiKey', apiKey);
+  localStorage.setItem('apiEndpoint', apiEndpoint);
+
+  location.reload();
+
+});
