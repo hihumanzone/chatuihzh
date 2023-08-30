@@ -1,237 +1,180 @@
-const chatHistory = document.getElementById('chat-history');
-const apiKeyInput = document.getElementById('api-key-input');
-const apiEndpointInput = document.getElementById('api-endpoint-input');
-const messageInput = document.getElementById('message-input');
-const modelMenu = document.getElementById('model-menu');
-const aiThinkingMsg = document.getElementById('ai-thinking');
-const systemRoleInput = document.getElementById('system-role-input');
+const chatApp = (() => {
+    const dom = {
+        chatHistory: document.getElementById('chat-history'),
+        apiKeyInput: document.getElementById('api-key-input'),
+        apiEndpointInput: document.getElementById('api-endpoint-input'),
+        messageInput: document.getElementById('message-input'),
+        modelMenu: document.getElementById('model-menu'),
+        aiThinkingMsg: document.getElementById('ai-thinking'),
+        systemRoleInput: document.getElementById('system-role-input'),
+        sendButton: document.getElementById('send-button'),
+        copyButton: document.getElementById('copy-button'),
+        refreshButton: document.getElementById('refresh-button'),
+        menuOptions: document.querySelectorAll('ul li'),
+        modelHeading: document.querySelector('h1'),
+    };
 
-let messages = [
-  {
-    role: 'system',
-    content: localStorage.getItem('systemRole') || '',
-  },
-];
+    const state = {
+        apiKey: localStorage.getItem('apiKey') || '',
+        apiEndpoint: localStorage.getItem('apiEndpoint') || '',
+        selectedModel: localStorage.getItem('selectedModel') || 'gpt-3.5-turbo',
+        systemRole: localStorage.getItem('systemRole') || '',
+        messages: [{ role: 'system', content: localStorage.getItem('systemRole') || '', }],
+    };
 
-let apiKey = localStorage.getItem('apiKey') || '';
-let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
-let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
+    const setLocalStorage = ({ key, value }) => localStorage.setItem(key, value);
+    const toggleDisplay = element => element.style.display = element.style.display === 'none' ? 'block' : 'none';
+    const createAndPopulateElement = ({ elementType, classes, content, attrs }) => {
+        const element = document.createElement(elementType);
+        classes.forEach(c => element.classList.add(c));
+        element.innerHTML = content;
+        for (const attr in attrs) { element.setAttribute(attr, attrs[attr]) }
+        return element;
+    };
 
-apiKeyInput.value = apiKey;
-apiEndpointInput.value = apiEndpoint;
-selectModel(selectedModel);
-updateModelHeading();
+    const setupEventListeners = () => {
+        const handleInput = (event, element) => {
+            event.preventDefault();
+            element.value += '\n';
+            element.style.height = `${element.scrollHeight}px`;
+        };
 
-messageInput.addEventListener('input', () => {
-  messageInput.style.height = 'auto';
-  messageInput.style.height = `${messageInput.scrollHeight}px`;
-});
+        dom.messageInput.addEventListener('input', () => handleInput(event, dom.messageInput));
+        dom.messageInput.addEventListener('keydown', event => {
+            if (event.key === 'Enter' && !event.shiftKey) handleInput(event, dom.messageInput);
+        });
 
-messageInput.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    messageInput.value += '\n';
-    messageInput.style.height = `${messageInput.scrollHeight}px`;
-  }
-});
+        dom.sendButton.addEventListener('click', sendMessage);
+        dom.copyButton.addEventListener('click', copyLatestResponseToClipboard);
+        dom.systemRoleInput.addEventListener('input', () => {
+            setLocalStorage({ key: 'systemRole', value: dom.systemRoleInput.value });
+            state.messages[0].content = dom.systemRoleInput.value;
+        });
 
-document.getElementById('send-button').addEventListener('click', sendMessage);
+        dom.refreshButton.addEventListener('click', () => {
+            setLocalStorage({ key: 'apiKey', value: dom.apiKeyInput.value.trim() });
+            setLocalStorage({ key: 'apiEndpoint', value: dom.apiEndpointInput.value.trim() });
+            location.reload();
+        });
+    };
 
-function toggleModelMenu() {
-  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
-}
-
-function selectModel(model) {
-  const modelOptions = document.querySelectorAll('ul li');
-  modelOptions.forEach((option) => option.classList.remove('selected'));
-
-  const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
-  if (selectedModelOption) {
-    selectedModelOption.classList.add('selected');
-  }
-
-  selectedModel = model;
-  localStorage.setItem('selectedModel', selectedModel);
-
-  toggleModelMenu();
-  updateModelHeading();
-}
-
-function updateModelHeading() {
-  const modelHeading = document.querySelector('h1');
-  modelHeading.textContent = `Chat with ${selectedModel}`;
-}
-
-const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
-
-async function getBotResponse(apiKey, apiEndpoint, message) {
-  const headers = {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${apiKey}`,
-  };
-
-  messages.push({
-    role: 'user',
-    content: message,
-  });
-
-  aiThinkingMsg.style.display = 'block';
-
-  const data = {
-    model: selectedModel,
-    messages: messages,
-  };
-
-  const response = await fetch(ENDPOINT, {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify(data),
-  });
-
-  aiThinkingMsg.style.display = 'none';
-
-  return response.json();
-}
-
-async function createAndAppendMessage(content, owner) {
-  const message = document.createElement('div');
-  message.classList.add('message', owner);
-
-  let displayedText = content;
-  
-  if (owner === 'bot') {
-    if (displayedText.startsWith('>')) {
-      message.style.backgroundColor = '#222';
-      message.style.borderColor = '#555';
+    function selectModel(model) {
+        dom.menuOptions.forEach((option) => option.classList.remove('selected'));
+        const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
+        if (selectedModelOption) { selectedModelOption.classList.add('selected') }
+        state.selectedModel = model;
+        setLocalStorage({ key: 'selectedModel', value: state.selectedModel });
+        toggleDisplay(dom.modelMenu);
+        updateModelHeading();
     }
-  }
 
-  const parsedContent = parseResponse(displayedText);
-  message.innerHTML = parsedContent;
+    function updateModelHeading() {
+        dom.modelHeading.textContent = `Chat with ${state.selectedModel}`;
+    }
 
-  chatHistory.appendChild(message);
-  chatHistory.scrollTop = chatHistory.scrollHeight;
+    async function getBotResponse(apiKey, apiEndpoint, message) {
+        const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}`, };
+        state.messages.push({ role: 'user', content: message });
 
-  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
-}
+        toggleDisplay(dom.aiThinkingMsg);
+        const response = await fetch(apiEndpoint || 'https://free.churchless.tech/v1/chat/completions', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({ model: state.selectedModel, messages: state.messages }),
+        });
+        toggleDisplay(dom.aiThinkingMsg);
+        return response.json();
+    }
 
-function parseResponse(response) {
-  let parsedResponse = response;
+    async function createAndAppendMessage(content, owner) {
+        const message = createAndPopulateElement({
+            elementType: 'div',
+            classes: ['message', owner],
+            content: parseResponse(content),
+            attrs: owner === 'bot' && content.startsWith('>') ? { style: 'background-color:#222;border-color:#555' } : {}
+        });
+        dom.chatHistory.appendChild(message);
+        dom.chatHistory.scrollTop = dom.chatHistory.scrollHeight;
+        MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
+    }
 
-  parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
-  parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
-  parsedResponse = parseTables(parsedResponse);
+    const parseResponse = (response) => {
+        function parseSubResponse(regex, string, outerElement, innerElement) {
+            return string.replace(regex, match => {
+                return `<${outerElement} class="mathjax-latex">${innerElement}${match.slice(1, -1)}${innerElement}</${outerElement}>`
+            });
+        }
+        return parseTables(parseSubResponse(/\$(.*?)\$/g, parseSubResponse(/\$\$(.*?)\$\$/g, response, 'span', '\\($1\\)'), 'span', '\\($1\\)'));
+    }
 
-  return parsedResponse;
-}
+    function parseTables(string) {
+        return string.replace(/\n((?:\s*:?[\|:].*?:?\|\n)+)\n/g, function(match, table) {
+            const rows = table.trim().split('\n');
+            const tableElement = createAndPopulateElement({ elementType: 'table', classes: [], content: '' });
 
-function parseTables(response) {
-  const tableRegex = /\n((?:\s*:?[\|:].*?:?\|\n)+)\n/g;
-  return response.replace(tableRegex, createTable);
-}
+            const tableHeaderCells = rows[0].split('|').slice(1, -1);
+            const tableHeader = createAndPopulateElement({ elementType: 'tr', classes: [], content: '' });
+            tableHeaderCells.forEach(cell => tableHeader.appendChild(
+                createAndPopulateElement({
+                    elementType: 'th',
+                    classes: ['table-header'],
+                    content: cell.trim()
+                })
+            ));
+            tableElement.appendChild(tableHeader);
 
-function createTable(match, table) {
-  const rows = table.trim().split('\n');
-  const tableElement = document.createElement('table');
+            for (let i = 2; i < rows.length; i++) {
+                const row = createAndPopulateElement({ elementType: 'tr', classes: [], content: '' });
+                const tableCells = rows[i].split('|').slice(1, -1);
+                tableCells.forEach(cell => row.appendChild(
+                    createAndPopulateElement({
+                        elementType: 'td',
+                        classes: ['table-data'],
+                        content: parseResponse(cell.trim())
+                    })
+                ));
+                tableElement.appendChild(row);
+            }
 
-  const tableHeader = document.createElement('tr');
-  const tableHeaderCells = rows[0].split('|').slice(1, -1);
-  tableHeaderCells.forEach((cell) => {
-    const th = document.createElement('th');
-    th.classList.add('table-header');
-    th.textContent = cell.trim();
-    tableHeader.appendChild(th);
-  });
-  tableElement.appendChild(tableHeader);
+            return `\n${tableElement.outerHTML}\n`;
+        });
+    }
 
-  for (let i = 2; i < rows.length; i++) {
-    const row = document.createElement('tr');
-    const tableCells = rows[i].split('|').slice(1, -1);
-    tableCells.forEach((cell) => {
-      const td = document.createElement('td');
-      td.classList.add('table-data');
-      td.innerHTML = parseResponse(cell.trim());
-      row.appendChild(td);
-    });
-    tableElement.appendChild(row);
-  }
+    async function sendMessage() {
+        const message = dom.messageInput.value.trim();
+        if (!message) { return alert('Please enter a message.') }
+        setLocalStorage({ key: 'apiKey', value: state.apiKey });
+        setLocalStorage({ key: 'apiEndpoint', value: state.apiEndpoint });
+        createAndAppendMessage(message, 'user');
+        dom.messageInput.value = '';
+        dom.messageInput.style.height = 'auto';
+        const jsonResponse = await getBotResponse(state.apiKey, state.apiEndpoint, message);
+        const botResponse = jsonResponse.choices[0].message.content;
+        state.messages.push({ role: 'assistant', content: botResponse });
+        createAndAppendMessage(botResponse, 'bot');
+    }
 
-  return `\n${tableElement.outerHTML}\n`;
-}
+    function copyLatestResponseToClipboard() {
+        const latestResponse = dom.chatHistory.lastElementChild.innerHTML;
+        if (latestResponse) {
+            document.execCommand('copy', false, latestResponse);
+            alert('Text copied to clipboard');
+        } else {
+            alert('No text to copy');
+        }
+    }
 
-async function sendMessage() {
-  apiKey = apiKeyInput.value.trim();
-  apiEndpoint = apiEndpointInput.value.trim();
-  const message = messageInput.value.trim();
+    return {
+        init: () => {
+            dom.apiKeyInput.value = state.apiKey;
+            dom.apiEndpointInput.value = state.apiEndpoint;
+            dom.systemRoleInput.value = state.systemRole;
+            selectModel(state.selectedModel);
+            setupEventListeners();
+            window.addEventListener('load', updateModelHeading);
+        }
+    };
 
-  if (!message) {
-    alert('Please enter a message.');
-    return;
-  }
+})();
 
-  localStorage.setItem('apiKey', apiKey);
-  localStorage.setItem('apiEndpoint', apiEndpoint);
-
-  createAndAppendMessage(message, 'user');
-  messageInput.value = '';
-  messageInput.style.height = 'auto';
-
-  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
-
-  const botResponse = jsonResponse.choices[0].message.content;
-  messages.push({
-    role: 'assistant',
-    content: botResponse,
-  });
-
-  createAndAppendMessage(botResponse, 'bot');
-}
-
-function copyToClipboard(text) {
-  const textarea = document.createElement('textarea');
-  textarea.value = text;
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand('copy');
-  document.body.removeChild(textarea);
-}
-
-function clearChatHistory() {
-  chatHistory.innerHTML = '';
-  messages = [
-    {
-      role: 'system',
-      content: localStorage.getItem('systemRole') || '',
-    },
-  ];
-}
-
-document.getElementById('copy-button').addEventListener('click', () => {
-  const latestResponse = chatHistory.lastElementChild.innerHTML;
-  if (latestResponse) {
-    copyToClipboard(latestResponse);
-    alert('Text copied to clipboard');
-  } else {
-    alert('No text to copy');
-  }
-});
-
-systemRoleInput.value = localStorage.getItem('systemRole') || '';
-systemRoleInput.addEventListener('input', () => {
-  localStorage.setItem('systemRole', systemRoleInput.value);
-  messages[0].content = systemRoleInput.value;
-});
-
-window.addEventListener('load', updateModelHeading);
-
-function saveInputsAndRefresh() {
-  apiKey = apiKeyInput.value.trim();
-  apiEndpoint = apiEndpointInput.value.trim();
-
-  localStorage.setItem('apiKey', apiKey);
-  localStorage.setItem('apiEndpoint', apiEndpoint);
-
-  location.reload();
-}
-
-document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
+chatApp.init();
