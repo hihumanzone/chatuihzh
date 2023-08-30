@@ -133,32 +133,22 @@
     </style>
 </head>
 <body>
-
     <div id="overlay"></div>
-
     <div id="settings">
         <button id="closeSettings">Close Settings</button> <br> <br>
-
         <label for="apiEndpoint">API Endpoint:</label><br>
         <input id="apiEndpoint" type="text" placeholder="OpenAI API endpoint"><br><br>
-
         <label for="apiKey">API Key:</label><br>
         <input id="apiKey" type="text" placeholder="Your OpenAI API Key"><br><br>
-
         <label for="systemRole">System Role:</label><br>
         <input id="systemRole" type="text" placeholder="Type system role content here..."><br><br>
-
         <label for="modelName">Model Name:</label><br>
         <input id="modelName" type="text" placeholder="Type model name here..."><br><br>
-
         <button id="saveSettingsButton">Save Changes</button>
-
     </div>
-
     <div id="chat">
         <div id="thinking">Assistant is thinking...</div>
     </div>
-
     <div id="buttonArea">
         <button id="settingsButton">Settings</button>
         <div class="div-spacer"></div>
@@ -166,12 +156,10 @@
         <div class="div-spacer"></div>
         <button id="copyLatest">Copy Latest Message</button>
     </div>
-
     <div id="inputArea">
         <textarea id="messageBox" rows="4" columns="50" placeholder="Type your message here... and press Shift+Enter to send"></textarea>
         <button id="sendButton">Send</button>
     </div>
-
     <script>
         let messages = [{
             "role": "system",
@@ -283,6 +271,5 @@
         });
 
     </script>
-
 </body>
-  </html>
+</html>
