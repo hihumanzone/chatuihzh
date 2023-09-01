@@ -183,8 +183,7 @@
         });
         
         $('#systemRole').val(messages[0].content);
-
-        async function sendMessage() {
+	    
 function sendMessage() {
     const userContent = $("#messageBox").val().replace(/\n/g, '<br>');
     apiKey = $('#apiKey').val();
