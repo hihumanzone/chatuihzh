@@ -161,141 +161,124 @@
     </div>
     <script>
         let messages = [{
-            "role": "system",
-            "content": localStorage.getItem('systemRole') || "You are a helpful assistant."
-        }];
+    "role": "system",
+    "content": localStorage.getItem('systemRole') || "You are a helpful assistant."
+}];
 
-        let apiEndpoint = localStorage.getItem('apiEndpoint');
-        let apiKey = localStorage.getItem('apiKey');
-        let modelName = localStorage.getItem('modelName') || 'gpt-3.5-turbo';
+let apiEndpoint = localStorage.getItem('apiEndpoint');
+let apiKey = localStorage.getItem('apiKey');
+let modelName = localStorage.getItem('modelName') || 'gpt-3.5-turbo';
 
-        if(apiEndpoint) $('#apiEndpoint').val(apiEndpoint);
-        if(apiKey) $('#apiKey').val(apiKey);
-        if(modelName) $('#modelName').val(modelName);
+if(apiEndpoint) $('#apiEndpoint').val(apiEndpoint);
+if(apiKey) $('#apiKey').val(apiKey);
+if(modelName) $('#modelName').val(modelName);
 
-        $("#sendButton").click(sendMessage);
-        $('#messageBox').keypress(function (e) {
-            if (e.which == 13 && e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-        
-        $('#systemRole').val(messages[0].content);
+$("#sendButton").click(sendMessage);
+$('#messageBox').keypress(function (e) {
+    if (e.which == 13 && e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
 
-        async function sendMessage() {
-            const userContent = $("#messageBox").val().replace(/\n/g, '<br>');
-            apiKey = $('#apiKey').val();
-            apiEndpoint = $('#apiEndpoint').val();
-            modelName = $('#modelName').val() || 'gpt-3.5-turbo';
-            messages[0]["content"] = $('#systemRole').val();
+$('#systemRole').val(messages[0].content);
 
-            messages.push({
-                "role": "user",
-                "content": userContent
-            });
+function sendMessage() {
+    const userContent = $("#messageBox").val().replace(/\n/g, '<br>');
+    apiKey = $('#apiKey').val();
+    apiEndpoint = $('#apiEndpoint').val();
+    modelName = $('#modelName').val() || 'gpt-3.5-turbo';
+    messages[0]["content"] = $('#systemRole').val();
 
-            $('#chat').append('<div class="message"><strong>User:</strong><br> ' + userContent + '</div>');
-            $("#thinking").show();
+    messages.push({
+        "role": "user",
+        "content": userContent
+    });
 
-            try {
-                const response = await fetch(apiEndpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + apiKey
-                    },
-                    body: JSON.stringify({
-                        'model': modelName,
-                        'messages': messages,
-                        'stream': true
-                    }),
-                });
+    $('#chat').append('<div class="message"><strong>User:</strong><br> ' + userContent + '</div>');
+    $("#thinking").show();
 
-                // Read the response as a stream of data
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder("utf-8");
-
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) {
-                        break;
-                    }
-                    // Massage and parse the chunk of data
-                    const chunk = decoder.decode(value);
-                    const lines = chunk.split("\\n");
-                    const parsedLines = lines
-                        .map((line) => line.replace(/^data: /, "").trim()) // Remove the "data: " prefix
-                        .filter((line) => line !== "" && line !== "[DONE]") // Remove empty lines and "[DONE]"
-                        .map((line) => JSON.parse(line)); // Parse the JSON string
-
-                    for (const parsedLine of parsedLines) {
-                        const { choices } = parsedLine;
-                        const { delta } = choices[0];
-                        const { content } = delta;
-                        // Update the UI with the new content
-                        if (content) {
-                            let assistantReply = content.replace(/\n/g, '<br>');
-                            messages.push({
-                                "role": "assistant",
-                                "content": assistantReply
-                            });
-                            $('#chat').append('<div class="message"><strong>Assistant:</strong><br> ' + assistantReply + '</div>');
-                        }
-                    }
+    fetch(apiEndpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + apiKey
+        },
+        body: JSON.stringify({
+            'model': modelName,
+            'messages': messages,
+            'stream': true
+        })
+    }).then(async (response) => {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        while (true) {
+            const {done, value} = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value);
+            const lines = chunk.split('\n')
+            const parsedLines = lines
+                .map((line) => line.replace(/^data: /, "").trim())
+                .filter((line) => line !== "" && line !== "[DONE]")
+                .map((line) => JSON.parse(line));
+            for (const parsedLine of parsedLines) {
+                const { choices } = parsedLine;
+                const { delta } = choices[0];
+                const { content } = delta;
+                if (content) {
+                    $('#chat').append('<div class="message"><strong>Assistant:</strong><br> ' + content + '</div>');
+                    $("#thinking").hide();
                 }
-
-                $("#thinking").hide();
-            } catch(err) {
-                console.log(err);
             }
-
-            $("#messageBox").val('');
         }
+    });
 
-        $("#clearChat").click(function() {
-            $("#chat").empty();
-            messages = [{
-                "role": "system",
-                "content": localStorage.getItem('systemRole') || "You are a helpful assistant."
-            }];
-        });
+    $("#messageBox").val('');
+}
 
-        $("#copyLatest").click(function() {
-            const latest = $('.message').last().text();
-            const textarea = document.createElement('textarea');
-            textarea.textContent = latest;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            alert('Latest message copied');
-        });
+$("#clearChat").click(function() {
+    $("#chat").empty();
+    messages = [{
+        "role": "system",
+        "content": localStorage.getItem('systemRole') || "You are a helpful assistant."
+    }];
+});
 
-        $("#settingsButton").click(function () {
-            $('#settings').addClass('active');
-            $('#overlay').addClass('active');
-        });
+$("#copyLatest").click(function() {
+    const latest = $('.message').last().text();
+    const textarea = document.createElement('textarea');
+    textarea.textContent = latest;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    alert('Latest message copied');
+});
 
-        $("#closeSettings, #overlay").click(function () {
-            $('#settings').removeClass('active');
-            $('#overlay').removeClass('active');
-        });
+$("#settingsButton").click(function () {
+    $('#settings').addClass('active');
+    $('#overlay').addClass('active');
+});
 
-        $("#saveSettingsButton").click(function () {
-            const apiKeyNew = $('#apiKey').val();
-            const apiEndpointNew = $('#apiEndpoint').val();
-            const systemRoleNew = $('#systemRole').val();
-            const modelNameNew = $('#modelName').val();
+$("#closeSettings, #overlay").click(function () {
+    $('#settings').removeClass('active');
+    $('#overlay').removeClass('active');
+});
 
-            localStorage.setItem('apiEndpoint', apiEndpointNew);
-            localStorage.setItem('apiKey', apiKeyNew);
-            localStorage.setItem('systemRole', systemRoleNew);
-            localStorage.setItem('modelName', modelNameNew || 'gpt-3.5-turbo');
+$("#saveSettingsButton").click(function () {
+    const apiKeyNew = $('#apiKey').val();
+    const apiEndpointNew = $('#apiEndpoint').val();
+    const systemRoleNew = $('#systemRole').val();
+    const modelNameNew = $('#modelName').val();
 
-            location.reload();
-        });
+    localStorage.setItem('apiEndpoint', apiEndpointNew);
+    localStorage.setItem('apiKey', apiKeyNew);
+    localStorage.setItem('systemRole', systemRoleNew);
+    localStorage.setItem('modelName', modelNameNew || 'gpt-3.5-turbo');
 
+    location.reload();
+});
     </script>
+</script>
 </body>
 </html>
