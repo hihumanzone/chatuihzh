@@ -168,7 +168,6 @@
         let apiEndpoint = localStorage.getItem('apiEndpoint');
         let apiKey = localStorage.getItem('apiKey');
         let modelName = localStorage.getItem('modelName') || 'gpt-3.5-turbo';
-        let assistantMessage = '';
 
         if(apiEndpoint) $('#apiEndpoint').val(apiEndpoint);
         if(apiKey) $('#apiKey').val(apiKey);
@@ -213,27 +212,24 @@
             }).then(async (response) => {
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder("utf-8");
+                let partialMessage = "";
                 while (true) {
                     const {done, value} = await reader.read();
                     if (done) break;
                     const chunk = decoder.decode(value);
-                    const lines = chunk.split('\n')
-                    const parsedLines = lines
-                        .map((line) => line.replace(/^data: /, "").trim())
-                        .filter((line) => line !== "" && line !== "[DONE]")
-                        .map((line) => JSON.parse(line));
-                    for (const parsedLine of parsedLines) {
-                        const { choices } = parsedLine;
-                        const { delta } = choices[0];
-                        const { content, finish_reason } = delta;
-                        if (content) {
-                            assistantMessage += content;
-                            if (finish_reason !== "stop") {
-                                continue;
+                    partialMessage += chunk;
+                    const messageChunks = partialMessage.split('\n');
+                    partialMessage = messageChunks.pop();
+                    for (const messageChunk of messageChunks) {
+                        if (messageChunk) {
+                            const parsedLine = JSON.parse(messageChunk.replace(/^data: /, ""));
+                            const { choices } = parsedLine;
+                            const { delta } = choices[0];
+                            const { content } = delta;
+                            if (content) {
+                                $('#chat').append('<div class="message"><strong>Assistant:</strong><br> ' + content + '</div>');
+                                $("#thinking").hide();
                             }
-                            $('#chat').append('<div class="message"><strong>Assistant:</strong><br> ' + assistantMessage + '</div>');
-                            $("#thinking").hide();
-                            assistantMessage = '';
                         }
                     }
                 }
