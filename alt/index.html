@@ -183,60 +183,63 @@
         
         $('#systemRole').val(messages[0].content);
 
-        function sendMessage() {
-            const userContent = $("#messageBox").val().replace(/\n/g, '<br>');
-            apiKey = $('#apiKey').val();
-            apiEndpoint = $('#apiEndpoint').val();
-            modelName = $('#modelName').val() || 'gpt-3.5-turbo';
-            messages[0]["content"] = $('#systemRole').val();
+function sendMessage() {
+    const userContent = $("#messageBox").val().replace(/\n/g, '<br>');
+    apiKey = $('#apiKey').val();
+    apiEndpoint = $('#apiEndpoint').val();
+    modelName = $('#modelName').val() || 'gpt-3.5-turbo';
+    messages[0]["content"] = $('#systemRole').val();
 
-            messages.push({
-                "role": "user",
-                "content": userContent
-            });
+    messages.push({
+        "role": "user",
+        "content": userContent
+    });
 
-            $('#chat').append('<div class="message"><strong>User:</strong><br> ' + userContent + '</div>');
-            $("#thinking").show();
+    $('#chat').append('<div class="message"><strong>User:</strong><br> ' + userContent + '</div>');
+    $("#thinking").show();
 
-            fetch(apiEndpoint, {
-                method: 'POST', 
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + apiKey
-                },
-                body: JSON.stringify({
-                    'model': modelName,
-                    'messages': messages,
-                    'stream': true
-                })
-            }).then(async (response) => {
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder("utf-8");
-                let partialMessage = "";
-                while (true) {
-                    const {done, value} = await reader.read();
-                    if (done) break;
-                    const chunk = decoder.decode(value);
-                    partialMessage += chunk;
-                    const messageChunks = partialMessage.split('\n');
-                    partialMessage = messageChunks.pop();
-                    for (const messageChunk of messageChunks) {
-                        if (messageChunk) {
-                            const parsedLine = JSON.parse(messageChunk.replace(/^data: /, ""));
-                            const { choices } = parsedLine;
-                            const { delta } = choices[0];
-                            const { content } = delta;
-                            if (content) {
-                                $('#chat').append('<div class="message"><strong>Assistant:</strong><br> ' + content + '</div>');
-                                $("#thinking").hide();
-                            }
-                        }
-                    }
+    fetch(apiEndpoint, {
+        method: 'POST', 
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + apiKey
+        },
+        body: JSON.stringify({
+            'model': modelName,
+            'messages': messages,
+            'stream': true
+        })
+    }).then(async (response) => {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let assistantReply = "";
+        while (true) {
+            const {done, value} = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value);
+            const lines = chunk.split('\n')
+            const parsedLines = lines
+                .map((line) => line.replace(/^data: /, "").trim())
+                .filter((line) => line !== "" && line !== "[DONE]")
+                .map((line) => JSON.parse(line));
+            for (const parsedLine of parsedLines) {
+                const { choices } = parsedLine;
+                const { delta } = choices[0];
+                const { content } = delta;
+                if (content) {
+                    assistantReply += content;
                 }
-            });
-
-            $("#messageBox").val('');
+                if (parsedLine.type === "message" && parsedLine.role === "assistant") {
+                    $('#chat').append('<div class="message"><strong>Assistant:</strong><br> ' + assistantReply + '</div>');
+                    $("#thinking").hide();
+                    assistantReply = "";
+                }
+            }
         }
+    });
+
+    $("#messageBox").val('');
+}
 
         $("#clearChat").click(function() {
             $("#chat").empty();
