@@ -184,71 +184,72 @@
         
         $('#systemRole').val(messages[0].content);
 	    
-async function sendMessage() {
-    const userContent = $("#messageBox").val().replace(/\n/g, '<br>');
-    apiKey = $('#apiKey').val();
-    apiEndpoint = $('#apiEndpoint').val();
-    modelName = $('#modelName').val() || 'gpt-3.5-turbo';
-    messages[0]["content"] = $('#systemRole').val();
+function sendMessage() {
+            const userContent = $("#messageBox").val().replace(/\n/g, '<br>');
+            apiKey = $('#apiKey').val();
+            apiEndpoint = $('#apiEndpoint').val();
+            modelName = $('#modelName').val() || 'gpt-3.5-turbo';
+            messages[0]["content"] = $('#systemRole').val();
 
-    messages.push({
-        "role": "user",
-        "content": userContent
-    });
+            messages.push({
+                "role": "user",
+                "content": userContent
+            });
 
-    $('#chat').append('<div class="message"><strong>User:</strong><br> ' + userContent + '</div>');
-    $("#thinking").show();
+            $('#chat').append('<div class="message"><strong>User:</strong><br> ' + userContent + '</div>');
+            $("#thinking").show();
 
-    const requestOptions = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + apiKey
-        },
-        body: JSON.stringify({
-            'model': modelName,
-            'messages': messages,
-            'stream': true 
-        })
-    };
+            fetch(apiEndpoint, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + apiKey
+                },
+                body: JSON.stringify({
+                    'model': modelName,
+                    'messages': messages,
+                    'stream': true
+                })
+            })
+            .then((response) => {
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
 
-    try {
-        const response = await fetch(apiEndpoint, requestOptions);
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder("utf-8");
-    
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) {
-                break;
-            }
-            const chunk = decoder.decode(value);
-            const lines = chunk.split('\n');
-            const parsedLines = lines
-                .map(line => line.replace(/^data: /, "").trim())
-                .filter(line => line !== "" && line !== "[DONE]")
-                .map(line => JSON.parse(line));
-    
-            for (const parsedLine of parsedLines) {
-                const { choices } = parsedLine;
-                const { message } = choices[0];
-                if (message && message.role === 'assistant') {
-                    const assistantReply = message.content.replace(/\n/g, '<br>');
-                    messages.push({
-                        "role": "assistant",
-                        "content": assistantReply
-                    });
-                    $('#chat').append('<div class="message"><strong>Assistant:</strong><br> ' + assistantReply + '</div>');
-                }
-            }
+                return new ReadableStream({
+                    start(controller) {
+                        return pump();
+                        function pump() {
+                            return reader.read().then(({ done, value }) => {
+                                if (done) {
+                                    controller.close();
+                                    $("#thinking").hide();
+                                    return;
+                                }
+                                controller.enqueue(value);
+                                let chunk = decoder.decode(value);
+                                let lines = chunk.split("\\n");
+                                let parsedLines = lines
+                                                    .map((line) => line.replace(/^data: /, "").trim())
+                                                    .filter((line) => line !== "" && line !== "[DONE]")
+                                                    .map((line) => JSON.parse(line));
 
-            $("#thinking").hide();
-        }
-    } catch (error) {
-        console.error('Error:', error);
-    }
+                                for (const parsedLine of parsedLines) {
+                                    const { message } = parsedLine;
+                                    const content = message.content
+                                    if (content) {
+                                        $('#chat').append(`<div class="message"><strong>Assistant:</strong><br> ${content} </div>`);
+                                    }
+                                }
 
-    $("#messageBox").val('');
+                                return pump();
+                            });
+                        }
+                    }
+                })
+            })
+            .catch(err => console.error(err));
+
+            $("#messageBox").val('');
 }
         
         $("#clearChat").click(function() {
