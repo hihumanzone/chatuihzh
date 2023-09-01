@@ -184,48 +184,72 @@
         
         $('#systemRole').val(messages[0].content);
 
-        function sendMessage() {
-            const userContent = $("#messageBox").val().replace(/\n/g, '<br>');
-            apiKey = $('#apiKey').val();
-            apiEndpoint = $('#apiEndpoint').val();
-            modelName = $('#modelName').val() || 'gpt-3.5-turbo';
-            messages[0]["content"] = $('#systemRole').val();
+async function sendMessage() {
+    const userContent = $("#messageBox").val().replace(/\n/g, '<br>');
+    apiKey = $('#apiKey').val();
+    apiEndpoint = $('#apiEndpoint').val();
+    modelName = $('#modelName').val() || 'gpt-3.5-turbo';
+    messages[0]["content"] = $('#systemRole').val();
 
-            messages.push({
-                "role": "user",
-                "content": userContent
-            });
+    messages.push({
+        "role": "user",
+        "content": userContent
+    });
 
-            $('#chat').append('<div class="message"><strong>User:</strong><br> ' + userContent + '</div>');
-            $("#thinking").show();
+    $('#chat').append('<div class="message"><strong>User:</strong><br> ' + userContent + '</div>');
+    $("#thinking").show();
 
-            $.ajax({
-                type: "POST",
-                url: apiEndpoint,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + apiKey
-                },
-                data: JSON.stringify({
-                    'model': modelName,
-                    'messages': messages
-                }),
-                success: function(data) {
-                    let assistantReply = data.choices[0].message.content.replace(/\n/g, '<br>');
+    try {
+        const response = await fetch(apiEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + apiKey
+            },
+            body: JSON.stringify({
+                'model': modelName,
+                'messages': messages,
+                'stream': true
+            })
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+              $("#thinking").hide();
+              break;
+            }
+
+            const chunk = decoder.decode(value);
+            const lines = chunk.split("\n");
+            const parsedLines = lines
+                .map((line) => line.replace(/^data: /, "").trim()) 
+                .filter((line) => line !== "" && line !== "[DONE]") 
+                .map((line) => JSON.parse(line));
+
+            for (const parsedLine of parsedLines) {
+                const { choices } = parsedLine;
+                const { delta } = choices[0];
+                const { content } = delta;
+                if (content) {
                     messages.push({
                         "role": "assistant",
-                        "content": assistantReply
+                        "content": content
                     });
-                    $('#chat').append('<div class="message"><strong>Assistant:</strong><br> ' + assistantReply + '</div>');
-                    $("#thinking").hide();
-                },
-                error: function (err) {
-                    console.log(err.responseJSON.error.message);
+                    $('#chat').append('<div class="message"><strong>Assistant:</strong><br> ' +
+                     content.replace(/\n/g, '<br>') + '</div>');
                 }
-            });
-
-            $("#messageBox").val('');
+            }
         }
+    } catch (err) {
+        console.error(err);
+    }
+
+    $("#messageBox").val('');
+}
 
         $("#clearChat").click(function() {
             $("#chat").empty();
