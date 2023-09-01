@@ -2,7 +2,7 @@
 <html>
 <head>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-	    <style>
+    <style>
         body {
             background-color: #111;
             color: #eee;
@@ -129,7 +129,7 @@
         button:hover {
             background-color: #444;
         }
-	    </style>
+    </style>
 </head>
 <body>
     <div id="overlay"></div>
@@ -200,7 +200,7 @@
 
             try {
                 const response = await fetch(apiEndpoint, {
-                    method: 'POST',
+                    method: "POST",
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': 'Bearer ' + apiKey
@@ -214,38 +214,37 @@
 
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder("utf-8");
-
+                
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) {
                         break;
                     }
-                    // Massage and parse the chunk of data
+
                     const chunk = decoder.decode(value);
                     const lines = chunk.split("\\n");
                     const parsedLines = lines
-                        .map((line) => line.replace(/^data: /, "").trim()) // Remove the "data: " prefix
-                        .filter((line) => line !== "" && line !== "[DONE]") // Remove empty lines and "[DONE]"
-                        .map((line) => JSON.parse(line)); // Parse the JSON string
-        
+                        .map((line) => line.replace(/^data: /, "").trim()) 
+                        .filter((line) => line !== "" && line !== "[DONE]") 
+                        .map((line) => JSON.parse(line));
+
                     for (const parsedLine of parsedLines) {
                         const { choices } = parsedLine;
                         const { delta } = choices[0];
                         const { content } = delta;
-                        // Update the UI with the new content
                         if (content) {
-                            const assistantReply = content.replace(/\n/g, '<br>');
                             messages.push({
                                 "role": "assistant",
-                                "content": assistantReply
+                                "content": content
                             });
-                            $('#chat').append('<div class="message"><strong>Assistant:</strong><br> ' + assistantReply + '</div>');
+                            $('#chat').append('<div class="message"><strong>Assistant:</strong><br> ' + content + '</div>');
                             $("#thinking").hide();
                         }
                     }
                 }
-            } catch (err) {
-                console.log(err);
+
+            } catch(err) {
+                console.log(err.message);
             }
 
             $("#messageBox").val('');
