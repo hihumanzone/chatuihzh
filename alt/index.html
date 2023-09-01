@@ -199,21 +199,19 @@
             $('#chat').append('<div class="message"><strong>User:</strong><br> ' + userContent + '</div>');
             $("#thinking").show();
 
-            const requestOptions = {
-                method: "POST",
-                body: JSON.stringify({
-                    model: modelName,
-                    messages: messages,
-                    stream: true // For streaming responses
-                }),
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + apiKey
-                },
-            };
-
             try {
-                const response = await fetch(apiEndpoint, requestOptions);
+                const response = await fetch(apiEndpoint, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + apiKey
+                    },
+                    body: JSON.stringify({
+                        'model': modelName,
+                        'messages': messages,
+                        'stream': true   // enable streaming
+                    })
+                });
 
                 // Read the response as a stream of data
                 const reader = response.body.getReader();
@@ -225,36 +223,34 @@
                         break;
                     }
 
-                    // Massage and parse the chunk of data
+                    // Parse the output
                     const chunk = decoder.decode(value);
-                    const lines = chunk.split("\\n");
+                    const lines = chunk.split("\n");
                     const parsedLines = lines
-                        .map((line) => line.replace(/^data: /, "").trim()) // Remove the "data: " prefix
-                        .filter((line) => line !== "" && line !== "[DONE]") // Remove empty lines and "[DONE]"
-                        .map((line) => JSON.parse(line));
+                        .map((line) => line.replace(/^data: /, "").trim())
+                        .filter((line) => line !== "" && line !== "[DONE]")
+                        .map((line) => JSON.parse(line))
 
                     for (const parsedLine of parsedLines) {
                         const { choices } = parsedLine;
                         const { delta } = choices[0];
                         const { content } = delta;
 
-                        // Update the chat with the new content
+                        // Update the UI with the new content
                         if (content) {
                             messages.push({
                                 "role": "assistant",
                                 "content": content
                             });
                             $('#chat').append('<div class="message"><strong>Assistant:</strong><br> ' + content.replace(/\n/g, '<br>') + '</div>');
+                            $("#thinking").hide();
                         }
                     }
                 }
 
-                $("#thinking").hide();
-
-            } catch(err) {
-                console.log(err);
+            } catch (err) {
+                console.log(err.message);
             }
-
             $("#messageBox").val('');
 	}
         
