@@ -185,74 +185,69 @@
         $('#systemRole').val(messages[0].content);
 
         async function sendMessage() {
-            const userContent = $("#messageBox").val().replace(/\n/g, '<br>');
-            apiKey = $('#apiKey').val();
-            apiEndpoint = $('#apiEndpoint').val();
-            modelName = $('#modelName').val() || 'gpt-3.5-turbo';
-            messages[0]["content"] = $('#systemRole').val();
+function sendMessage() {
+    const userContent = $("#messageBox").val().replace(/\n/g, '<br>');
+    apiKey = $('#apiKey').val();
+    apiEndpoint = $('#apiEndpoint').val();
+    modelName = $('#modelName').val() || 'gpt-3.5-turbo';
+    messages[0]["content"] = $('#systemRole').val();
 
-            messages.push({
-                "role": "user",
-                "content": userContent
-            });
+    messages.push({
+        "role": "user",
+        "content": userContent
+    });
 
-            $('#chat').append('<div class="message"><strong>User:</strong><br> ' + userContent + '</div>');
-            $("#thinking").show();
+    $('#chat').append('<div class="message"><strong>User:</strong><br> ' + userContent + '</div>');
+    $("#thinking").show();
 
-            try {
-                const response = await fetch(apiEndpoint, {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + apiKey
-                    },
-                    body: JSON.stringify({
-                        'model': modelName,
-                        'messages': messages,
-                        'stream': true   // enable streaming
-                    })
-                });
+    fetch(apiEndpoint, {
+      method: "POST",
+      headers: {
+         'Content-Type': 'application/json',
+         'Authorization': 'Bearer ' + apiKey
+      },
+      body: JSON.stringify({
+         'model': modelName,
+         'messages': messages,
+         'stream': true //For streaming responses 
+       }),
+    })
+    .then(response => {
+         const reader = response.body.getReader();
+		 const decoder = new TextDecoder('utf-8');
+				
+		 reader.read().then(function processResult({ done, value }) {
+	    	const chunk = decoder.decode(value);
+	            const lines = chunk.split("\\n");
+	            const parsedLines = lines
+	                .map((line) => line.replace(/^data: /, "").trim()) 
+	                .filter((line) => line !== "" && line !== "[DONE]") 
+	                .map((line) => JSON.parse(line));
 
-                // Read the response as a stream of data
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder("utf-8");
-
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) {
-                        break;
-                    }
-
-                    // Parse the output
-                    const chunk = decoder.decode(value);
-                    const lines = chunk.split("\n");
-                    const parsedLines = lines
-                        .map((line) => line.replace(/^data: /, "").trim())
-                        .filter((line) => line !== "" && line !== "[DONE]")
-                        .map((line) => JSON.parse(line))
-
-                    for (const parsedLine of parsedLines) {
-                        const { choices } = parsedLine;
-                        const { delta } = choices[0];
-                        const { content } = delta;
-
-                        // Update the UI with the new content
-                        if (content) {
-                            messages.push({
-                                "role": "assistant",
-                                "content": content
-                            });
-                            $('#chat').append('<div class="message"><strong>Assistant:</strong><br> ' + content.replace(/\n/g, '<br>') + '</div>');
-                            $("#thinking").hide();
-                        }
-                    }
-                }
-
-            } catch (err) {
-                console.log(err.message);
-            }
-            $("#messageBox").val('');
-	}
+	            for (const parsedLine of parsedLines) {
+	            	if(parsedLine.choices[0].delta.role != "system") {
+	                	let assistantReply = parsedLine.choices[0].delta.content.replace(/\n/g, '<br>');
+	                	messages.push({
+	                    	"role": "assistant",
+	                    	"content": assistantReply
+	                	});
+		                $('#chat').append('<div class="message"><strong>Assistant:</strong><br> ' + assistantReply + '</div>');
+		              }
+	            }
+        
+	           if (!done) {
+                	return reader.read().then(processResult);
+            	}
+			
+			   $("#thinking").hide();
+		  });
+    })
+    .catch(error => {
+      console.log(error);
+    });
+    
+    $("#messageBox").val('');
+}
         
         $("#clearChat").click(function() {
             $("#chat").empty();
