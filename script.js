@@ -118,14 +118,14 @@ async function createAndAppendMessage(content, owner) {
 function parseResponse(response) {
   let parsedResponse = response;
 
-  var converter = new showdown.Converter();
-  parsedResponse = converter.makeHtml(parsedResponse);
+  parsedResponse = marked(parsedResponse);
   parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parseTables(parsedResponse);
 
   return parsedResponse;
 }
+
 
 function parseTables(response) {
   const tableRegex = /\n((?:\s*:?[\|:].*?:?\|\n)+)\n/g;
