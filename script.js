@@ -118,10 +118,10 @@ async function createAndAppendMessage(content, owner) {
 function parseResponse(response) {
   let parsedResponse = response;
 
-  parsedResponse = marked(parsedResponse);
   parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parseTables(parsedResponse);
+  parsedResponse = marked(parsedResponse);
 
   return parsedResponse;
 }
