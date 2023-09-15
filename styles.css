@@ -235,3 +235,7 @@ td:empty {
   color: white;
   margin-bottom: 16px;
 }
+
+marked.setOptions{
+  sanitize: true
+}
