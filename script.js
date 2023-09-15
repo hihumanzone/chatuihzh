@@ -98,7 +98,6 @@ async function createAndAppendMessage(content, owner) {
   message.classList.add('message', owner);
 
   let displayedText = content;
-  displayedText = marked(displayedText);
   
   if (owner === 'bot') {
     if (displayedText.startsWith('>')) {
