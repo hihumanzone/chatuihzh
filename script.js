@@ -98,6 +98,7 @@ async function createAndAppendMessage(content, owner) {
   message.classList.add('message', owner);
 
   let displayedText = content;
+  
   if (owner === 'bot') {
     if (displayedText.startsWith('>')) {
       message.style.backgroundColor = '#222';
@@ -106,8 +107,7 @@ async function createAndAppendMessage(content, owner) {
   }
 
   const parsedContent = parseResponse(displayedText);
-  
-  message.innerHTML = marked(parsedContent);
+  message.innerHTML = parsedContent;
 
   chatHistory.appendChild(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -118,7 +118,8 @@ async function createAndAppendMessage(content, owner) {
 function parseResponse(response) {
   let parsedResponse = response;
 
-  parsedResponse = marked(parsedResponse);
+  var converter = new showdown.Converter();
+  parsedResponse = converter.makeHtml(parsedResponse);
   parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parseTables(parsedResponse);
@@ -234,7 +235,5 @@ function saveInputsAndRefresh() {
 
   location.reload();
 }
-
-marked.setOptions({ sanitize: true });
 
 document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
