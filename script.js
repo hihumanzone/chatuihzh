@@ -116,16 +116,62 @@ async function createAndAppendMessage(content, owner) {
 }
 
 function parseResponse(response) {
-  let parsedResponse = response;
+    let parsedResponse = response;
 
-  parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
-  parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
-  parsedResponse = parseTables(parsedResponse);
-  parsedResponse = marked(parsedResponse);
+    // Parses bold text
+    parsedResponse = parsedResponse.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-  return parsedResponse;
+    // Parses italic text
+    parsedResponse = parsedResponse.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+    // Parses strikethrough text
+    parsedResponse = parsedResponse.replace(/~~(.*?)~~/g, '<del>$1</del>');
+
+    // Parses headers using fontSize instead of h tags
+    parsedResponse = parsedResponse.replace(/#### (.*?)( \n|$)/g, '<p style="font-size: 1em;">$1</p>');
+    parsedResponse = parsedResponse.replace(/### (.*?)( \n|$)/g, '<p style="font-size: 1.25em;">$1</p>');
+    parsedResponse = parsedResponse.replace(/## (.*?)( \n|$)/g, '<p style="font-size: 1.5em;">$1</p>');
+    parsedResponse = parsedResponse.replace(/# (.*?)( \n|$)/g, '<p style="font-size: 2em;">$1</p>');
+    
+    // Parses inline code
+    parsedResponse = parsedResponse.replace(/`(.*?)`/g, '<code>$1</code>');
+    
+    // Parses links
+    parsedResponse = parsedResponse.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
+
+    // Parses images
+    parsedResponse = parsedResponse.replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1">');
+
+    // Parses blockquotes
+    parsedResponse = parsedResponse.replace(/> (.*?)( \n|$)/g, '<blockquote>$1</blockquote>');
+
+    // Parses unordered lists
+    parsedResponse = parsedResponse.replace(/\n\*(.*?)\n/g, '\n<ul>\n<li>$1</li>\n</ul>\n');
+    parsedResponse = parsedResponse.replace(/\n\+(.*?)\n/g, '\n<ul>\n<li>$1</li>\n</ul>\n');
+    parsedResponse = parsedResponse.replace(/\n\-(.*?)\n/g, '\n<ul>\n<li>$1</li>\n</ul>\n');
+
+    // Parses ordered lists
+    parsedResponse = parsedResponse.replace(/\n(\d+\..*?)\n/g, '\n<ol>\n<li>$1</li>\n</ol>\n');
+
+    // Parses task lists
+    parsedResponse = parsedResponse.replace(/\n\-\s\[x\](.*?)\n/g, '\n<ul>\n<li><input type="checkbox" checked disabled>$1</li>\n</ul>\n');
+    parsedResponse = parsedResponse.replace(/\n\-\s\[\](.*?)\n/g, '\n<ul>\n<li><input type="checkbox" disabled>$1</li>\n</ul>\n');
+
+    // Parses code blocks
+    parsedResponse = parsedResponse.replace(/```(.*?)```/gs, function (match, p1) {
+        return `<div class="code-block"><pre>${p1}</pre>
+          <button class="copy-button" onclick="copyToClipboard('${p1}')">Copy</button>
+        </div>`;
+    });
+  
+    // Parses math equations
+    parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+    parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+
+    parsedResponse = parseTables(parsedResponse);
+
+    return parsedResponse;
 }
-
 
 function parseTables(response) {
   const tableRegex = /\n((?:\s*:?[\|:].*?:?\|\n)+)\n/g;
