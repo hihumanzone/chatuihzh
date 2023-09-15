@@ -235,4 +235,8 @@ function saveInputsAndRefresh() {
   location.reload();
 }
 
+marked.setOptions({
+  sanitize: true
+});
+
 document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
