@@ -1,3 +1,27 @@
+window.addEventListener('DOMContentLoaded', (event) => {
+    const allCodeBlocksElements = document.querySelectorAll('pre > code');
+  
+    allCodeBlocksElements.forEach((codeBlockElement) => {
+        const copyCodeButton = document.createElement('button');
+        copyCodeButton.className = 'copy-code-button';
+        copyCodeButton.textContent = 'Copy Code to Clipboard';
+        copyCodeButton.addEventListener('click', () => {
+            const textToCopy = codeBlockElement.innerText;
+            copyToClipboard(textToCopy);
+        });
+
+        codeBlockElement.parentNode.insertAdjacentElement('afterend', copyCodeButton);
+    });
+});
+
+function copyToClipboard(textToCopy) {
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        alert(`Copied to clipboard`);
+    }).catch((err) => {
+        alert('Could not copy to clipboard');
+    });
+}
+
 const chatHistory = document.getElementById('chat-history');
 const apiKeyInput = document.getElementById('api-key-input');
 const apiEndpointInput = document.getElementById('api-endpoint-input');
