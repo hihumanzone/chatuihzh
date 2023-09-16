@@ -106,6 +106,16 @@ async function createAndAppendMessage(content, owner) {
     }
   }
 
+  const md = window.markdownit();
+  const parsedContent = md.render(displayedText);
+  message.innerHTML = parsedContent;
+
+  chatHistory.appendChild(message);
+  chatHistory.scrollTop = chatHistory.scrollHeight;
+
+  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
+}
+
   const parsedContent = parseResponse(displayedText);
   message.innerHTML = parsedContent;
 
