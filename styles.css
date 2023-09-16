@@ -227,11 +227,23 @@ td:empty {
   color: #333;
 }
 
-.blockquote {
-  background-color: #181818;
-  border-left: 8px solid #444;
-  padding-left: 16px;
-  padding-right: 16px;
-  color: white;
-  margin-bottom: 16px;
+blockquote {
+  padding: 10px 20px;
+  margin: 0 0 20px;
+  font-size: 17.5px;
+  border-left: 5px solid #eee;
+}
+
+blockquote p:last-child,
+blockquote ul:last-child,
+blockquote ol:last-child {
+  margin-bottom: 0;
+}
+
+code {
+  padding: 2px 4px;
+  font-size: 90%;
+  color: #c7254e;
+  background-color: #f9f2f4;
+  border-radius: 4px;
 }
