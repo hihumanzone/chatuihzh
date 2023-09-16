@@ -220,3 +220,20 @@ p code {
     padding: 2px 4px;
     border-radius: 3px;
 }
+
+.copy-code-button {
+    display: block;
+    text-align: center;
+    padding: 0.5em;
+    background-color: #555;
+    border: none;
+    color: white;
+    margin-top: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+}
+
+.copy-code-button:active {
+    transform: scale(0.95);
+} 
