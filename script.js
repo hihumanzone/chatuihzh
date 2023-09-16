@@ -116,15 +116,6 @@ async function createAndAppendMessage(content, owner) {
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
 }
 
-  const parsedContent = parseResponse(displayedText);
-  message.innerHTML = parsedContent;
-
-  chatHistory.appendChild(message);
-  chatHistory.scrollTop = chatHistory.scrollHeight;
-
-  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
-}
-
 function parseResponse(response) {
   let parsedResponse = response;
 
