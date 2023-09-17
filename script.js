@@ -243,16 +243,6 @@ function clearChatHistory() {
   ];
 }
 
-document.getElementById('copy-button').addEventListener('click', () => {
-  const latestResponse = chatHistory.lastElementChild.innerHTML;
-  if (latestResponse) {
-    copyToClipboard(latestResponse);
-    alert('Text copied to clipboard');
-  } else {
-    alert('No text to copy');
-  }
-});
-
 systemRoleInput.value = localStorage.getItem('systemRole') || '';
 systemRoleInput.addEventListener('input', () => {
   localStorage.setItem('systemRole', systemRoleInput.value);
