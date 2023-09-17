@@ -198,6 +198,12 @@ td:empty {
   display: none;
 }
 
+.message table {
+  display: block;
+  overflow: auto;
+  max-width: 100%;
+}
+
 blockquote {
     border-left: solid 2px #ddd;
     color: #aaa;
