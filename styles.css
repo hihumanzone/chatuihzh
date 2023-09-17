@@ -21,9 +21,10 @@ body {
 .class-h2 {
   text-align: center;
   font-size: 15px;
-  border: 0.8px solid #B8B8B8;
+  border: 0.8px solid #838383;
+  background-color: #181818;
   border-radius: 5px;
-  padding: 3px;
+  padding: 2px;
 }
 
 .class-h3 {
