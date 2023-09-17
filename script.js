@@ -111,11 +111,9 @@ let latestMessageRawText = '';
 async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
+  message.dataset.raw = content;
   
-  let displayedText = content.trim();
-
-  displayedText = displayedText.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
-  displayedText = displayedText.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\[ $1 \\]</span>');
+  let displayedText = content;
 
   if (owner === 'bot') {
     if (displayedText.startsWith('>')) {
@@ -124,14 +122,17 @@ async function createAndAppendMessage(content, owner) {
     }
   }
 
-  const md = window.markdownit();
-  const parsedContent = md.render(displayedText);
-  message.innerHTML = parsedContent;
+  message.textContent = displayedText;
 
   chatHistory.appendChild(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
-  addCopyButtonToCodeBlock();
+  
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
+  const md = window.markdownit();
+  const parsedContent = md.render(message.innerHTML);
+  message.innerHTML = parsedContent;
+
+  addCopyButtonToCodeBlock();
 }
 
 function parseResponse(response) {
