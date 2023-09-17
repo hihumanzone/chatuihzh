@@ -162,6 +162,7 @@ table {
   border-collapse: collapse;
   margin-bottom: 10px;
   width: 100%;
+  overflow: auto;
 }
 
 th,
@@ -196,10 +197,6 @@ td:last-child {
 th:empty,
 td:empty {
   display: none;
-}
-
-.message table {
-  overflow: auto;
 }
 
 blockquote {
