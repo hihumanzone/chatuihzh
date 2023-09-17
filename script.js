@@ -22,6 +22,17 @@ apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
 
+document.addEventListener('click', function(event) {
+  const target = event.target;
+  if (target.classList.contains('copy-code-button')) {
+    const codeBlock = target.parentElement.querySelector('pre');
+    if (codeBlock) {
+      copyToClipboard(codeBlock.textContent);
+      alert('Code copied to clipboard');
+    }
+  }
+});
+
 messageInput.addEventListener('input', () => {
   messageInput.style.height = 'auto';
   messageInput.style.height = `${messageInput.scrollHeight}px`;
