@@ -6,13 +6,15 @@ const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 
-let messages = [{ 
-  role: 'system', 
-  content: localStorage.getItem('systemRole') || '', 
-}];
+let messages = [
+  {
+    role: 'system',
+    content: localStorage.getItem('systemRole') || '',
+  },
+];
 
-const apiKey = localStorage.getItem('apiKey') || '';
-const apiEndpoint = localStorage.getItem('apiEndpoint') || '';
+let apiKey = localStorage.getItem('apiKey') || '';
+let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
 let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
 
 apiKeyInput.value = apiKey;
@@ -20,46 +22,60 @@ apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
 
-const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
-let latestMessageRawText = '';
-
-document.addEventListener('click', handleCopyCodeButtonClick);
-messageInput.addEventListener('input', handleChangeInInputHeight);
-messageInput.addEventListener('keydown', handleNewlineInMessage);
-document.getElementById('send-button').addEventListener('click', sendMessage);
-document.getElementById('copy-button').addEventListener('click', () => copyTextToClipboard(latestMessageRawText));
-document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
-systemRoleInput.addEventListener('input', handleSystemRoleChange);
-window.addEventListener('load', updateModelHeading);
-
-function handleCopyCodeButtonClick(event) {
-  if (event.target.classList.contains('copy-code-button')) {
-    const codeBlock = event.target.parentElement.querySelector('pre');
+document.addEventListener('click', function(event) {
+  const target = event.target;
+  if (target.classList.contains('copy-code-button')) {
+    const codeBlock = target.parentElement.querySelector('pre');
     if (codeBlock) {
-      copyTextToClipboard(codeBlock.textContent);
+      copyToClipboard(codeBlock.textContent);
     }
   }
-}
+});
 
-function handleChangeInInputHeight() {
+messageInput.addEventListener('input', () => {
   messageInput.style.height = 'auto';
   messageInput.style.height = `${messageInput.scrollHeight}px`;
-}
+});
 
-function handleNewlineInMessage(event) {
+messageInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && !event.shiftKey) {
-    insertNewLineInInputValue(event, messageInput);
+    event.preventDefault();
+    let caret = messageInput.selectionStart;
+    messageInput.value = messageInput.value.substring(0, caret) + '\n' + messageInput.value.substring(caret);
+    messageInput.selectionEnd = caret + 1;
+    messageInput.style.height = `${messageInput.scrollHeight}px`;
   }
+});
+
+
+document.getElementById('send-button').addEventListener('click', sendMessage);
+
+function toggleModelMenu() {
+  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
 }
 
-function insertNewLineInInputValue(event, inputElement) {
-  event.preventDefault();
-  const caret = inputElement.selectionStart;
-  const text = inputElement.value;
-  inputElement.value = `${text.substring(0, caret)}\n${text.substring(caret)}`;
-  inputElement.selectionEnd = caret + 1;
-  inputElement.style.height = `${inputElement.scrollHeight}px`;
+function selectModel(model) {
+  const modelOptions = document.querySelectorAll('ul li');
+  modelOptions.forEach((option) => option.classList.remove('selected'));
+
+  const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
+  if (selectedModelOption) {
+    selectedModelOption.classList.add('selected');
+  }
+
+  selectedModel = model;
+  localStorage.setItem('selectedModel', selectedModel);
+
+  toggleModelMenu();
+  updateModelHeading();
 }
+
+function updateModelHeading() {
+  const modelHeading = document.querySelector('.class-h1');
+  modelHeading.textContent = `Chat with ${selectedModel}`;
+}
+
+const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
@@ -90,76 +106,9 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   return response.json();
 }
 
-function selectModel(model) {
-  const modelOptions = document.querySelectorAll('ul li');
-  modelOptions.forEach((option) => option.classList.remove('selected'));
+let latestMessageRawText = '';
 
-  const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
-  if (selectedModelOption) {
-    selectedModelOption.classList.add('selected');
-  }
-
-  selectedModel = model;
-  localStorage.setItem('selectedModel', selectedModel);
-
-  toggleModelMenu();
-  updateModelHeading();
-}
-
-function toggleModelMenu() {
-  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
-}
-
-function updateModelHeading() {
-  const modelHeading = document.querySelector('.class-h1');
-  modelHeading.textContent = `Chat with ${selectedModel}`;
-}
-
-async function sendMessage() {
-  const apiKey = apiKeyInput.value.trim();
-  const apiEndpoint = apiEndpointInput.value.trim();
-  const message = messageInput.value.trim();
-
-  if (!message) {
-    alert('Please enter a message.');
-    return;
-  }
-
-  localStorage.setItem('apiKey', apiKey);
-  localStorage.setItem('apiEndpoint', apiEndpoint);
-
-  appendUserMessage(message);
-  messageInput.value = '';
-
-  const botResponse = await getBotResponse(apiKey, apiEndpoint, message);
-  appendBotMessage(botResponse);
-}
-
-function appendUserMessage(message) {
-  messages.push({
-    role: 'user',
-    content: message,
-  });
-
-  const messageElement = createMessageElement(message, 'user');
-  chatHistory.appendChild(messageElement);
-  scrollToBottom();
-}
-
-function appendBotMessage(message) {
-  const botResponse = message.choices[0].message.content;
-  messages.push({
-    role: 'assistant',
-    content: botResponse,
-  });
-
-  const messageElement = createMessageElement(botResponse, 'bot');
-  chatHistory.appendChild(messageElement);
-  scrollToBottom();
-  latestMessageRawText = botResponse;
-}
-
-function createMessageElement(content, owner) {
+async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
   message.dataset.raw = content;
@@ -178,26 +127,85 @@ function createMessageElement(content, owner) {
   const parsedContent = md.render(displayedText);
   message.innerHTML = parsedContent;
 
-  addCopyButtonToCodeBlock(message);
+  chatHistory.appendChild(message);
+  chatHistory.scrollTop = chatHistory.scrollHeight;
+  addCopyButtonToCodeBlock();
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
-
-  return message;
 }
 
-function addCopyButtonToCodeBlock(message) {
-  const codeBlocks = message.getElementsByTagName('pre');
-  if (codeBlocks.length > 0) {
-    const copyButton = document.createElement('button');
-    copyButton.classList.add('copy-code-button');
-    copyButton.textContent = 'Copy Code';
-    copyButton.addEventListener('click', () => {
-      copyTextToClipboard(message.dataset.raw);
+function parseResponse(response) {
+  let parsedResponse = response;
+
+  parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+  parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+  parsedResponse = parseTables(parsedResponse);
+
+  return parsedResponse;
+}
+
+function parseTables(response) {
+  const tableRegex = /\n((?:\s*:?[\|:].*?:?\|\n)+)\n/g;
+  return response.replace(tableRegex, createTable);
+}
+
+function createTable(match, table) {
+  const rows = table.trim().split('\n');
+  const tableElement = document.createElement('table');
+
+  const tableHeader = document.createElement('tr');
+  const tableHeaderCells = rows[0].split('|').slice(1, -1);
+  tableHeaderCells.forEach((cell) => {
+    const th = document.createElement('th');
+    th.classList.add('table-header');
+    th.textContent = cell.trim();
+    tableHeader.appendChild(th);
+  });
+  tableElement.appendChild(tableHeader);
+
+  for (let i = 2; i < rows.length; i++) {
+    const row = document.createElement('tr');
+    const tableCells = rows[i].split('|').slice(1, -1);
+    tableCells.forEach((cell) => {
+      const td = document.createElement('td');
+      td.classList.add('table-data');
+      td.innerHTML = parseResponse(cell.trim());
+      row.appendChild(td);
     });
-    message.appendChild(copyButton);
+    tableElement.appendChild(row);
   }
+
+  return `\n${tableElement.outerHTML}\n`;
 }
 
-function copyTextToClipboard(text) {
+async function sendMessage() {
+  apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
+  const message = messageInput.value.trim();
+
+  if (!message) {
+    alert('Please enter a message.');
+    return;
+  }
+
+  localStorage.setItem('apiKey', apiKey);
+  localStorage.setItem('apiEndpoint', apiEndpoint);
+
+  createAndAppendMessage(message, 'user');
+  messageInput.value = '';
+  messageInput.style.height = 'auto';
+
+  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
+
+  const botResponse = jsonResponse.choices[0].message.content;
+  messages.push({
+    role: 'assistant',
+    content: botResponse,
+  });
+
+  createAndAppendMessage(botResponse, 'bot');
+}
+
+function copyToClipboard(text) {
   const textarea = document.createElement('textarea');
   textarea.value = text;
   document.body.appendChild(textarea);
@@ -206,22 +214,51 @@ function copyTextToClipboard(text) {
   document.body.removeChild(textarea);
 }
 
-function scrollToBottom() {
-  chatHistory.scrollTop = chatHistory.scrollHeight;
+document.getElementById('copy-button').addEventListener('click', () => {
+  if (latestMessageRawText) {
+    copyToClipboard(latestMessageRawText);
+    alert('Text copied to clipboard');
+  } else {
+    alert('No text to copy');
+  }
+});
+
+function addCopyButtonToCodeBlock(){
+  const allCodeBlocks = document.querySelectorAll('pre');
+  allCodeBlocks.forEach((block) => {
+      const copyButton = document.createElement('button');
+      copyButton.classList.add('copy-code-button');
+      copyButton.textContent = 'Copy Code';
+      block.parentElement.insertBefore(copyButton, block.nextSibling);
+  });
 }
 
-function handleSystemRoleChange() {
-  const role = systemRoleInput.value;
-  localStorage.setItem('systemRole', role);
-  messages[0].content = role;
+function clearChatHistory() {
+  chatHistory.innerHTML = '';
+  messages = [
+    {
+      role: 'system',
+      content: localStorage.getItem('systemRole') || '',
+    },
+  ];
 }
+
+systemRoleInput.value = localStorage.getItem('systemRole') || '';
+systemRoleInput.addEventListener('input', () => {
+  localStorage.setItem('systemRole', systemRoleInput.value);
+  messages[0].content = systemRoleInput.value;
+});
+
+window.addEventListener('load', updateModelHeading);
 
 function saveInputsAndRefresh() {
-  const apiKey = apiKeyInput.value.trim();
-  const apiEndpoint = apiEndpointInput.value.trim();
+  apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
 
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
 
   location.reload();
 }
+
+document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
