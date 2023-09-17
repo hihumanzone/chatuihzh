@@ -209,6 +209,7 @@ pre {
     color: #aaa;
     padding: 1em;
     border-radius: 5px;
+    overflow-x: auto;
 }
 
 code {
@@ -223,7 +224,6 @@ p code {
     color: #aaa;
     padding: 2px 4px;
     border-radius: 3px;
-    overflow-x:auto;
 }
 
 .copy-code-button {
