@@ -128,7 +128,7 @@ async function createAndAppendMessage(content, owner) {
   message.innerHTML = parsedContent;
 
   chatHistory.appendChild(message);
-  MathJax.Hub.Queue(["Typeset", MathJax.Hub, message]);
+  MathJax.typesetPromise([message]);
   chatHistory.scrollTop = chatHistory.scrollHeight;
   addCopyButtonToCodeBlock();
 }
