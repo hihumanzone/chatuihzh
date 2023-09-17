@@ -211,15 +211,18 @@ pre {
     border-radius: 5px;
 }
 
-pre, code {
+code {
     background-color: #333;
     color: #aaa;
-    padding: 1em;
+    padding: 0.2em 0.4em;
     border-radius: 5px;
     overflow-x:auto;
 }
 
 p code {
+    background-color: #333;
+    color: #aaa;
+    padding: 2px 4px;
     border-radius: 3px;
 }
 
