@@ -123,12 +123,12 @@ async function createAndAppendMessage(content, owner) {
     }
   }
   
-  MathJax.Hub.Queue(["Typeset", MathJax.Hub, message]);
   const md = window.markdownit();
   const parsedContent = md.render(displayedText);
   message.innerHTML = parsedContent;
 
   chatHistory.appendChild(message);
+  MathJax.Hub.Queue(["Typeset", MathJax.Hub, message]);
   chatHistory.scrollTop = chatHistory.scrollHeight;
   addCopyButtonToCodeBlock();
 }
