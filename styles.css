@@ -170,32 +170,27 @@ td {
   text-align: left;
   vertical-align: top;
   border: 1px solid #555;
-  overflow: auto;
 }
 
 th:first-child,
 td:first-child {
   padding-left: 0;
-  overflow: auto;
 }
 
 th:last-child,
 td:last-child {
   padding-right: 0;
-  overflow: auto;
 }
 
 .table-header {
   font-weight: bold;
   background-color: #333;
   color: #fefefe;
-  overflow: auto;
 }
 
 .table-data {
   background-color: #222;
   color: #fefefe;
-  overflow: auto;
 }
 
 th:empty,
@@ -209,7 +204,6 @@ blockquote {
     margin-left: 2em;
     padding-left: 1em;
     background-color: #333;
-    overflow: auto;
 }
 
 pre {
