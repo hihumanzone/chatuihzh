@@ -40,10 +40,13 @@ messageInput.addEventListener('input', () => {
 messageInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
-    messageInput.value += '\n';
+    let caret = messageInput.selectionStart;
+    messageInput.value = messageInput.value.substring(0, caret) + '\n' + messageInput.value.substring(caret);
+    messageInput.selectionEnd = caret + 1;
     messageInput.style.height = `${messageInput.scrollHeight}px`;
   }
 });
+
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
