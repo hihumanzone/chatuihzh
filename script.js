@@ -112,7 +112,7 @@ async function createAndAppendMessage(content, owner) {
 
   chatHistory.appendChild(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
-
+  addCopyButtonToCodeBlock();
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
 }
 
@@ -195,6 +195,16 @@ function copyToClipboard(text) {
   textarea.select();
   document.execCommand('copy');
   document.body.removeChild(textarea);
+}
+
+function addCopyButtonToCodeBlock(){
+  const allCodeBlocks = document.querySelectorAll('pre');
+  allCodeBlocks.forEach((block) => {
+      const copyButton = document.createElement('button');
+      copyButton.classList.add('copy-code-button');
+      copyButton.textContent = 'Copy Code';
+      block.parentElement.insertBefore(copyButton, block.nextSibling);
+  });
 }
 
 function clearChatHistory() {
