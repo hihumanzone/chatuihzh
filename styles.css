@@ -163,9 +163,11 @@ body {
   overflow-x: auto;
   display: block;
   max-width: 100%;
+  min-width: 100%;
 }
 
 table {
+  min-width: 100%;
   border: 0.8px solid #555;
   border-collapse: collapse;
   margin-bottom: 10px;
