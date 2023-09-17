@@ -95,6 +95,10 @@ body {
   color: #fff;
 }
 
+#message-input {
+  resize: none;
+}
+
 #api-key-input,
 #api-endpoint-input,
 #system-role-input {
