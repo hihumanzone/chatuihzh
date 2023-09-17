@@ -122,23 +122,22 @@ async function createAndAppendMessage(content, owner) {
       message.style.borderColor = '#555';
     }
   }
-  
+
   const md = window.markdownit();
   const parsedContent = md.render(displayedText);
   message.innerHTML = parsedContent;
 
   chatHistory.appendChild(message);
-  MathJax.typesetPromise([message]);
   chatHistory.scrollTop = chatHistory.scrollHeight;
   addCopyButtonToCodeBlock();
+  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
 }
-
 
 function parseResponse(response) {
   let parsedResponse = response;
 
-  parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="math-tex">\\[\\displaystyle $1\\]</span>');
-  parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="math-tex-inline">\\($1\\)</span>');
+  parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+  parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
   parsedResponse = parseTables(parsedResponse);
 
   return parsedResponse;
