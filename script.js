@@ -111,10 +111,11 @@ let latestMessageRawText = '';
 async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
-  message.dataset.raw = content;
-  latestMessageRawText = content;
+  
+  let displayedText = content.trim();
 
-  let displayedText = content;
+  displayedText = displayedText.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
+  displayedText = displayedText.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\[ $1 \\]</span>');
 
   if (owner === 'bot') {
     if (displayedText.startsWith('>')) {
