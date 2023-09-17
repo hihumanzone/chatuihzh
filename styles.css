@@ -204,8 +204,11 @@ td:empty {
   display: none;
 }
 
-.message table {
-  padding-right: 15px;
+.message table th,
+.message table td {
+  text-align: left;
+  padding: 10px;
+  margin: 0;
 }
 
 blockquote {
