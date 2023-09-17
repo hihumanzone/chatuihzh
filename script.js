@@ -106,12 +106,16 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   return response.json();
 }
 
+let latestMessageRawText = '';
+
 async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
+  message.dataset.raw = content;
+  latestMessageRawText = content;
 
   let displayedText = content;
-  
+
   if (owner === 'bot') {
     if (displayedText.startsWith('>')) {
       message.style.backgroundColor = '#222';
@@ -209,6 +213,15 @@ function copyToClipboard(text) {
   document.execCommand('copy');
   document.body.removeChild(textarea);
 }
+
+document.getElementById('copy-button').addEventListener('click', () => {
+  if (latestMessageRawText) {
+    copyToClipboard(latestMessageRawText);
+    alert('Text copied to clipboard');
+  } else {
+    alert('No text to copy');
+  }
+});
 
 function addCopyButtonToCodeBlock(){
   const allCodeBlocks = document.querySelectorAll('pre');
