@@ -139,6 +139,7 @@ body {
   word-wrap: break-word;
   white-space: pre-wrap;
   color: #fefefe;
+  overflow-x: auto;
 }
 
 .message.user {
@@ -196,6 +197,10 @@ td:last-child {
 th:empty,
 td:empty {
   display: none;
+}
+
+.message table {
+  padding-right: 15px;
 }
 
 blockquote {
