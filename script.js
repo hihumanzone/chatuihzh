@@ -28,7 +28,6 @@ document.addEventListener('click', function(event) {
     const codeBlock = target.parentElement.querySelector('pre');
     if (codeBlock) {
       copyToClipboard(codeBlock.textContent);
-      alert('Code copied to clipboard');
     }
   }
 });
