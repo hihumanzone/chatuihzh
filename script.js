@@ -32,6 +32,16 @@ document.addEventListener('click', function(event) {
   }
 });
 
+document.addEventListener('click', function(event) {
+  const target = event.target;
+  if (target.classList.contains('copy-code-button')) {
+    const messageElement = target.parentElement.querySelector('.message');
+    if (messageElement) {
+      copyToClipboard(messageElement.dataset.raw);
+    }
+  }
+});
+
 messageInput.addEventListener('input', () => {
   messageInput.style.height = 'auto';
   messageInput.style.height = `${messageInput.scrollHeight}px`;
@@ -109,9 +119,10 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
+  message.dataset.raw = content;
 
   let displayedText = content;
-  
+
   if (owner === 'bot') {
     if (displayedText.startsWith('>')) {
       message.style.backgroundColor = '#222';
@@ -125,6 +136,7 @@ async function createAndAppendMessage(content, owner) {
 
   chatHistory.appendChild(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
+
   addCopyButtonToCodeBlock();
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
 }
