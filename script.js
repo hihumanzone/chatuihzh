@@ -225,9 +225,13 @@ function addCopyButtonToCodeBlock(){
   const allCodeBlocks = document.querySelectorAll('pre');
   allCodeBlocks.forEach((block) => {
       const copyButton = document.createElement('button');
+      const parentDiv = document.createElement('div');
       copyButton.classList.add('copy-code-button');
       copyButton.textContent = 'Copy Code';
-      block.parentElement.insertBefore(copyButton, block.nextSibling);
+      const dupBlock = block.cloneNode(true);
+      block.replaceWith(parentDiv);
+      parentDiv.appendChild(dupBlock);
+      parentDiv.appendChild(copyButton);
   });
 }
 
