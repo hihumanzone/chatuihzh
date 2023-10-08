@@ -221,15 +221,15 @@ document.getElementById('copy-button').addEventListener('click', () => {
   }
 });
 
-document.addEventListener('click', function(event) {
-  const target = event.target;
-  if (target.classList.contains('copy-code-button')) {
-    const codeBlock = target.nextSibling;
-    if (codeBlock) {
-      copyToClipboard(codeBlock.textContent);
-    }
-  }
-});
+function addCopyButtonToCodeBlock(){
+  const allCodeBlocks = document.querySelectorAll('pre');
+  allCodeBlocks.forEach((block) => {
+      const copyButton = document.createElement('button');
+      copyButton.classList.add('copy-code-button');
+      copyButton.textContent = 'Copy Code';
+      block.parentElement.insertBefore(copyButton, block.nextSibling);
+  });
+}
 
 function clearChatHistory() {
   chatHistory.innerHTML = '';
