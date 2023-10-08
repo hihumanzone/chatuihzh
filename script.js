@@ -112,6 +112,7 @@ async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
   message.dataset.raw = content;
+  latestMessageRawText = content;
   
   let displayedText = content;
 
