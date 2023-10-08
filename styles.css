@@ -19,6 +19,7 @@ body {
   border-left: 10px solid #fefefe;
   border-right: 10px solid #fefefe;
   border-top: 1px solid #fefefe;
+  border-radius: 3px;
 }
 
 .class-h2 {
