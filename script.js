@@ -123,23 +123,6 @@ async function createAndAppendMessage(content, owner) {
   chatHistory.insertBefore(message, aiThinkingMsg);
   chatHistory.scrollTop = chatHistory.scrollHeight;
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
-  addCopyButtonToCodeBlock();
-}
-
-function addCopyButtonToCodeBlock(){
-    const allCodeBlocks = document.querySelectorAll('pre');
-    allCodeBlocks.forEach((block) => {
-        if (!block.parentElement.classList.contains('code-wrapper')) {
-            const copyButton = document.createElement('button');
-            copyButton.classList.add('copy-code-button');
-            copyButton.textContent = 'Copy Code';
-            const parentDiv = document.createElement('div');
-            parentDiv.classList.add('code-wrapper');
-            block.parentNode.insertBefore(parentDiv, block);
-            parentDiv.appendChild(block);
-            parentDiv.appendChild(copyButton);
-        }
-    });
 }
 
 function copyMessage(content) {
@@ -167,22 +150,6 @@ function editMessage(message) {
     const md = window.markdownit();
     message.firstChild.innerHTML = md.render(updatedMessageContent);
   }
-}
-
-function addCopyButtonToCodeBlock(){
-  const allCodeBlocks = document.querySelectorAll('pre');
-  allCodeBlocks.forEach((block) => {
-    if (block.parentElement.getElementsByClassName('copy-code-button').length === 0) {
-      const copyButton = document.createElement('button');
-      const parentDiv = document.createElement('div');
-      copyButton.classList.add('copy-code-button');
-      copyButton.textContent = 'Copy Code';
-      const dupBlock = block.cloneNode(true);
-      block.replaceWith(parentDiv);
-      parentDiv.appendChild(dupBlock);
-      parentDiv.appendChild(copyButton);
-    }
-  });
 }
 
 async function sendMessage() {
