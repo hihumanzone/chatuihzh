@@ -5,7 +5,6 @@ const messageInput = document.getElementById('message-input');
 const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
-const messagesDiv = document.getElementById('messages');
 
 let messages = [
   {
@@ -127,7 +126,7 @@ async function createAndAppendMessage(content, owner) {
   const md = window.markdownit();
   displayedText = md.render(displayedText);
   message.innerHTML = displayedText;
-  messagesDiv.appendChild(message);
+  chatHistory.appendChild(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
   addCopyButtonToCodeBlock();
@@ -238,7 +237,10 @@ function addCopyButtonToCodeBlock(){
 }
 
 function clearChatHistory() {
-  messagesDiv.innerHTML = '';
+  Array.from(chatHistory.getElementsByClassName('message')).forEach(message => {
+    chatHistory.removeChild(message);
+  });
+  
   messages = [
     {
       role: 'system',
