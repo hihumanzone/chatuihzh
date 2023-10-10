@@ -154,8 +154,8 @@ body {
 }
 
 .message > * {
-  margin-bottom: -32px;
-  margin-top: -12px;
+  margin-bottom: -14px;
+  margin-top: 0px;
 }
 
 .message.user {
