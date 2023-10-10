@@ -46,6 +46,7 @@ function selectModel(model) {
 
 messageInput.addEventListener('input', () => {
     messageInput.style.height = 'auto';
+    messageInput.style.height = `${messageInput.scrollHeight}px`;
 });
 
 function updateModelHeading() {
@@ -121,6 +122,7 @@ async function createAndAppendMessage(content, owner) {
 
   chatHistory.insertBefore(message, aiThinkingMsg);
   chatHistory.scrollTop = chatHistory.scrollHeight;
+  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
   addCopyButtonToCodeBlock();
 }
 
