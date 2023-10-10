@@ -126,30 +126,39 @@ if (owner === 'user') {
   deleteButton.classList.add('action-button-delete');
   deleteButton.addEventListener('click', () => deleteMessage(message));
 
-  const copyButton = document.createElement('button');
-  copyButton.textContent = 'Copy';
-  copyButton.classList.add('action-button-copy');
-  copyButton.addEventListener('click', () => copyMessage(content));
+  function editMessage(message) {
+  const messageContent = message.dataset.raw;
+  const messageIndex = Array.from(message.parentNode.children).indexOf(message);
 
-  actionButtons.appendChild(editButton);
-  actionButtons.appendChild(deleteButton);
-  actionButtons.appendChild(copyButton);
+  // create edit form
+  const editForm = document.createElement('form');
+  editForm.onsubmit = e => e.preventDefault();
+  const editInput = document.createElement('textarea');
+  editInput.value = messageContent;
 
-  message.appendChild(actionButtons);
+  // add an "apply" button to the form
+  const applyButton = document.createElement('button');
+  applyButton.textContent = 'Apply changes';
 
-  chatHistory.insertBefore(message, aiThinkingMsg);
-  chatHistory.scrollTop = chatHistory.scrollHeight;
-  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
-}
+  // attach an eventListener to the button that updates the message content
+  applyButton.addEventListener('click', () => {
+    const updatedMessageContent = editInput.value;
+    messages[messageIndex].content = updatedMessageContent;
+    message.dataset.raw = updatedMessageContent;
+    const md = window.markdownit();
+    message.firstChild.innerHTML = md.render(updatedMessageContent);
 
-function copyMessage(content) {
-  if (content) {
-    copyToClipboard(content);
-    alert('Text copied to clipboard');
-  } else {
-    alert('No text to copy');
+    // remove edit form after applying changes
+    message.removeChild(editForm);
+  });
+  
+  editForm.appendChild(editInput);
+  editForm.appendChild(applyButton);
+  
+  // append edit form to the message
+  message.appendChild(editForm);
   }
-}
+  
 
 function deleteMessage(message) {
   const messageIndex = Array.from(message.parentNode.children).indexOf(message);
