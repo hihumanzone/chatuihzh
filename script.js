@@ -123,7 +123,7 @@ async function createAndAppendMessage(content, owner) {
   chatHistory.insertBefore(message, aiThinkingMsg);
   chatHistory.scrollTop = chatHistory.scrollHeight;
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
-  addCopyButtonToCodeBlock();
+  addCopyButtonToCodeBlock(message);
 }
 
 function copyMessage(content) {
@@ -153,8 +153,8 @@ function editMessage(message) {
   }
 }
 
-function addCopyButtonToCodeBlock(){
-  const allCodeBlocks = document.querySelectorAll('pre');
+function addCopyButtonToCodeBlock(node){
+  const allCodeBlocks = node.querySelectorAll('pre');
   allCodeBlocks.forEach((block) => {
       const copyButton = document.createElement('button');
       const parentDiv = document.createElement('div');
