@@ -126,7 +126,7 @@ async function createAndAppendMessage(content, owner) {
   const md = window.markdownit();
   displayedText = md.render(displayedText);
   message.innerHTML = displayedText;
-  chatHistory.appendChild(message);
+  chatHistory.insertBefore(message, aiThinkingMsg);
   chatHistory.scrollTop = chatHistory.scrollHeight;
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
   addCopyButtonToCodeBlock();
