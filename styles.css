@@ -165,8 +165,14 @@ body {
 table {
   border: 0.8px solid #555;
   border-collapse: collapse;
-  margin-bottom: 10px;
+  margin: 10px;
   width: 100%;
+}
+
+th,
+td {
+  padding: 5px;
+  border: 1px solid #555;
 }
 
 blockquote {
