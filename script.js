@@ -224,12 +224,3 @@ function saveInputsAndRefresh() {
 }
 
 document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
-
-document.getElementById('system-role-input').addEventListener('keydown', function(e) {
-    if (e.key == 'Enter') {
-      e.preventDefault();
-      var s = this.selectionStart;
-      this.value = this.value.substring(0,s) + "\n" + this.value.substring(this.selectionEnd);
-      this.selectionEnd = s+1;
-    }
-});
