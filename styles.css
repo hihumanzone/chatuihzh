@@ -169,40 +169,6 @@ table {
   width: 100%;
 }
 
-th,
-td {
-  padding: 5px;
-  text-align: left;
-  vertical-align: top;
-  border: 1px solid #555;
-}
-
-th:first-child,
-td:first-child {
-  padding-left: 0;
-}
-
-th:last-child,
-td:last-child {
-  padding-right: 0;
-}
-
-.table-header {
-  font-weight: bold;
-  background-color: #333;
-  color: #fefefe;
-}
-
-.table-data {
-  background-color: #222;
-  color: #fefefe;
-}
-
-th:empty,
-td:empty {
-  display: none;
-}
-
 blockquote {
     border-left: solid 2px #ddd;
     color: #aaa;
