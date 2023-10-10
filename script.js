@@ -126,7 +126,7 @@ async function createAndAppendMessage(content, owner) {
   const md = window.markdownit();
   displayedText = md.render(displayedText);
   message.innerHTML = displayedText;
-  chatHistory.appendChild(message);
+  chatHistory.prepend(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
   addCopyButtonToCodeBlock();
@@ -237,7 +237,10 @@ function addCopyButtonToCodeBlock(){
 }
 
 function clearChatHistory() {
-  chatHistory.innerHTML = '';
+  Array.from(chatHistory.getElementsByClassName('message')).forEach(message => {
+    chatHistory.removeChild(message);
+  });
+  
   messages = [
     {
       role: 'system',
