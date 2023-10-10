@@ -153,8 +153,8 @@ function editMessage(message) {
   }
 }
 
-function addCopyButtonToCodeBlock(node){
-  const allCodeBlocks = node.querySelectorAll('pre');
+function addCopyButtonToCodeBlock(message){
+  const allCodeBlocks = message.querySelectorAll('pre:not(.copy-button-added)');
   allCodeBlocks.forEach((block) => {
       const copyButton = document.createElement('button');
       const parentDiv = document.createElement('div');
@@ -164,6 +164,8 @@ function addCopyButtonToCodeBlock(node){
       block.replaceWith(parentDiv);
       parentDiv.appendChild(dupBlock);
       parentDiv.appendChild(copyButton);
+
+      dupBlock.classList.add('copy-button-added');
   });
 }
 
