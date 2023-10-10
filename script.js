@@ -143,58 +143,25 @@ function deleteMessage(message) {
 function editMessage(message) {
   const messageContent = message.dataset.raw;
   const messageIndex = Array.from(message.parentNode.children).indexOf(message);
-
-  // create edit form
   const editForm = document.createElement('form');
   editForm.onsubmit = e => e.preventDefault();
   const editInput = document.createElement('textarea');
   editInput.value = messageContent;
-
-  // add an "apply" button to the form
   const applyButton = document.createElement('button');
   applyButton.textContent = 'Apply changes';
-
-  // attach an eventListener to the button that updates the message content
   applyButton.addEventListener('click', () => {
     const updatedMessageContent = editInput.value;
     messages[messageIndex].content = updatedMessageContent;
     message.dataset.raw = updatedMessageContent;
     const md = window.markdownit();
     message.firstChild.innerHTML = md.render(updatedMessageContent);
-
-    // remove edit form after applying changes
     message.removeChild(editForm);
   });
   
   editForm.appendChild(editInput);
   editForm.appendChild(applyButton);
-  
-  // append edit form to the message
   message.appendChild(editForm);
 }
-
-applyButton.addEventListener('click', () => {
-  const updatedMessageContent = editInput.value;
-  if(updatedMessageContent !== messageContent) {
-    messages[messageIndex].content = updatedMessageContent;
-    message.dataset.raw = updatedMessageContent;
-    const md = window.markdownit();
-
-    // Render Markdown and then trim
-    let renderedContent = md.render(updatedMessageContent);
-    renderedContent = renderedContent.trim();
-
-    // Remove original rendered content before adding new
-    while(message.firstChild){
-      message.removeChild(message.firstChild);
-    }
-
-    message.innerHTML = renderedContent;
-  }
-
-  // Remove edit form after applying changes
-  message.removeChild(editForm);
-});
 
 async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
