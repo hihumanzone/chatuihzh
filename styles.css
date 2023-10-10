@@ -35,10 +35,10 @@ body {
 
 .class-h4 {
   text-align: center;
-  font-size: 12px;
-  border-left: 1px solid #fefefe;
-  border-top: 1px solid #fefefe;
-  border-radius: 3px;
+  background-color: #222;
+  padding: 5px 10px;
+  border-radius: 10px;
+  border: 1px solid #555;
   position: sticky;
   bottom: 0;
   align-self: flex-end;
