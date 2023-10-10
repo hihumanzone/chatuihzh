@@ -174,25 +174,22 @@ function editMessage(message) {
 }
 
 applyButton.addEventListener('click', () => {
-    const updatedMessageContent = editInput.value;
-    // Only update things if content has changed
-    if(updatedMessageContent !== messageContent) {
-      messages[messageIndex].content = updatedMessageContent;
-      message.dataset.raw = updatedMessageContent;
-      const md = window.markdownit();
-      
-      // remove original rendered content
-      if(message.firstChild) {
-        message.firstChild.remove();
-      }
-
-      // create new div with updated content and add it to the message
-      const newContentDiv = document.createElement('div');
-      newContentDiv.innerHTML = md.render(updatedMessageContent);
-      message.prepend(newContentDiv);
+  const updatedMessageContent = editInput.value;
+  // Only update things if content has changed
+  if(updatedMessageContent.trim() !== messageContent.trim()) {
+    messages[messageIndex].content = updatedMessageContent;
+    message.dataset.raw = updatedMessageContent;
+    const md = window.markdownit();
+    // Remove original rendered content before adding new
+    while(message.firstChild){
+      message.removeChild(message.firstChild);
     }
-    // remove edit form after applying changes
-    message.removeChild(editForm);
+    // Trim and render the updated content
+    message.innerHTML = md.render(updatedMessageContent.trim());
+  }
+  // remove edit form after applying changes
+  message.removeChild(editForm);
+  messageInput.style.height = 'auto';
 });
 
 async function sendMessage() {
