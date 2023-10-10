@@ -99,10 +99,27 @@ async function createAndAppendMessage(content, owner) {
   const actionButtons = document.createElement('div');
   actionButtons.classList.add('action-buttons');
 
+  function editMessage(message) {
+  const messageContent = message.dataset.raw;
+  const messageIndex = Array.from(message.parentNode.children).indexOf(message);
+  const updatedMessageContent = prompt('Edit your message:', messageContent);
+
+  if (updatedMessageContent !== null) {
+    messages[messageIndex].content = updatedMessageContent;
+    message.dataset.raw = updatedMessageContent;
+    const md = window.markdownit();
+    message.firstChild.innerHTML = md.render(updatedMessageContent);
+  }
+  }
+
   const editButton = document.createElement('button');
-  editButton.textContent = 'Edit';
-  editButton.classList.add('action-button-edit');
+editButton.textContent = 'Edit';
+editButton.classList.add('action-button-edit');
+if (owner === 'user') {
   editButton.addEventListener('click', () => editMessage(message));
+} else {
+  editButton.disabled = true;
+}
 
   const deleteButton = document.createElement('button');
   deleteButton.textContent = 'Delete';
