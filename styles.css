@@ -38,7 +38,7 @@ body {
   text-align: center;
   background-color: #222;
   padding: 5px 10px;
-  margin: 10px 0;
+  margin: 5px 0;
   border-radius: 10px;
   border: 1px solid #555;
   position: sticky;
@@ -144,7 +144,7 @@ body {
 }
 
 .message {
-  margin: 10px 0;
+  margin: 5px 0;
   max-width: 70%;
   padding: 5px 10px 0px 10px;
   word-wrap: break-word;
@@ -231,6 +231,12 @@ p code {
     transform: scale(0.95);
 }
 
+.message form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
 .message textarea {
   font-size: 14px;
   resize: none;  
@@ -243,14 +249,22 @@ p code {
   color: #fff;
 }
 
-.action-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 4px;
+.message button {
+  padding: 5px;
   background-color: #303030;
   border: 1px solid #555;
   border-radius: 5px;
   color: #ffffff;
+  cursor: pointer;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  background-color: #181818;
+  border: 0.6px solid #555;
+  color: #000;
 }
 
 .action-button-edit,
