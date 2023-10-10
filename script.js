@@ -123,7 +123,7 @@ async function createAndAppendMessage(content, owner) {
   chatHistory.insertBefore(message, aiThinkingMsg);
   chatHistory.scrollTop = chatHistory.scrollHeight;
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
-  addCopyButtonToCodeBlock(message);
+  addCopyButtonToCodeBlock();
 }
 
 function copyMessage(content) {
@@ -153,9 +153,10 @@ function editMessage(message) {
   }
 }
 
-function addCopyButtonToCodeBlock(message){
-  const allCodeBlocks = message.querySelectorAll('pre:not(.copy-button-added)');
+function addCopyButtonToCodeBlock(){
+  const allCodeBlocks = document.querySelectorAll('pre');
   allCodeBlocks.forEach((block) => {
+    if (block.parentElement.getElementsByClassName('copy-code-button').length === 0) {
       const copyButton = document.createElement('button');
       const parentDiv = document.createElement('div');
       copyButton.classList.add('copy-code-button');
@@ -164,8 +165,7 @@ function addCopyButtonToCodeBlock(message){
       block.replaceWith(parentDiv);
       parentDiv.appendChild(dupBlock);
       parentDiv.appendChild(copyButton);
-
-      dupBlock.classList.add('copy-button-added');
+    }
   });
 }
 
