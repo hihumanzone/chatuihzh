@@ -205,8 +205,13 @@ function clearChatHistory() {
   ];
 }
 
-systemRoleInput.value = localStorage.getItem('systemRole') || '';
-systemRoleInput.addEventListener('input', () => {
+systemRoleInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    let caret = systemRoleInput.selectionStart;
+    systemRoleInput.value = systemRoleInput.value.substring(0, caret) + '\n' + systemRoleInput.value.substring(caret);
+    systemRoleInput.selectionEnd = caret + 1;
+  }
   localStorage.setItem('systemRole', systemRoleInput.value);
   messages[0].content = systemRoleInput.value;
 });
