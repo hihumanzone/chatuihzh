@@ -99,34 +99,48 @@ async function createAndAppendMessage(content, owner) {
   const actionButtons = document.createElement('div');
   actionButtons.classList.add('action-buttons');
 
-  function editMessage(message) {
-  const messageContent = message.dataset.raw;
-  const messageIndex = Array.from(message.parentNode.children).indexOf(message);
-  const updatedMessageContent = prompt('Edit your message:', messageContent);
-
-  if (updatedMessageContent !== null) {
-    messages[messageIndex].content = updatedMessageContent;
-    message.dataset.raw = updatedMessageContent;
-    const md = window.markdownit();
-    message.firstChild.innerHTML = md.render(updatedMessageContent);
-  }
-  }
-
   const editButton = document.createElement('button');
-editButton.textContent = 'Edit';
-editButton.classList.add('action-button-edit');
-if (owner === 'user') {
+  editButton.textContent = 'Edit';
+  editButton.classList.add('action-button-edit');
   editButton.addEventListener('click', () => editMessage(message));
-} else {
-  editButton.disabled = true;
-}
 
   const deleteButton = document.createElement('button');
   deleteButton.textContent = 'Delete';
   deleteButton.classList.add('action-button-delete');
   deleteButton.addEventListener('click', () => deleteMessage(message));
 
-  function editMessage(message) {
+  const copyButton = document.createElement('button');
+  copyButton.textContent = 'Copy';
+  copyButton.classList.add('action-button-copy');
+  copyButton.addEventListener('click', () => copyMessage(content));
+
+  actionButtons.appendChild(editButton);
+  actionButtons.appendChild(deleteButton);
+  actionButtons.appendChild(copyButton);
+
+  message.appendChild(actionButtons);
+
+  chatHistory.insertBefore(message, aiThinkingMsg);
+  chatHistory.scrollTop = chatHistory.scrollHeight;
+  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
+}
+
+function copyMessage(content) {
+  if (content) {
+    copyToClipboard(content);
+    alert('Text copied to clipboard');
+  } else {
+    alert('No text to copy');
+  }
+}
+
+function deleteMessage(message) {
+  const messageIndex = Array.from(message.parentNode.children).indexOf(message);
+  messages.splice(messageIndex, 1);
+  message.remove();
+}
+
+function editMessage(message) {
   const messageContent = message.dataset.raw;
   const messageIndex = Array.from(message.parentNode.children).indexOf(message);
 
@@ -157,25 +171,6 @@ if (owner === 'user') {
   
   // append edit form to the message
   message.appendChild(editForm);
-  }
-  
-
-function deleteMessage(message) {
-  const messageIndex = Array.from(message.parentNode.children).indexOf(message);
-  messages.splice(messageIndex, 1);
-  message.remove();
-}
-
-function editMessage(message) {
-  const messageContent = message.dataset.raw;
-  const messageIndex = Array.from(message.parentNode.children).indexOf(message);
-  const updatedMessageContent = prompt('Edit your message:', messageContent);
-  if (updatedMessageContent !== null) {
-    messages[messageIndex].content = updatedMessageContent;
-    message.dataset.raw = updatedMessageContent;
-    const md = window.markdownit();
-    message.firstChild.innerHTML = md.render(updatedMessageContent);
-  }
 }
 
 async function sendMessage() {
