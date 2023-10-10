@@ -5,7 +5,6 @@ const messageInput = document.getElementById('message-input');
 const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
-const md = window.markdownit({ breaks: true });
 
 let messages = [
   {
@@ -173,6 +172,28 @@ function editMessage(message) {
   // append edit form to the message
   message.appendChild(editForm);
 }
+
+applyButton.addEventListener('click', () => {
+    const updatedMessageContent = editInput.value;
+    // Only update things if content has changed
+    if(updatedMessageContent !== messageContent) {
+      messages[messageIndex].content = updatedMessageContent;
+      message.dataset.raw = updatedMessageContent;
+      const md = window.markdownit();
+      
+      // remove original rendered content
+      if(message.firstChild) {
+        message.firstChild.remove();
+      }
+
+      // create new div with updated content and add it to the message
+      const newContentDiv = document.createElement('div');
+      newContentDiv.innerHTML = md.render(updatedMessageContent);
+      message.prepend(newContentDiv);
+    }
+    // remove edit form after applying changes
+    message.removeChild(editForm);
+});
 
 async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
