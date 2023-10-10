@@ -231,12 +231,6 @@ p code {
     transform: scale(0.95);
 }
 
-.message form {
-  display: flex;
-  flex-direction: column;
-  margin-top: 10px;
-}
-
 .message textarea {
   font-size: 14px;
   resize: none;  
@@ -249,24 +243,14 @@ p code {
   color: #fff;
 }
 
-.message button {
-  width: 100px;
-  padding: 5px;
-  background-color: #303030;
-  border: 1px solid #555;
-  border-radius: 5px;
-  color: #ffffff;
-  cursor: pointer;
-  align-self: flex-end;
-}
-
 .action-buttons {
   display: flex;
   justify-content: space-between;
   margin-top: 4px;
-  background-color: #181818;
-  border: 0.6px solid #555;
-  color: #000;
+  background-color: #303030;
+  border: 1px solid #555;
+  border-radius: 5px;
+  color: #ffffff;
 }
 
 .action-button-edit,
