@@ -7,10 +7,10 @@ const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 
 let messages = [
-  {
-    role: 'system',
-    content: localStorage.getItem('systemRole') || '',
-  },
+    {
+        role: 'system',
+        content: localStorage.getItem('systemRole') || '',
+    },
 ];
 
 let apiKey = localStorage.getItem('apiKey') || '';
@@ -23,122 +23,134 @@ selectModel(selectedModel);
 updateModelHeading();
 
 document.addEventListener('click', function(event) {
-  const target = event.target;
-  if (target.classList.contains('copy-code-button')) {
-    const codeBlock = target.parentElement.querySelector('pre');
-    if (codeBlock) {
-      copyToClipboard(codeBlock.textContent);
+    const target = event.target;
+    if (target.classList.contains('copy-code-button')) {
+        const codeBlock = target.parentElement.querySelector('pre');
+        if (codeBlock) {
+            copyToClipboard(codeBlock.textContent);
+        }
     }
-  } else if (target.classList.contains('edit-btn')) {
-    const messageContainer = target.parentElement.parentElement;
-    editMessage(messageContainer);
-  } else if (target.classList.contains('delete-btn')) {
-    const messageContainer = target.parentElement.parentElement;
-    deleteMessage(messageContainer);
-  }
+});
+
+messageInput.addEventListener('input', () => {
+    messageInput.style.height = 'auto';
+    messageInput.style.height = `${messageInput.scrollHeight}px`;
 });
 
 messageInput.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    let caret = messageInput.selectionStart;
-    messageInput.value = messageInput.value.substring(0, caret) + '\n' + messageInput.value.substring(caret);
-    messageInput.selectionEnd = caret + 1;
-  }
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        let caret = messageInput.selectionStart;
+        messageInput.value = messageInput.value.substring(0, caret) + '\n' + messageInput.value.substring(caret);
+        messageInput.selectionEnd = caret + 1;
+        messageInput.style.height = `${messageInput.scrollHeight}px`;
+    }
 });
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
 function toggleModelMenu() {
-  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
+    modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
 }
 
 function selectModel(model) {
-  const modelOptions = document.querySelectorAll('ul li');
-  modelOptions.forEach((option) => option.classList.remove('selected'));
+    const modelOptions = document.querySelectorAll('ul li');
+    modelOptions.forEach((option) => option.classList.remove('selected'));
 
-  const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
-  if (selectedModelOption) {
-    selectedModelOption.classList.add('selected');
-  }
+    const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
+    if (selectedModelOption) {
+        selectedModelOption.classList.add('selected');
+    }
 
-  selectedModel = model;
-  localStorage.setItem('selectedModel', selectedModel);
-  toggleModelMenu();
-  updateModelHeading();
+    selectedModel = model;
+    localStorage.setItem('selectedModel', selectedModel);
+
+    toggleModelMenu();
+    updateModelHeading();
 }
 
 function updateModelHeading() {
-  const modelHeading = document.querySelector('.class-h1');
-  modelHeading.textContent = `Chat with ${selectedModel}`;
+    const modelHeading = document.querySelector('.class-h1');
+    modelHeading.textContent = `Chat with ${selectedModel}`;
 }
 
 const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
-  const headers = {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${apiKey}`,
-  };
+    const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+    };
 
-  messages.push({
-    role: 'user',
-    content: message,
-  });
+    messages.push({
+        role: 'user',
+        content: message,
+    });
 
-  aiThinkingMsg.style.display = 'flex';
+    aiThinkingMsg.style.display = 'flex';
 
-  const data = {
-    model: selectedModel,
-    messages: messages,
-  };
+    const data = {
+        model: selectedModel,
+        messages: messages,
+    };
 
-  const response = await fetch(ENDPOINT, {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify(data),
-  });
+    const response = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(data),
+    });
 
-  aiThinkingMsg.style.display = 'none';
-  return response.json();
+    aiThinkingMsg.style.display = 'none';
+
+    return response.json();
 }
 
 let latestMessageRawText = '';
 
 async function createAndAppendMessage(content, owner) {
-  const messageContainer = document.createElement('div');
-  messageContainer.classList.add('message-container');
+    const message = document.createElement('div');
+    const deleteButton = document.createElement('button');
+    const editButton = document.createElement('button');
+    message.classList.add('message', owner);
+    message.dataset.raw = content;
+    latestMessageRawText = content;
+    let displayedText = content;
+    deleteButton.textContent = 'Delete';
+    deleteButton.addEventListener('click', () => deleteMessage(message, owner));
+    editButton.textContent = 'Edit';
+    editButton.addEventListener('click', () => editMessage(message, owner));
+    const md = window.markdownit();
+    displayedText = md.render(displayedText);
+    message.innerHTML = displayedText;
+    message.append(deleteButton);
+    message.append(editButton);
+    chatHistory.insertBefore(message, aiThinkingMsg);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+    addCopyButtonToCodeBlock();
+}
 
-  const message = document.createElement('div');
-  message.classList.add('message', owner);
-  message.dataset.raw = content;
-  latestMessageRawText = content;
+function deleteMessage(messageElement, role) {
+    let roleKey = role === "user" ? "user" : "assistant";
+    const content = messageElement.dataset.raw;
+    const index = messages.findIndex(msg => msg.role === roleKey && msg.content === content);
+    if (index > -1) {
+        messages.splice(index, 1);
+        messageElement.remove();
+    }
+}
 
-  const md = window.markdownit();
-  const displayedText = md.render(content);
-  message.innerHTML = displayedText;
-
-  const btnGroup = document.createElement('div');
-  btnGroup.classList.add('btn-group');
-
-  const editBtn = document.createElement('button');
-  editBtn.innerText = 'Edit';
-  editBtn.classList.add('edit-btn');
-
-  const deleteBtn = document.createElement('button');
-  deleteBtn.innerText = 'Delete';
-  deleteBtn.classList.add('delete-btn');
-
-  btnGroup.appendChild(editBtn);
-  btnGroup.appendChild(deleteBtn);
-
-  messageContainer.appendChild(message);
-  messageContainer.appendChild(btnGroup);
-
-  chatHistory.insertBefore(messageContainer, aiThinkingMsg);
-  chatHistory.scrollTop = chatHistory.scrollHeight;
-
-  addCopyButtonToCodeBlock();
+function editMessage(messageElement, role) {
+    let roleKey = role === "user" ? "user" : "assistant";
+    const content = messageElement.dataset.raw;
+    let newContent = prompt("Edit your message:", content);
+    if (newContent !== null) {
+        const index = messages.findIndex(msg => msg.role === roleKey && msg.content === content);
+        if (index !== -1) {
+            messages[index].content = newContent;
+            messageElement.dataset.raw = newContent;
+            messageElement.childNodes[0].textContent = newContent;
+        }
+    }
 }
 
 async function sendMessage() {
@@ -156,10 +168,11 @@ async function sendMessage() {
 
   createAndAppendMessage(message, 'user');
   messageInput.value = '';
+  messageInput.style.height = 'auto';
 
   const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
-  const botResponse = jsonResponse.choices[0].message.content;
 
+  const botResponse = jsonResponse.choices[0].message.content;
   messages.push({
     role: 'assistant',
     content: botResponse,
@@ -186,26 +199,25 @@ document.getElementById('copy-button').addEventListener('click', () => {
   }
 });
 
-function addCopyButtonToCodeBlock() {
+function addCopyButtonToCodeBlock(){
   const allCodeBlocks = document.querySelectorAll('pre');
   allCodeBlocks.forEach((block) => {
-    const copyButton = document.createElement('button');
-    const parentDiv = document.createElement('div');
-    copyButton.classList.add('copy-code-button');
-    copyButton.textContent = 'Copy Code';
-
-    const dupBlock = block.cloneNode(true);
-    block.replaceWith(parentDiv);
-    parentDiv.appendChild(dupBlock);
-    parentDiv.appendChild(copyButton);
+      const copyButton = document.createElement('button');
+      const parentDiv = document.createElement('div');
+      copyButton.classList.add('copy-code-button');
+      copyButton.textContent = 'Copy Code';
+      const dupBlock = block.cloneNode(true);
+      block.replaceWith(parentDiv);
+      parentDiv.appendChild(dupBlock);
+      parentDiv.appendChild(copyButton);
   });
 }
 
 function clearChatHistory() {
-  Array.from(chatHistory.getElementsByClassName('message-container')).forEach((messageContainer) => {
-    chatHistory.removeChild(messageContainer);
+  Array.from(chatHistory.getElementsByClassName('message')).forEach(message => {
+    chatHistory.removeChild(message);
   });
-
+  
   messages = [
     {
       role: 'system',
@@ -238,41 +250,3 @@ function saveInputsAndRefresh() {
 }
 
 document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
-
-function editMessage(messageContainer) {
-  const message = messageContainer.querySelector('.message');
-  const rawText = message.dataset.raw;
-
-  const oldMessage = {
-    role: message.classList.contains('user') ? 'user' : 'assistant',
-    content: rawText,
-  };
-
-  const newContent = prompt('Edit Message', rawText);
-  if (newContent && newContent !== rawText) {
-    message.innerHTML = newContent;
-    message.dataset.raw = newContent;
-
-    const index = messages.findIndex((msg) => msg.role === oldMessage.role && msg.content === oldMessage.content);
-    if (index !== -1) {
-      messages[index].content = newContent;
-    }
-  }
-}
-
-function deleteMessage(messageContainer) {
-  const message = messageContainer.querySelector('.message');
-  const rawText = message.dataset.raw;
-
-  const oldMessage = {
-    role: message.classList.contains('user') ? 'user' : 'assistant',
-    content: rawText,
-  };
-
-  const index = messages.findIndex((msg) => msg.role === oldMessage.role && msg.content === oldMessage.content);
-  if (index !== -1) {
-    messages.splice(index, 1);
-  }
-
-  chatHistory.removeChild(messageContainer);
-}
