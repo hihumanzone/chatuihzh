@@ -29,12 +29,13 @@ document.addEventListener('click', function(event) {
     if (codeBlock) {
       copyToClipboard(codeBlock.textContent);
     }
+  } else if (target.classList.contains('edit-btn')) {
+    const messageContainer = target.parentElement.parentElement;
+    editMessage(messageContainer);
+  } else if (target.classList.contains('delete-btn')) {
+    const messageContainer = target.parentElement.parentElement;
+    deleteMessage(messageContainer);
   }
-});
-
-messageInput.addEventListener('input', () => {
-  messageInput.style.height = 'auto';
-  messageInput.style.height = `${messageInput.scrollHeight}px`;
 });
 
 messageInput.addEventListener('keydown', (event) => {
@@ -43,10 +44,8 @@ messageInput.addEventListener('keydown', (event) => {
     let caret = messageInput.selectionStart;
     messageInput.value = messageInput.value.substring(0, caret) + '\n' + messageInput.value.substring(caret);
     messageInput.selectionEnd = caret + 1;
-    messageInput.style.height = `${messageInput.scrollHeight}px`;
   }
 });
-
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
@@ -65,7 +64,6 @@ function selectModel(model) {
 
   selectedModel = model;
   localStorage.setItem('selectedModel', selectedModel);
-
   toggleModelMenu();
   updateModelHeading();
 }
@@ -102,33 +100,44 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   });
 
   aiThinkingMsg.style.display = 'none';
-
   return response.json();
 }
 
 let latestMessageRawText = '';
 
 async function createAndAppendMessage(content, owner) {
+  const messageContainer = document.createElement('div');
+  messageContainer.classList.add('message-container');
+
   const message = document.createElement('div');
   message.classList.add('message', owner);
   message.dataset.raw = content;
   latestMessageRawText = content;
-  
-  let displayedText = content;
-
-  if (owner === 'bot') {
-    if (displayedText.startsWith('>')) {
-      message.style.backgroundColor = '#222';
-      message.style.borderColor = '#555';
-    }
-  }
 
   const md = window.markdownit();
-  displayedText = md.render(displayedText);
+  const displayedText = md.render(content);
   message.innerHTML = displayedText;
-  chatHistory.insertBefore(message, aiThinkingMsg);
+
+  const btnGroup = document.createElement('div');
+  btnGroup.classList.add('btn-group');
+
+  const editBtn = document.createElement('button');
+  editBtn.innerText = 'Edit';
+  editBtn.classList.add('edit-btn');
+
+  const deleteBtn = document.createElement('button');
+  deleteBtn.innerText = 'Delete';
+  deleteBtn.classList.add('delete-btn');
+
+  btnGroup.appendChild(editBtn);
+  btnGroup.appendChild(deleteBtn);
+
+  messageContainer.appendChild(message);
+  messageContainer.appendChild(btnGroup);
+
+  chatHistory.insertBefore(messageContainer, aiThinkingMsg);
   chatHistory.scrollTop = chatHistory.scrollHeight;
-  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
+
   addCopyButtonToCodeBlock();
 }
 
@@ -147,11 +156,10 @@ async function sendMessage() {
 
   createAndAppendMessage(message, 'user');
   messageInput.value = '';
-  messageInput.style.height = 'auto';
 
   const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
-
   const botResponse = jsonResponse.choices[0].message.content;
+
   messages.push({
     role: 'assistant',
     content: botResponse,
@@ -178,25 +186,26 @@ document.getElementById('copy-button').addEventListener('click', () => {
   }
 });
 
-function addCopyButtonToCodeBlock(){
+function addCopyButtonToCodeBlock() {
   const allCodeBlocks = document.querySelectorAll('pre');
   allCodeBlocks.forEach((block) => {
-      const copyButton = document.createElement('button');
-      const parentDiv = document.createElement('div');
-      copyButton.classList.add('copy-code-button');
-      copyButton.textContent = 'Copy Code';
-      const dupBlock = block.cloneNode(true);
-      block.replaceWith(parentDiv);
-      parentDiv.appendChild(dupBlock);
-      parentDiv.appendChild(copyButton);
+    const copyButton = document.createElement('button');
+    const parentDiv = document.createElement('div');
+    copyButton.classList.add('copy-code-button');
+    copyButton.textContent = 'Copy Code';
+
+    const dupBlock = block.cloneNode(true);
+    block.replaceWith(parentDiv);
+    parentDiv.appendChild(dupBlock);
+    parentDiv.appendChild(copyButton);
   });
 }
 
 function clearChatHistory() {
-  Array.from(chatHistory.getElementsByClassName('message')).forEach(message => {
-    chatHistory.removeChild(message);
+  Array.from(chatHistory.getElementsByClassName('message-container')).forEach((messageContainer) => {
+    chatHistory.removeChild(messageContainer);
   });
-  
+
   messages = [
     {
       role: 'system',
@@ -229,3 +238,41 @@ function saveInputsAndRefresh() {
 }
 
 document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
+
+function editMessage(messageContainer) {
+  const message = messageContainer.querySelector('.message');
+  const rawText = message.dataset.raw;
+
+  const oldMessage = {
+    role: message.classList.contains('user') ? 'user' : 'assistant',
+    content: rawText,
+  };
+
+  const newContent = prompt('Edit Message', rawText);
+  if (newContent && newContent !== rawText) {
+    message.innerHTML = newContent;
+    message.dataset.raw = newContent;
+
+    const index = messages.findIndex((msg) => msg.role === oldMessage.role && msg.content === oldMessage.content);
+    if (index !== -1) {
+      messages[index].content = newContent;
+    }
+  }
+}
+
+function deleteMessage(messageContainer) {
+  const message = messageContainer.querySelector('.message');
+  const rawText = message.dataset.raw;
+
+  const oldMessage = {
+    role: message.classList.contains('user') ? 'user' : 'assistant',
+    content: rawText,
+  };
+
+  const index = messages.findIndex((msg) => msg.role === oldMessage.role && msg.content === oldMessage.content);
+  if (index !== -1) {
+    messages.splice(index, 1);
+  }
+
+  chatHistory.removeChild(messageContainer);
+}
