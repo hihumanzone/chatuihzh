@@ -152,6 +152,20 @@ function editMessage(message) {
   }
 }
 
+function addCopyButtonToCodeBlock(){
+  const allCodeBlocks = document.querySelectorAll('pre');
+  allCodeBlocks.forEach((block) => {
+      const copyButton = document.createElement('button');
+      const parentDiv = document.createElement('div');
+      copyButton.classList.add('copy-code-button');
+      copyButton.textContent = 'Copy Code';
+      const dupBlock = block.cloneNode(true);
+      block.replaceWith(parentDiv);
+      parentDiv.appendChild(dupBlock);
+      parentDiv.appendChild(copyButton);
+  });
+}
+
 async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
