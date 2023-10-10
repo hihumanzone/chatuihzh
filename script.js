@@ -44,6 +44,11 @@ function selectModel(model) {
   updateModelHeading();
 }
 
+messageInput.addEventListener('input', () => {
+    messageInput.style.height = 'auto';
+    messageInput.style.height = `${messageInput.scrollHeight}px`;
+});
+
 function updateModelHeading() {
   const modelHeading = document.querySelector('.class-h1');
   modelHeading.textContent = `Chat with ${selectedModel}`;
