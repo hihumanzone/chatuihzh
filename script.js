@@ -121,7 +121,7 @@ async function createAndAppendMessage(content, owner) {
 
   chatHistory.insertBefore(message, aiThinkingMsg);
   chatHistory.scrollTop = chatHistory.scrollHeight;
-  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
+  addCopyButtonToCodeBlock();
 }
 
 function copyMessage(content) {
