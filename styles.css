@@ -144,6 +144,10 @@ body {
   border-radius: 10px;
 }
 
+.message > * {
+  margin-bottom: -100px;
+}
+
 .message.user {
   align-self: flex-end;
   background-color: #111;
