@@ -175,21 +175,25 @@ function editMessage(message) {
 
 applyButton.addEventListener('click', () => {
   const updatedMessageContent = editInput.value;
-  // Only update things if content has changed
-  if(updatedMessageContent.trim() !== messageContent.trim()) {
+  if(updatedMessageContent !== messageContent) {
     messages[messageIndex].content = updatedMessageContent;
     message.dataset.raw = updatedMessageContent;
     const md = window.markdownit();
+
+    // Render Markdown and then trim
+    let renderedContent = md.render(updatedMessageContent);
+    renderedContent = renderedContent.trim();
+
     // Remove original rendered content before adding new
     while(message.firstChild){
       message.removeChild(message.firstChild);
     }
-    // Trim and render the updated content
-    message.innerHTML = md.render(updatedMessageContent.trim());
+
+    message.innerHTML = renderedContent;
   }
-  // remove edit form after applying changes
+
+  // Remove edit form after applying changes
   message.removeChild(editForm);
-  messageInput.style.height = 'auto';
 });
 
 async function sendMessage() {
