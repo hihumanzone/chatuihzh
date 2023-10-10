@@ -99,6 +99,10 @@ body {
   color: #fff;
 }
 
+#system-role-input {
+  resize: none;
+}
+
 #message-input {
   resize: none;
 }
