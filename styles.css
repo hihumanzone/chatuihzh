@@ -125,6 +125,7 @@ body {
   border: 0.8px solid #555;
   border-radius: 5px;
   color: #fefefe;
+  cursor: pointer;
 }
 
 #about {
@@ -232,27 +233,15 @@ p code {
   display: flex;
   justify-content: space-between;
   margin-top: 4px;
+  background-color: #181818;
+  border: 0.6px solid #555;
 }
 
 .action-button-edit,
 .action-button-delete,
 .action-button-copy {
-  color: #fefefe;
+  color: #fff;
   cursor: pointer;
   font-size: 12px;
-  padding: 2px;
-  border: none;
-  background-color: transparent;
-}
-
-.action-button-edit:hover {
-  color: #b3b3b3;
-}
-
-.action-button-delete:hover {
-  color: #ff0000;
-}
-
-.action-button-copy:hover {
-  color: #33cc33;
+  padding: 1px;
 }
