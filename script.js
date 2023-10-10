@@ -238,10 +238,7 @@ function addCopyButtonToCodeBlock(){
 }
 
 function clearChatHistory() {
-  Array.from(chatHistory.getElementsByClassName('message')).forEach(message => {
-    chatHistory.removeChild(message);
-  });
-  
+  messagesDiv.innerHTML = '';
   messages = [
     {
       role: 'system',
