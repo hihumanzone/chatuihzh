@@ -87,13 +87,6 @@ async function createAndAppendMessage(content, owner) {
 
   let displayedText = content;
 
-  if (owner === 'bot') {
-    if (displayedText.startsWith('>')) {
-      message.style.backgroundColor = '#222';
-      message.style.borderColor = '#555';
-    }
-  }
-
   const md = window.markdownit();
   displayedText = md.render(displayedText);
   message.innerHTML = displayedText;
