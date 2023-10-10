@@ -227,3 +227,32 @@ p code {
 .copy-code-button:active {
     transform: scale(0.95);
 }
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.action-button-edit,
+.action-button-delete,
+.action-button-copy {
+  color: #fefefe;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px;
+  border: none;
+  background-color: transparent;
+}
+
+.action-button-edit:hover {
+  color: #b3b3b3;
+}
+
+.action-button-delete:hover {
+  color: #ff0000;
+}
+
+.action-button-copy:hover {
+  color: #33cc33;
+}
