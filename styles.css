@@ -25,6 +25,7 @@ body {
   background-color: #181818;
   border-radius: 5px;
   padding: 2.5px;
+  cursor: pointer;
 }
 
 .class-h3 {
@@ -50,6 +51,7 @@ body {
   border: 0.6px solid #555;
   background-color: #333;
   border-radius: 5px;
+  cursor: pointer;
 }
 
 #chat-container {
