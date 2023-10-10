@@ -161,7 +161,6 @@ function copyMessage(content) {
   textarea.select();
   document.execCommand('copy');
   document.body.removeChild(textarea);
-  alert('Message copied to clipboard');
 }
 
 async function sendMessage() {
