@@ -165,7 +165,8 @@ body {
 table {
   border: 0.8px solid #555;
   border-collapse: collapse;
-  margin: 10px;
+  margin-bottom: 10px;
+  margin-top: 10px;
   width: 100%;
 }
 
