@@ -39,9 +39,9 @@ body {
   border-left: 1px solid #fefefe;
   border-top: 1px solid #fefefe;
   border-radius: 3px;
-  position: sticky;
-  bottom: 0;
-  align-self: flex-end;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
 }
 
 #model-list li {
