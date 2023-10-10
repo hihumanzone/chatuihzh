@@ -5,6 +5,7 @@ const messageInput = document.getElementById('message-input');
 const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
+const md = window.markdownit({ breaks: true });
 
 let messages = [
   {
