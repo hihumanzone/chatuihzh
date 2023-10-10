@@ -132,50 +132,6 @@ async function createAndAppendMessage(content, owner) {
   addCopyButtonToCodeBlock();
 }
 
-function parseResponse(response) {
-  let parsedResponse = response;
-
-  parsedResponse = parsedResponse.replace(/\$\$(.*?)\$\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
-  parsedResponse = parsedResponse.replace(/\$(.*?)\$/g, '<span class="mathjax-latex">\\($1\\)</span>');
-  parsedResponse = parseTables(parsedResponse);
-
-  return parsedResponse;
-}
-
-function parseTables(response) {
-  const tableRegex = /\n((?:\s*:?[\|:].*?:?\|\n)+)\n/g;
-  return response.replace(tableRegex, createTable);
-}
-
-function createTable(match, table) {
-  const rows = table.trim().split('\n');
-  const tableElement = document.createElement('table');
-
-  const tableHeader = document.createElement('tr');
-  const tableHeaderCells = rows[0].split('|').slice(1, -1);
-  tableHeaderCells.forEach((cell) => {
-    const th = document.createElement('th');
-    th.classList.add('table-header');
-    th.textContent = cell.trim();
-    tableHeader.appendChild(th);
-  });
-  tableElement.appendChild(tableHeader);
-
-  for (let i = 2; i < rows.length; i++) {
-    const row = document.createElement('tr');
-    const tableCells = rows[i].split('|').slice(1, -1);
-    tableCells.forEach((cell) => {
-      const td = document.createElement('td');
-      td.classList.add('table-data');
-      td.innerHTML = parseResponse(cell.trim());
-      row.appendChild(td);
-    });
-    tableElement.appendChild(row);
-  }
-
-  return `\n${tableElement.outerHTML}\n`;
-}
-
 async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
