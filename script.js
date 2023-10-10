@@ -88,7 +88,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     content: message,
   });
 
-  aiThinkingMsg.style.display = 'block';
+  aiThinkingMsg.style.display = 'flex';
 
   const data = {
     model: selectedModel,
