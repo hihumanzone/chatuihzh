@@ -124,6 +124,7 @@ async function createAndAppendMessage(content, owner) {
     message.innerHTML = displayedText;
     message.append(deleteButton);
     message.append(editButton);
+    message.append(copyButton);
     chatHistory.insertBefore(message, aiThinkingMsg);
     chatHistory.scrollTop = chatHistory.scrollHeight;
     addCopyButtonToCodeBlock();
@@ -151,6 +152,16 @@ function editMessage(messageElement, role) {
             messageElement.childNodes[0].textContent = newContent;
         }
     }
+}
+
+function copyMessage(content) {
+  const textarea = document.createElement('textarea');
+  textarea.value = content;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+  alert('Message copied to clipboard');
 }
 
 async function sendMessage() {
