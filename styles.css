@@ -237,12 +237,12 @@ p code {
   margin-top: 4px;
   background-color: #181818;
   border: 0.6px solid #555;
+  color: #000;
 }
 
 .action-button-edit,
 .action-button-delete,
 .action-button-copy {
-  color: #fff;
   cursor: pointer;
   font-size: 12px;
   padding: 1px;
