@@ -101,7 +101,7 @@ body {
 
 #system-role-input {
   resize: none;
-  width: 200%;
+  height: 100px;
 }
 
 #message-input {
