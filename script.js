@@ -127,7 +127,7 @@ async function createAndAppendMessage(content, owner) {
   const md = window.markdownit();
   displayedText = md.render(displayedText);
   message.innerHTML = displayedText;
-  chatHistory.appendChild(message);
+  messagesDiv.appendChild(message);
   chatHistory.scrollTop = chatHistory.scrollHeight;
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
   addCopyButtonToCodeBlock();
