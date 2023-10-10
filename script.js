@@ -85,6 +85,22 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   return response.json();
 }
 
+function addCopyButtonToCodeBlock(){
+    const allCodeBlocks = document.querySelectorAll('pre');
+    allCodeBlocks.forEach((block) => {
+        if (!block.parentElement.classList.contains('code-wrapper')) {
+            const copyButton = document.createElement('button');
+            copyButton.classList.add('copy-code-button');
+            copyButton.textContent = 'Copy Code';
+            const parentDiv = document.createElement('div');
+            parentDiv.classList.add('code-wrapper');
+            block.parentNode.insertBefore(parentDiv, block);
+            parentDiv.appendChild(block);
+            parentDiv.appendChild(copyButton);
+        }
+    });
+}
+
 async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
