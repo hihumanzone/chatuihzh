@@ -16,104 +16,37 @@ let messages = [
 let apiKey = localStorage.getItem('apiKey') || '';
 let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
 let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
+let latestMessageRawText = '';
 
 apiKeyInput.value = apiKey;
 apiEndpointInput.value = apiEndpoint;
 selectModel(selectedModel);
 updateModelHeading();
 
-document.addEventListener('click', function(event) {
-  const target = event.target;
-  if (target.classList.contains('copy-code-button')) {
-    const codeBlock = target.parentElement.querySelector('pre');
-    if (codeBlock) {
-      copyToClipboard(codeBlock.textContent);
-    }
-  }
-});
+function createActions(messageElem) {
+  const actionsDiv = document.createElement('div');
+  const editBtn = document.createElement('button');
+  const delBtn = document.createElement('button');
+  
+  editBtn.textContent = 'Edit';
+  delBtn.textContent = 'Delete';
+  editBtn.classList.add('action-btn', 'edit-btn');
+  delBtn.classList.add('action-btn', 'delete-btn');
+  actionsDiv.classList.add('message-actions');
 
-messageInput.addEventListener('input', () => {
-  messageInput.style.height = 'auto';
-  messageInput.style.height = `${messageInput.scrollHeight}px`;
-});
-
-messageInput.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    let caret = messageInput.selectionStart;
-    messageInput.value = messageInput.value.substring(0, caret) + '\n' + messageInput.value.substring(caret);
-    messageInput.selectionEnd = caret + 1;
-    messageInput.style.height = `${messageInput.scrollHeight}px`;
-  }
-});
-
-
-document.getElementById('send-button').addEventListener('click', sendMessage);
-
-function toggleModelMenu() {
-  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
+  actionsDiv.appendChild(editBtn);
+  actionsDiv.appendChild(delBtn);
+  messageElem.appendChild(actionsDiv);
 }
 
-function selectModel(model) {
-  const modelOptions = document.querySelectorAll('ul li');
-  modelOptions.forEach((option) => option.classList.remove('selected'));
-
-  const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
-  if (selectedModelOption) {
-    selectedModelOption.classList.add('selected');
-  }
-
-  selectedModel = model;
-  localStorage.setItem('selectedModel', selectedModel);
-
-  toggleModelMenu();
-  updateModelHeading();
-}
-
-function updateModelHeading() {
-  const modelHeading = document.querySelector('.class-h1');
-  modelHeading.textContent = `Chat with ${selectedModel}`;
-}
-
-const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
-
-async function getBotResponse(apiKey, apiEndpoint, message) {
-  const headers = {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${apiKey}`,
-  };
-
-  messages.push({
-    role: 'user',
-    content: message,
-  });
-
-  aiThinkingMsg.style.display = 'flex';
-
-  const data = {
-    model: selectedModel,
-    messages: messages,
-  };
-
-  const response = await fetch(ENDPOINT, {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify(data),
-  });
-
-  aiThinkingMsg.style.display = 'none';
-
-  return response.json();
-}
-
-let latestMessageRawText = '';
-
-async function createAndAppendMessage(content, owner) {
+async function createAndAppendMessage(content, owner, msgIndex) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
+  message.dataset.index = msgIndex;
   message.dataset.raw = content;
+
   latestMessageRawText = content;
-  
+
   let displayedText = content;
 
   if (owner === 'bot') {
@@ -126,6 +59,7 @@ async function createAndAppendMessage(content, owner) {
   const md = window.markdownit();
   displayedText = md.render(displayedText);
   message.innerHTML = displayedText;
+  createActions(message);
   chatHistory.insertBefore(message, aiThinkingMsg);
   chatHistory.scrollTop = chatHistory.scrollHeight;
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
@@ -136,6 +70,7 @@ async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
   const message = messageInput.value.trim();
+  const editingMsgIndex = localStorage.getItem('editingMsgIndex');
 
   if (!message) {
     alert('Please enter a message.');
@@ -145,64 +80,53 @@ async function sendMessage() {
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
 
-  createAndAppendMessage(message, 'user');
+  const userMessage = {
+    role: 'user',
+    content: message,
+  };
+
+  if (editingMsgIndex !== null) {
+    messages[editingMsgIndex] = userMessage;
+    localStorage.removeItem('editingMsgIndex');
+  } else {
+    messages.push(userMessage);
+  }
+
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
   const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
-
+  
   const botResponse = jsonResponse.choices[0].message.content;
   messages.push({
     role: 'assistant',
     content: botResponse,
   });
 
-  createAndAppendMessage(botResponse, 'bot');
-}
-
-function copyToClipboard(text) {
-  const textarea = document.createElement('textarea');
-  textarea.value = text;
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand('copy');
-  document.body.removeChild(textarea);
-}
-
-document.getElementById('copy-button').addEventListener('click', () => {
-  if (latestMessageRawText) {
-    copyToClipboard(latestMessageRawText);
-    alert('Text copied to clipboard');
-  } else {
-    alert('No text to copy');
-  }
-});
-
-function addCopyButtonToCodeBlock(){
-  const allCodeBlocks = document.querySelectorAll('pre');
-  allCodeBlocks.forEach((block) => {
-      const copyButton = document.createElement('button');
-      const parentDiv = document.createElement('div');
-      copyButton.classList.add('copy-code-button');
-      copyButton.textContent = 'Copy Code';
-      const dupBlock = block.cloneNode(true);
-      block.replaceWith(parentDiv);
-      parentDiv.appendChild(dupBlock);
-      parentDiv.appendChild(copyButton);
-  });
+  reloadChatHistory();
 }
 
 function clearChatHistory() {
-  Array.from(chatHistory.getElementsByClassName('message')).forEach(message => {
-    chatHistory.removeChild(message);
-  });
-  
+  while (chatHistory.firstChild) {
+    chatHistory.removeChild(chatHistory.firstChild);
+  }
+
   messages = [
     {
       role: 'system',
       content: localStorage.getItem('systemRole') || '',
     },
   ];
+}
+
+function reloadChatHistory() {
+  clearChatHistory();
+
+  messages.forEach((message, index) => {
+    if (message.role !== 'system') {
+      createAndAppendMessage(message.content, message.role === 'assistant' ? 'bot' : 'user', index);
+    }
+  });
 }
 
 systemRoleInput.addEventListener('keydown', (event) => {
@@ -228,4 +152,22 @@ function saveInputsAndRefresh() {
   location.reload();
 }
 
+document.addEventListener('click', (event) => {
+  const target = event.target;
+  const messageElement = target.parentElement.parentElement;
+
+  if (target.classList.contains('edit-btn')) {
+    const rawMessage = messageElement.dataset.raw;
+    const msgIndex = messageElement.dataset.index;
+
+    messageInput.value = rawMessage;
+
+    localStorage.setItem('editingMsgIndex', msgIndex);
+  } else if (target.classList.contains('delete-btn')) {
+    messages.splice(messageElement.dataset.index, 1);
+    messageElement.remove();
+  }
+});
+
+document.getElementById('send-button').addEventListener('click', sendMessage);
 document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
