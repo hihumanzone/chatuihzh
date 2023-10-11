@@ -106,28 +106,26 @@ async function createAndAppendMessage(content, owner) {
   deleteButton.textContent = 'Delete';
   deleteButton.classList.add('action-button-delete');
   deleteButton.addEventListener('click', () => deleteMessage(message));
-
+  actionButtons.appendChild(deleteButton);
+  
   const copyButton = document.createElement('button');
   copyButton.textContent = 'Copy';
   copyButton.classList.add('action-button-copy');
   copyButton.addEventListener('click', () => copyMessage(content));
+  actionButtons.appendChild(copyButton);
 
   const editButton = document.createElement('button');
   editButton.textContent = 'Edit';
   editButton.classList.add('action-button-edit');
-  editButton.addEventListener('click', () => editMessage(message));
-
-  const regenButton = document.createElement('button');
-  regenButton.textContent = 'Regen';
-  regenButton.classList.add('action-button-regen');
-  if (owner === 'bot') {
-    regenButton.addEventListener('click', () => regenerateMessage(message));
-    actionButtons.appendChild(regenButton);
+  if (owner == 'user') {
+    editButton.addEventListener('click', () => editMessage(message, editButton));
+    actionButtons.appendChild(editButton);
   }
-
-  actionButtons.appendChild(deleteButton);
-  actionButtons.appendChild(copyButton);
-  actionButtons.appendChild(editButton);
+  else if (owner == 'bot') {
+    editButton.addEventListener('click', () => regenerateMessage(message));
+    editButton.textContent = 'Regen';
+    actionButtons.appendChild(editButton);
+  }
 
   message.appendChild(actionButtons);
 
@@ -151,21 +149,51 @@ function deleteMessage(message) {
   message.remove();
 }
 
-function editMessage(message) {
-  const newContent = prompt('Enter new content for the message:', message.dataset.raw);
-  if (newContent !== null) {
-    message.dataset.raw = newContent;
-    message.firstChild.nodeValue = newContent;
-  }
+function editMessage(message, editButton) {
+  let raw = message.dataset.raw;
+  let textField = document.createElement('textarea');
+  textField.value = raw;
+
+  // replace text with textarea
+  message.innerHTML = '';
+  message.appendChild(textField);
+  textField.focus();
+  
+  // switch to save action
+  editButton.textContent = 'Save';
+  editButton.onclick = () => {
+    raw = textField.value;
+    message.dataset.raw = raw;
+    message.innerHTML = window.markdownit().render(raw);
+
+    // switch back to edit action
+    editButton.textContent = 'Edit';
+    editButton.onclick = () => editMessage(message, editButton);
+
+    // find index and replace in messages array
+    const messageIndex = Array.from(message.parentNode.children).indexOf(message);
+    messages[messageIndex].content = raw;  
+  };
 }
 
 async function regenerateMessage(message) {
-  const newResponse = await getBotResponse(apiKey, apiEndpoint, messages[messages.length - 2].content);
-  const botResponse = newResponse.choices[0].message.content;
-  messages[messages.length - 1].content = botResponse;
+  const index = Array.from(message.parentNode.children).indexOf(message);
+  
+  // remove bot's message from messages array
+  messages.pop();
+  const userMessage = messages[messages.length-1].content;
+  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, userMessage);
+  
+  // assign new bot's response
+  const botResponse = jsonResponse.choices[0].message.content;
+  messages.push({
+    role: 'assistant',
+    content: botResponse,
+  });
 
+  // update message display
   message.dataset.raw = botResponse;
-  message.firstChild.nodeValue = botResponse;
+  message.innerHTML = window.markdownit().render(botResponse);
 }
 
 async function sendMessage() {
