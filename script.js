@@ -110,10 +110,24 @@ async function createAndAppendMessage(content, owner) {
   const copyButton = document.createElement('button');
   copyButton.textContent = 'Copy';
   copyButton.classList.add('action-button-copy');
+
+  const editButton = document.createElement('button');
+  editButton.textContent = 'Edit';
+  editButton.classList.add('action-button-edit');
+  editButton.addEventListener('click', () => editMessage(message, owner));
+
+  const regenButton = document.createElement('button');
+  regenButton.textContent = 'Regen';
+  regenButton.classList.add('action-button-regen');
+  if(owner === 'bot') regenButton.addEventListener('click', () => regenerateMessage(message));
+  else regenButton.style.visibility = 'hidden';
+
   copyButton.addEventListener('click', () => copyMessage(content));
 
   actionButtons.appendChild(deleteButton);
   actionButtons.appendChild(copyButton);
+  actionButtons.appendChild(editButton);
+  actionButtons.appendChild(regenButton);
 
   message.appendChild(actionButtons);
 
@@ -135,6 +149,48 @@ function deleteMessage(message) {
   const messageIndex = Array.from(message.parentNode.children).indexOf(message);
   messages.splice(messageIndex, 1);
   message.remove();
+}
+
+async function editMessage(message, owner) {
+  const messageIndex = Array.from(message.parentNode.children).indexOf(message);
+  const originalText = messages[messageIndex].content;
+
+  const updatedText = prompt("Edit message:", originalText);
+  if (updatedText === null) return;
+  
+  message.parentNode.removeChild(message);
+
+  messages[messageIndex] = {
+    role: owner === 'user' ? 'user' : 'assistant',
+    content: updatedText,
+  };
+
+  createAndAppendMessage(updatedText, owner);
+}
+
+async function regenerateMessage(message) {
+  const messageIndex = Array.from(message.parentNode.children).indexOf(message);
+  const originalText = messages[messageIndex].content;
+
+  aiThinkingMsg.style.display = 'flex';
+  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, originalText);
+
+  const botResponse = jsonResponse.choices[0].message.content;
+  
+  messages[messageIndex] = {
+    role: 'assistant',
+    content: botResponse,
+  };
+  
+  message.innerHTML = '';
+  message.dataset.raw = botResponse;
+    
+  let displayedText = botResponse;
+  const md = window.markdownit();
+  displayedText = md.render(displayedText);
+  message.innerHTML = displayedText;
+
+  aiThinkingMsg.style.display = 'none';
 }
 
 async function sendMessage() {
