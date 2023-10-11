@@ -59,16 +59,20 @@ function updateModelHeading() {
 
 const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
 
-async function getBotResponse(apiKey, apiEndpoint, message) {
+async function getBotResponse(apiKey, apiEndpoint, message, deletedIndex = null) {
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
   };
 
-  messages.push({
-    role: 'user',
-    content: message,
-  });
+    if (deletedIndex !== null) {
+    messages.splice(deletedIndex, 1);
+  } else if (message) {
+    messages.push({
+      role: 'user',
+      content: message,
+    });
+  }
 
   aiThinkingMsg.style.display = 'flex';
 
@@ -85,7 +89,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 
   aiThinkingMsg.style.display = 'none';
 
-  return response.json();
+  return await response.json(); 
 }
 
 async function createAndAppendMessage(content, owner) {
@@ -133,8 +137,9 @@ function copyMessage(content) {
 
 function deleteMessage(message) {
   const messageIndex = Array.from(message.parentNode.children).indexOf(message);
-  messages.splice(messageIndex, 1);
-  message.remove();
+  getBotResponse(apiKey, apiEndpoint, null, messageIndex).then(() => {
+    message.remove();
+  });
 }
 
 async function sendMessage() {
@@ -156,14 +161,6 @@ async function sendMessage() {
   const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
 
   const botResponse = jsonResponse.choices[0].message.content;
- 
-  // Add the user's message to the messages array after the server response
-  messages.push({
-    role: 'user',
-    content: message,
-  });
-
-  // Add the bot's message to the messages array
   messages.push({
     role: 'assistant',
     content: botResponse,
