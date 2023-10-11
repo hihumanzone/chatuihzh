@@ -65,6 +65,11 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     Authorization: `Bearer ${apiKey}`,
   };
 
+  messages.push({
+    role: 'user',
+    content: message,
+  });
+
   aiThinkingMsg.style.display = 'flex';
 
   const data = {
@@ -82,12 +87,11 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 
   return response.json();
 }
-  
-async function createAndAppendMessage(content, owner, index) {
+
+async function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
   message.dataset.raw = content;
-  message.dataset.index = index;
 
   let displayedText = content;
 
@@ -98,19 +102,10 @@ async function createAndAppendMessage(content, owner, index) {
   const actionButtons = document.createElement('div');
   actionButtons.classList.add('action-buttons');
 
-  if (owner == 'user') {
-    const editButton = document.createElement('button');
-    editButton.textContent = 'Edit';
-    editButton.classList.add('action-button-edit');
-    editButton.addEventListener('click', () => editMessage(message));
-    actionButtons.appendChild(editButton);
-  } else if (owner == 'bot') {
-    const regenButton = document.createElement('button');
-    regenButton.textContent = 'Regen';
-    regenButton.classList.add('action-button-regen');
-    regenButton.addEventListener('click', () => regenerateBotResponse(message));
-    actionButtons.appendChild(regenButton);
-  }
+  const editButton = document.createElement('button');
+  editButton.textContent = 'Edit';
+  editButton.classList.add('action-button-edit');
+  editButton.addEventListener('click', () => editMessage(message));
 
   const deleteButton = document.createElement('button');
   deleteButton.textContent = 'Delete';
@@ -122,6 +117,7 @@ async function createAndAppendMessage(content, owner, index) {
   copyButton.classList.add('action-button-copy');
   copyButton.addEventListener('click', () => copyMessage(content));
 
+  actionButtons.appendChild(editButton);
   actionButtons.appendChild(deleteButton);
   actionButtons.appendChild(copyButton);
 
@@ -142,17 +138,26 @@ function copyMessage(content) {
 }
 
 function deleteMessage(message) {
-  const messageIndex = parseInt(message.dataset.index);
+  const messageIndex = Array.from(message.parentNode.children).indexOf(message);
   messages.splice(messageIndex, 1);
   message.remove();
 }
 
-function editMessage(message) {
-  const newContent = prompt('Edit your message:', message.dataset.raw);
-  if (newContent === null || newContent === '') return;
-  const messageIndex = parseInt(message.dataset.index);
-  messages[messageIndex].content = newContent;
-  message.dataset.raw = newContent;
+function editMessage(messageNode) {
+  const currentMessage = messageNode.textContent;
+  
+  // Edit the message as needed
+  const newMessage = prompt("Edit your message", currentMessage);
+  
+  // Update the message in both the on-page HTML and the 'messages' array
+  if (newMessage) {
+    messageNode.textContent = newMessage;
+    const messageIndex = Array.from(messageNode.parentNode.children).indexOf(messageNode);
+    
+    // Here assuming the shape of each message in 'messages' to be {role:'...', content:'...'}
+    // Please adjust this line according to the data structure of your 'messages' array
+    messages[messageIndex].content = newMessage;
+  }
 }
 
 async function sendMessage() {
@@ -168,7 +173,7 @@ async function sendMessage() {
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
 
-  createAndAppendMessage(message, 'user', messages.length);
+  createAndAppendMessage(message, 'user');
   messageInput.value = '';
 
   const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
@@ -179,11 +184,7 @@ async function sendMessage() {
     content: botResponse,
   });
 
-  createAndAppendMessage(botResponse, 'bot', messages.length - 1);
-}
-
-function regenerateBotResponse(message) {
-  sendMessage();
+  createAndAppendMessage(botResponse, 'bot');
 }
 
 function copyToClipboard(text) {
