@@ -112,8 +112,22 @@ async function createAndAppendMessage(content, owner) {
   copyButton.classList.add('action-button-copy');
   copyButton.addEventListener('click', () => copyMessage(content));
 
+  const editButton = document.createElement('button');
+  editButton.textContent = 'Edit';
+  editButton.classList.add('action-button-edit');
+  editButton.addEventListener('click', () => editMessage(message));
+
+  const regenButton = document.createElement('button');
+  regenButton.textContent = 'Regen';
+  regenButton.classList.add('action-button-regen');
+  if (owner === 'bot') {
+    regenButton.addEventListener('click', () => regenerateMessage(message));
+    actionButtons.appendChild(regenButton);
+  }
+
   actionButtons.appendChild(deleteButton);
   actionButtons.appendChild(copyButton);
+  actionButtons.appendChild(editButton);
 
   message.appendChild(actionButtons);
 
@@ -135,6 +149,23 @@ function deleteMessage(message) {
   const messageIndex = Array.from(message.parentNode.children).indexOf(message);
   messages.splice(messageIndex, 1);
   message.remove();
+}
+
+function editMessage(message) {
+  const newContent = prompt('Enter new content for the message:', message.dataset.raw);
+  if (newContent !== null) {
+    message.dataset.raw = newContent;
+    message.firstChild.nodeValue = newContent;
+  }
+}
+
+async function regenerateMessage(message) {
+  const newResponse = await getBotResponse(apiKey, apiEndpoint, messages[messages.length - 2].content);
+  const botResponse = newResponse.choices[0].message.content;
+  messages[messages.length - 1].content = botResponse;
+
+  message.dataset.raw = botResponse;
+  message.firstChild.nodeValue = botResponse;
 }
 
 async function sendMessage() {
