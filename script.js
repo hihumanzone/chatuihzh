@@ -114,9 +114,20 @@ async function createAndAppendMessage(content, owner) {
     deleteMessage(message, content);
   });
 
+  if (owner === 'bot') {
+    const regenButton = document.createElement('button');
+    regenButton.textContent = 'Regenerate';
+    regenButton.classList.add('action-button-regen');
+    regenButton.addEventListener('click', async () => {
+      await regenerateMessage(message, content);
+    });
+
+    actionButtons.appendChild(regenButton);
+  }
+
   actionButtons.appendChild(copyButton);
   actionButtons.appendChild(deleteButton);
-  
+
   message.appendChild(actionButtons);
 
   chatHistory.insertBefore(message, aiThinkingMsg);
@@ -136,6 +147,18 @@ function copyMessage(content) {
 function deleteMessage(messageElement, content) {
   chatHistory.removeChild(messageElement);
   messages = messages.filter(msg => msg.content !== content);
+}
+
+async function regenerateMessage(originalMessage, originalContent) {
+  chatHistory.removeChild(originalMessage);
+  messages = messages.filter(msg => msg.content !== originalContent);
+  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, originalContent);
+  const botResponse = jsonResponse.choices[0].message.content;
+  messages.push({
+    role: 'assistant',
+    content: botResponse,
+  });
+  createAndAppendMessage(botResponse, 'bot');
 }
 
 async function sendMessage() {
