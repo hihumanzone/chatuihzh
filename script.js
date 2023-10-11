@@ -111,15 +111,16 @@ async function createAndAppendMessage(content, owner) {
   deleteButton.textContent = 'Delete';
   deleteButton.classList.add('action-button-delete');
   deleteButton.addEventListener('click', () => {
-    deleteMessage(message);
+    deleteMessage(message, content);
   });
 
   const regenButton = document.createElement('button');
   regenButton.textContent = 'Regen';
   regenButton.classList.add('action-button-regen');
+  // Only add the regenerate functionality to bot responses
   if (owner === 'bot') {
     regenButton.addEventListener('click', () => {
-      regenerateMessage(message, content);
+      regenerateMessage(message, owner);
     });
   }
 
