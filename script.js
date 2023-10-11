@@ -59,20 +59,16 @@ function updateModelHeading() {
 
 const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
 
-async function getBotResponse(apiKey, apiEndpoint, message, deletedIndex = null) {
+async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
   };
 
-    if (deletedIndex !== null) {
-    messages.splice(deletedIndex, 1);
-  } else if (message) {
-    messages.push({
-      role: 'user',
-      content: message,
-    });
-  }
+  messages.push({
+    role: 'user',
+    content: message,
+  });
 
   aiThinkingMsg.style.display = 'flex';
 
@@ -89,7 +85,7 @@ async function getBotResponse(apiKey, apiEndpoint, message, deletedIndex = null)
 
   aiThinkingMsg.style.display = 'none';
 
-  return await response.json(); 
+  return response.json();
 }
 
 async function createAndAppendMessage(content, owner) {
@@ -137,9 +133,8 @@ function copyMessage(content) {
 
 function deleteMessage(message) {
   const messageIndex = Array.from(message.parentNode.children).indexOf(message);
-  getBotResponse(apiKey, apiEndpoint, null, messageIndex).then(() => {
-    message.remove();
-  });
+  messages.splice(messageIndex, 1);
+  message.remove();
 }
 
 async function sendMessage() {
