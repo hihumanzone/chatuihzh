@@ -102,19 +102,21 @@ async function createAndAppendMessage(content, owner) {
   const actionButtons = document.createElement('div');
   actionButtons.classList.add('action-buttons');
 
-  const deleteButton = document.createElement('button');
-  deleteButton.textContent = 'Delete';
-  deleteButton.classList.add('action-button-delete');
-  deleteButton.addEventListener('click', () => deleteMessage(message));
-
   const copyButton = document.createElement('button');
   copyButton.textContent = 'Copy';
   copyButton.classList.add('action-button-copy');
   copyButton.addEventListener('click', () => copyMessage(content));
 
-  actionButtons.appendChild(deleteButton);
-  actionButtons.appendChild(copyButton);
+  const deleteButton = document.createElement('button');
+  deleteButton.textContent = 'Delete';
+  deleteButton.classList.add('action-button-delete');
+  deleteButton.addEventListener('click', () => {
+    deleteMessage(message, content);
+  });
 
+  actionButtons.appendChild(copyButton);
+  actionButtons.appendChild(deleteButton);
+  
   message.appendChild(actionButtons);
 
   chatHistory.insertBefore(message, aiThinkingMsg);
@@ -131,10 +133,9 @@ function copyMessage(content) {
   }
 }
 
-function deleteMessage(message) {
-  const messageIndex = Array.from(message.parentNode.children).indexOf(message);
-  messages.splice(messageIndex, 1);
-  message.remove();
+function deleteMessage(messageElement, content) {
+  chatHistory.removeChild(messageElement);
+  messages = messages.filter(msg => msg.content !== content);
 }
 
 async function sendMessage() {
