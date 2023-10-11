@@ -111,22 +111,21 @@ async function createAndAppendMessage(content, owner) {
   deleteButton.textContent = 'Delete';
   deleteButton.classList.add('action-button-delete');
   deleteButton.addEventListener('click', () => {
-    deleteMessage(message, content);
+    deleteMessage(message);
   });
 
+  const regenButton = document.createElement('button');
+  regenButton.textContent = 'Regen';
+  regenButton.classList.add('action-button-regen');
   if (owner === 'bot') {
-    const regenButton = document.createElement('button');
-    regenButton.textContent = 'Regenerate';
-    regenButton.classList.add('action-button-regen');
-    regenButton.addEventListener('click', async () => {
-      await regenerateMessage(message, content);
+    regenButton.addEventListener('click', () => {
+      regenerateMessage(message, content);
     });
-
-    actionButtons.appendChild(regenButton);
   }
 
   actionButtons.appendChild(copyButton);
   actionButtons.appendChild(deleteButton);
+  actionButtons.appendChild(regenButton);
 
   message.appendChild(actionButtons);
 
@@ -149,15 +148,30 @@ function deleteMessage(messageElement, content) {
   messages = messages.filter(msg => msg.content !== content);
 }
 
-async function regenerateMessage(originalMessage, originalContent) {
-  chatHistory.removeChild(originalMessage);
-  messages = messages.filter(msg => msg.content !== originalContent);
-  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, originalContent);
+async function regenerateMessage(messageElement, owner) {
+  // Find the index of the message in the messages array
+  const messageIdx = messages.findIndex(msg => msg.content === messageElement.dataset.raw && msg.role === owner);
+  
+  // Remove the message from the messages array
+  messages.splice(messageIdx, 1);
+  
+  // Remove the message from the chat history (HTML)
+  chatHistory.removeChild(messageElement);
+  
+  // Reconstruct the previous user message from the messages array
+  const userMessage = messages[messages.length - 1].content;
+  
+  // Re-send the user message to the API to regenerate the bot response
+  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, userMessage);
+
+  // Update the bot response in the messages array
   const botResponse = jsonResponse.choices[0].message.content;
   messages.push({
     role: 'assistant',
     content: botResponse,
   });
+
+  // Append the new bot response to the chat history
   createAndAppendMessage(botResponse, 'bot');
 }
 
