@@ -60,32 +60,38 @@ function updateModelHeading() {
 const ENDPOINT = apiEndpoint || 'https://free.churchless.tech/v1/chat/completions';
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
-  const headers = {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${apiKey}`,
-  };
+    const headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+    };
 
-  messages.push({
-    role: 'user',
-    content: message,
-  });
+    const localMessages = [
+        {
+            role: 'system',
+            content: systemRole,
+        },
+        {
+            role: 'user',
+            content: message,
+        },
+    ];
 
-  aiThinkingMsg.style.display = 'flex';
+    aiThinkingMsg.style.display = 'flex';
 
-  const data = {
-    model: selectedModel,
-    messages: messages,
-  };
+    const data = {
+        model: selectedModel,
+        messages: localMessages,
+    };
 
-  const response = await fetch(ENDPOINT, {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify(data),
-  });
+    const response = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(data),
+    });
 
-  aiThinkingMsg.style.display = 'none';
+    aiThinkingMsg.style.display = 'none';
 
-  return response.json();
+    return response.json();
 }
 
 async function createAndAppendMessage(content, owner) {
