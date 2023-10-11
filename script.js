@@ -7,20 +7,23 @@ const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 
 let messages = [
-  {
-    role: 'system',
-    content: localStorage.getItem('systemRole') || '',
-  },
+    {
+      role: 'system',
+      content: localStorage.getItem('systemRole') || '',
+    },
 ];
 
 let apiKey = localStorage.getItem('apiKey') || '';
 let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
 let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
+let systemRole = localStorage.getItem('systemRole') || '';
 
 apiKeyInput.value = apiKey;
 apiEndpointInput.value = apiEndpoint;
+systemRoleInput.value = systemRole;
 selectModel(selectedModel);
 updateModelHeading();
+
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
@@ -226,13 +229,15 @@ if (event.key === 'Enter' && !event.shiftKey) {
 window.addEventListener('load', updateModelHeading);
 
 function saveInputsAndRefresh() {
-apiKey = apiKeyInput.value.trim();
-apiEndpoint = apiEndpointInput.value.trim();
+  apiKey = apiKeyInput.value.trim();
+  apiEndpoint = apiEndpointInput.value.trim();
+  let systemRole = systemRoleInput.value.trim();
 
-localStorage.setItem('apiKey', apiKey);
-localStorage.setItem('apiEndpoint', apiEndpoint);
+  localStorage.setItem('apiKey', apiKey);
+  localStorage.setItem('apiEndpoint', apiEndpoint);
+  localStorage.setItem('systemRole', systemRole);
 
-location.reload();
+  location.reload();
 }
 
 document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
