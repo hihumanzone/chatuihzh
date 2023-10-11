@@ -107,24 +107,24 @@ async function createAndAppendMessage(content, owner) {
   copyButton.classList.add('action-button-copy');
   copyButton.addEventListener('click', () => copyMessage(content));
 
+  const deleteButton = document.createElement('button');
+  deleteButton.textContent = 'Delete';
+  deleteButton.classList.add('action-button-delete');
+  deleteButton.addEventListener('click', () => {
+    deleteMessage(message, content);
+  });
+
   actionButtons.appendChild(copyButton);
+  actionButtons.appendChild(deleteButton);
 
-  if (owner === "bot") {
-    const deleteButton = document.createElement('button');
-    deleteButton.textContent = 'Delete';
-    deleteButton.classList.add('action-button-delete');
-    deleteButton.addEventListener('click', () => {
-      deleteMessage(message, content);
-    });
-
+  if (owner === 'bot') {
     const regenButton = document.createElement('button');
     regenButton.textContent = 'Regen';
-    regenButton.classList.add('action-button-regen');
+    regenButton.classList.add('action-button-regen');  
     regenButton.addEventListener('click', () => {
       regenerateMessage(message, owner);
     });
 
-    actionButtons.appendChild(deleteButton);
     actionButtons.appendChild(regenButton);
   }
   
