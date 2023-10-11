@@ -7,10 +7,10 @@ const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 
 let messages = [
-  {
-    role: 'system',
-    content: localStorage.getItem('systemRole') || '',
-  },
+    {
+      role: 'system',
+      content: localStorage.getItem('systemRole') || '',
+    },
 ];
 
 let apiKey = localStorage.getItem('apiKey') || '';
@@ -23,6 +23,7 @@ apiEndpointInput.value = apiEndpoint;
 systemRoleInput.value = systemRole;
 selectModel(selectedModel);
 updateModelHeading();
+
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
@@ -47,8 +48,8 @@ function selectModel(model) {
 }
 
 messageInput.addEventListener('input', () => {
-  messageInput.style.height = 'auto';
-  messageInput.style.height = `${messageInput.scrollHeight}px`;
+    messageInput.style.height = 'auto';
+    messageInput.style.height = `${messageInput.scrollHeight}px`;
 });
 
 function updateModelHeading() {
@@ -97,6 +98,24 @@ async function createAndAppendMessage(content, owner) {
   const md = window.markdownit();
   displayedText = md.render(displayedText);
   message.innerHTML = displayedText;
+
+  const actionButtons = document.createElement('div');
+  actionButtons.classList.add('action-buttons');
+
+  const deleteButton = document.createElement('button');
+  deleteButton.textContent = 'Delete';
+  deleteButton.classList.add('action-button-delete');
+  deleteButton.addEventListener('click', () => deleteMessage(message));
+
+  const copyButton = document.createElement('button');
+  copyButton.textContent = 'Copy';
+  copyButton.classList.add('action-button-copy');
+  copyButton.addEventListener('click', () => copyMessage(content));
+
+  actionButtons.appendChild(deleteButton);
+  actionButtons.appendChild(copyButton);
+
+  message.appendChild(actionButtons);
 
   chatHistory.insertBefore(message, aiThinkingMsg);
   chatHistory.scrollTop = chatHistory.scrollHeight;
@@ -155,27 +174,27 @@ function copyToClipboard(text) {
 }
 
 function clearChatHistory() {
-  Array.from(chatHistory.getElementsByClassName('message')).forEach((message) => {
+  Array.from(chatHistory.getElementsByClassName('message')).forEach(message => {
     chatHistory.removeChild(message);
   });
 
   messages = [
     {
-      role: 'system',
-      content: localStorage.getItem('systemRole') || '',
-    },
-  ];
+    role: 'system',
+    content: localStorage.getItem('systemRole') || '',
+  },
+];
 }
 
 systemRoleInput.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    let caret = systemRoleInput.selectionStart;
-    systemRoleInput.value = systemRoleInput.value.substring(0, caret) + '\n' + systemRoleInput.value.substring(caret);
-    systemRoleInput.selectionEnd = caret + 1;
-    localStorage.setItem('systemRole', systemRoleInput.value);
-    messages[0].content = systemRoleInput.value;
-  }
+if (event.key === 'Enter' && !event.shiftKey) {
+  event.preventDefault();
+  let caret = systemRoleInput.selectionStart;
+  systemRoleInput.value = systemRoleInput.value.substring(0, caret) + '\n' + systemRoleInput.value.substring(caret);
+  systemRoleInput.selectionEnd = caret + 1;
+  localStorage.setItem('systemRole', systemRoleInput.value);
+  messages[0].content = systemRoleInput.value;
+}
 });
 
 window.addEventListener('load', updateModelHeading);
