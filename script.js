@@ -102,11 +102,6 @@ async function createAndAppendMessage(content, owner) {
   const actionButtons = document.createElement('div');
   actionButtons.classList.add('action-buttons');
 
-  const editButton = document.createElement('button');
-  editButton.textContent = 'Edit';
-  editButton.classList.add('action-button-edit');
-  editButton.addEventListener('click', () => editMessage(message));
-
   const deleteButton = document.createElement('button');
   deleteButton.textContent = 'Delete';
   deleteButton.classList.add('action-button-delete');
@@ -117,7 +112,6 @@ async function createAndAppendMessage(content, owner) {
   copyButton.classList.add('action-button-copy');
   copyButton.addEventListener('click', () => copyMessage(content));
 
-  actionButtons.appendChild(editButton);
   actionButtons.appendChild(deleteButton);
   actionButtons.appendChild(copyButton);
 
@@ -141,23 +135,6 @@ function deleteMessage(message) {
   const messageIndex = Array.from(message.parentNode.children).indexOf(message);
   messages.splice(messageIndex, 1);
   message.remove();
-}
-
-function editMessage(messageNode) {
-  const currentMessage = messageNode.textContent;
-  
-  // Edit the message as needed
-  const newMessage = prompt("Edit your message", currentMessage);
-  
-  // Update the message in both the on-page HTML and the 'messages' array
-  if (newMessage) {
-    messageNode.textContent = newMessage;
-    const messageIndex = Array.from(messageNode.parentNode.children).indexOf(messageNode);
-    
-    // Here assuming the shape of each message in 'messages' to be {role:'...', content:'...'}
-    // Please adjust this line according to the data structure of your 'messages' array
-    messages[messageIndex].content = newMessage;
-  }
 }
 
 async function sendMessage() {
