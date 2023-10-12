@@ -179,7 +179,7 @@ async function regenerateMessage(messageElement, owner) {
 async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
-  const message = messageInput.value.trim();
+  const message = messageInput.value;
 
   if (!message) {
     alert('Please enter a message.');
