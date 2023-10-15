@@ -88,12 +88,16 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   return response.json();
 }
 
-async function createAndAppendMessage(content, owner) {
+function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
   message.dataset.raw = content;
 
   let displayedText = content;
+
+  displayedText = displayedText.replace(/\$(.*?)\$/g, (match, latexContent) => {
+    return `<span class="latex-inline">${latexContent}</span>`;
+  });
 
   const md = window.markdownit();
   displayedText = md.render(displayedText);
