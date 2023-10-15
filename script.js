@@ -95,11 +95,9 @@ function createAndAppendMessage(content, owner) {
 
   let displayedText = content;
 
-  if (content.includes('$$')) {
-    displayedText = md.render(displayedText);
-  } else if (content.includes('$')) {
-    displayedText = md.renderInline(displayedText);
-  }
+  displayedText = displayedText.replace(/\$(.*?)\$/g, (match, latexContent) => {
+    return `<span class="latex-inline">${latexContent}</span>`;
+  });
 
   const md = window.markdownit();
   displayedText = md.render(displayedText);
