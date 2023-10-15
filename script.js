@@ -103,9 +103,9 @@ MathJax.Hub.Config({
 });
 
   const md = window.markdownit();
+  displayedText = displayedText.replace(/\n/g, '<br>');
   displayedText = md.render(displayedText);
   message.innerHTML = displayedText;
-  displayedText = displayedText.replace(/\n/g, '<br>');
 
   const actionButtons = document.createElement('div');
   actionButtons.classList.add('action-buttons');
