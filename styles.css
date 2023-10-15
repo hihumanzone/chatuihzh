@@ -130,6 +130,10 @@ body {
   cursor: pointer;
 }
 
+#clear-button {
+  border-bottom: 0px solid #000;
+}
+
 #about {
   margin: 0 auto;
   margin-top: 6px;
