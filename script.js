@@ -94,7 +94,7 @@ function createAndAppendMessage(content, owner) {
   message.dataset.raw = content;
 
   let displayedText = content;
-
+    
 MathJax.Hub.Config({
   tex2jax: {
     inlineMath: [['$', '$'], ['\\(', '\\)']],
@@ -105,6 +105,7 @@ MathJax.Hub.Config({
   const md = window.markdownit();
   displayedText = md.render(displayedText);
   message.innerHTML = displayedText;
+  displayedText = displayedText.replace(/\n/g, '<br>');
 
   const actionButtons = document.createElement('div');
   actionButtons.classList.add('action-buttons');
