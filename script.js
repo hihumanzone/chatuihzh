@@ -95,9 +95,12 @@ function createAndAppendMessage(content, owner) {
 
   let displayedText = content;
 
-  displayedText = displayedText.replace(/\$(.*?)\$/g, (match, latexContent) => {
-    return `<span class="latex-inline">${latexContent}</span>`;
-  });
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],  // Recognize both $...$ and \(...\) as inline math
+    processEscapes: true
+  }
+});
 
   const md = window.markdownit();
   displayedText = md.render(displayedText);
