@@ -54,7 +54,7 @@ messageInput.addEventListener('input', () => {
 
 function updateModelHeading() {
   const modelHeading = document.querySelector('.class-h1');
-  modelHeading.textContent = `Chat with ${selectedModel}`;
+  modelHeading.textContent = `{selectedModel}`;
 }
 
 const ENDPOINT = apiEndpoint || 'https://nyx-beta.samirawm7.repl.co/openai/chat/completions';
