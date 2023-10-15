@@ -97,7 +97,7 @@ function createAndAppendMessage(content, owner) {
 
 MathJax.Hub.Config({
   tex2jax: {
-    inlineMath: [['$', '$'], ['\\(', '\\)']],  // Recognize both $...$ and \(...\) as inline math
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
     processEscapes: true
   }
 });
@@ -157,29 +157,16 @@ function deleteMessage(messageElement, content) {
 }
 
 async function regenerateMessage(messageElement, owner) {
-  // Find the index of the message in the messages array
   const messageIdx = messages.findIndex(msg => msg.content === messageElement.dataset.raw && msg.role === owner);
-  
-  // Remove the message from the messages array
   messages.splice(messageIdx, 1);
-  
-  // Remove the message from the chat history (HTML)
   chatHistory.removeChild(messageElement);
-  
-  // Reconstruct the previous user message from the messages array
   const userMessage = messages[messages.length - 1].content;
-  
-  // Re-send the user message to the API to regenerate the bot response
   const jsonResponse = await getBotResponse(apiKey, apiEndpoint, userMessage);
-
-  // Update the bot response in the messages array
   const botResponse = jsonResponse.choices[0].message.content;
   messages.push({
     role: 'assistant',
     content: botResponse,
   });
-
-  // Append the new bot response to the chat history
   createAndAppendMessage(botResponse, 'bot');
 }
 
