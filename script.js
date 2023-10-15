@@ -103,7 +103,6 @@ MathJax.Hub.Config({
 });
 
   const md = window.markdownit();
-  displayedText = displayedText.replace(/\n/g, '<br>');
   displayedText = md.render(displayedText);
   message.innerHTML = displayedText;
 
