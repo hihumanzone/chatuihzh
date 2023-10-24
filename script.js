@@ -6,12 +6,10 @@ const modelMenu = document.getElementById('model-menu');
 const aiThinkingMsg = document.getElementById('ai-thinking');
 const systemRoleInput = document.getElementById('system-role-input');
 
-let messages = [
-    {
-      role: 'system',
-      content: localStorage.getItem('systemRole') || '',
-    },
-];
+let messages = [{
+  role: 'system',
+  content: localStorage.getItem('systemRole') || '',
+}, ];
 
 let apiKey = localStorage.getItem('apiKey') || '';
 let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
@@ -23,7 +21,6 @@ apiEndpointInput.value = apiEndpoint;
 systemRoleInput.value = systemRole;
 selectModel(selectedModel);
 updateModelHeading();
-
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
@@ -48,8 +45,8 @@ function selectModel(model) {
 }
 
 messageInput.addEventListener('input', () => {
-    messageInput.style.height = 'auto';
-    messageInput.style.height = `${messageInput.scrollHeight}px`;
+  messageInput.style.height = 'auto';
+  messageInput.style.height = `${messageInput.scrollHeight}px`;
 });
 
 function updateModelHeading() {
@@ -94,13 +91,16 @@ function createAndAppendMessage(content, owner) {
   message.dataset.raw = content;
 
   let displayedText = content;
-    
-MathJax.Hub.Config({
-  tex2jax: {
-    inlineMath: [['$', '$'], ['\\(', '\\)']],
-    processEscapes: true
-  }
-});
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [
+        ['$', '$'],
+        ['\\(', '\\)']
+      ],
+      processEscapes: true
+    }
+  });
 
   const md = window.markdownit();
   displayedText = md.render(displayedText);
@@ -127,14 +127,14 @@ MathJax.Hub.Config({
   if (owner === 'bot') {
     const regenButton = document.createElement('button');
     regenButton.textContent = 'Regen';
-    regenButton.classList.add('action-button-regen');  
+    regenButton.classList.add('action-button-regen');
     regenButton.addEventListener('click', () => {
       regenerateMessage(message, owner);
     });
 
     actionButtons.appendChild(regenButton);
   }
-  
+
   message.appendChild(actionButtons);
 
   chatHistory.insertBefore(message, aiThinkingMsg);
@@ -212,23 +212,21 @@ function clearChatHistory() {
     chatHistory.removeChild(message);
   });
 
-  messages = [
-    {
+  messages = [{
     role: 'system',
     content: localStorage.getItem('systemRole') || '',
-  },
-];
+  }, ];
 }
 
 systemRoleInput.addEventListener('keydown', (event) => {
-if (event.key === 'Enter' && !event.shiftKey) {
-  event.preventDefault();
-  let caret = systemRoleInput.selectionStart;
-  systemRoleInput.value = systemRoleInput.value.substring(0, caret) + '\n' + systemRoleInput.value.substring(caret);
-  systemRoleInput.selectionEnd = caret + 1;
-  localStorage.setItem('systemRole', systemRoleInput.value);
-  messages[0].content = systemRoleInput.value;
-}
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    let caret = systemRoleInput.selectionStart;
+    systemRoleInput.value = systemRoleInput.value.substring(0, caret) + '\n' + systemRoleInput.value.substring(caret);
+    systemRoleInput.selectionEnd = caret + 1;
+    localStorage.setItem('systemRole', systemRoleInput.value);
+    messages[0].content = systemRoleInput.value;
+  }
 });
 
 window.addEventListener('load', updateModelHeading);
