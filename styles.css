@@ -11,7 +11,7 @@ body {
   text-transform: uppercase;
   text-align: center;
   font-size: 28px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .class-h2 {
@@ -112,7 +112,7 @@ body {
 #refresh-button,
 #clear-button,
 #about {
-  margin-top: 10px;
+  margin-top: 4px;
   padding: 10px 20px;
   background-color: #8D99AE;
   border: 1px solid #8D99AE;
