@@ -52,10 +52,10 @@ body {
   max-width: 800px;
   min-width: 300px;
   margin: 50px auto;
-  padding: 20px;
+  padding: 25px;
   background-color: #FFFFFF;
   border-radius: 15px;
-  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
 }
 
 #chat-history {
