@@ -8,6 +8,7 @@ body {
 }
 
 .class-h1 {
+  text-transform: uppercase;
   text-align: center;
   font-size: 28px;
   margin-bottom: 16px;
@@ -23,14 +24,13 @@ body {
 }
 
 .class-h3 {
-  text-align: left;
   font-size: 16px;
   margin-top: 20px;
 }
 
 .class-h4 {
   text-align: center;
-  background-color: #E1E8ED;
+  background-color: #F6F9FC;
   padding: 10px;
   margin: 20px 0;
   border-radius: 8px;
@@ -42,6 +42,7 @@ body {
   background-color: #E1E8ED;
   border-radius: 8px;
   cursor: pointer;
+  padding: 10px;
 }
 
 #chat-container {
@@ -71,6 +72,7 @@ body {
 #model-menu {
   padding: 30px;
   margin-bottom: 40px;
+  border-bottom: 2px solid #8D99AE;
 }
 
 #model-list li.selected {
@@ -142,5 +144,5 @@ body {
 
 .message.bot {
   align-self: flex-start;
-  background-color: #E1E8ED;
+  background-color: #F6F9FC;
 }
