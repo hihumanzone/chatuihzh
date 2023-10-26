@@ -31,7 +31,7 @@ body {
 .class-h4 {
   text-align: center;
   background-color: #F6F9FC;
-  padding: 10px;
+  padding: 5px 10px 0px 10px;
   margin: 20px 0;
   border-radius: 8px;
 }
@@ -42,7 +42,7 @@ body {
   background-color: #E1E8ED;
   border-radius: 8px;
   cursor: pointer;
-  padding: 10px;
+  padding: 7px;
 }
 
 #chat-container {
@@ -121,6 +121,27 @@ body {
   cursor: pointer;
 }
 
+#about {
+  margin: 0 auto;
+  margin-top: 6px;
+  padding: 5px 10px;
+  display: block;
+}
+
+table {
+  border: 0.8px solid #555;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  width: 100%;
+}
+
+th,
+td {
+  padding: 5px;
+  border: 1px solid #555;
+}
+
 #refresh-button {
   text-align: center;
   width: 100%;
@@ -129,12 +150,18 @@ body {
 
 .message {
   margin: 20px 0;
-  padding: 10px;
+  padding: 5px 10px 0px 10px;
+  max-width: 70%;
   word-wrap: break-word;
   white-space: pre-wrap;
   color: #333333;
   border-radius: 10px;
   border: 1px solid #8D99AE;
+}
+
+.message > * {
+  margin-bottom: -14px;
+  margin-top: 0px;
 }
 
 .message.user {
@@ -145,4 +172,78 @@ body {
 .message.bot {
   align-self: flex-start;
   background-color: #F6F9FC;
+}
+
+blockquote {
+    border-left: solid 2px #8D99AE;
+    color: #444;
+    margin-left: 2em;
+    padding-left: 1em;
+    background-color: #E1E8ED;
+}
+
+pre {
+    background-color: #E1E8ED;
+    color: #444;
+    padding: 1em;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+code {
+    background-color: #F6F9FC;
+    color: #444;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+}
+
+p code {
+    background-color: #E1E8ED;
+    color: #444;
+    padding: 2px 4px;
+    border-radius: 5px;
+}
+
+.message form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+.message textarea {
+  font-size: 14px;
+  resize: none;  
+  height: 50px;
+  margin-bottom: 10px;
+  padding: 5px;
+  border: 1px solid #8D99AE;
+  border-radius: 8px;
+  background-color: #F6F9FC;
+  color: #333333;
+}
+
+.message button {
+  padding: 5px;
+  background-color: #8D99AE;
+  border: 1px solid #8D99AE;
+  border-radius: 8px;
+  color: #FFFFFF;
+  cursor: pointer;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  background-color: #F6F9FC;
+  border: 0.8px solid #8D99AE;
+  color: #333333;
+}
+
+.action-button-edit,
+.action-button-delete,
+.action-button-copy {
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px;
 }
