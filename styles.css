@@ -50,12 +50,12 @@ body {
   flex-direction: column;
   width: 75%;
   max-width: 800px;
-  min-width: 400px;
+  min-width: 300px;
   margin: 50px auto;
-  padding: 30px;
+  padding: 20px;
   background-color: #FFFFFF;
   border-radius: 15px;
-  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.5);
 }
 
 #chat-history {
