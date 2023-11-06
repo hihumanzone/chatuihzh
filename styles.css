@@ -110,7 +110,9 @@ body {
 
 #api-key-input,
 #api-endpoint-input,
-#system-role-input {}
+#system-role-input {
+  width: 100%;
+}
 
 #send-button,
 #copy-button,
