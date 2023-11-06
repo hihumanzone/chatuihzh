@@ -18,7 +18,7 @@ body {
   text-align: center;
   font-size: 20px;
   padding: 6px;
-  background-color: #232323;
+  background-color: #222222;
   border-radius: 8px;
   cursor: pointer;
 }
@@ -38,8 +38,8 @@ body {
 
 #model-list li {
   margin-top: 6px;
-  border: 1px solid #8D99AE;
-  background-color: #232323;
+  border: 1px solid #444444;
+  background-color: #222222;
   border-radius: 8px;
   cursor: pointer;
   padding: 7px;
@@ -64,20 +64,20 @@ body {
   overflow-y: auto;
   height: 500px;
   padding: 15px;
-  border: 1px solid #8D99AE;
+  border: 1px solid #444444;
   border-radius: 8px;
-  background-color: #232323;
+  background-color: #222222;
 }
 
 #model-menu {
   padding: 30px;
   margin-bottom: 40px;
-  border-bottom: 2px solid #8D99AE;
+  border-bottom: 2px solid #444444;
 }
 
 #model-list li.selected {
   font-weight: bold;
-  background-color: #8D99AE;
+  background-color: #444444;
 }
 
 #api-key-input,
@@ -86,7 +86,7 @@ body {
 #message-input {
   margin-top: 6px;
   padding: 10px;
-  border: 1px solid #8D99AE;
+  border: 1px solid #444444;
   border-radius: 8px;
   background-color: #121212;
   color: #FFFFFF;
@@ -114,8 +114,8 @@ body {
 #about {
   margin-top: 4px;
   padding: 10px 20px;
-  background-color: #8D99AE;
-  border: 1px solid #8D99AE;
+  background-color: #444444;
+  border: 1px solid #444444;
   border-radius: 8px;
   color: #FFFFFF;
   cursor: pointer;
@@ -156,7 +156,7 @@ td {
   white-space: pre-wrap;
   color: #FFFFFF;
   border-radius: 10px;
-  border: 1px solid #8D99AE;
+  border: 1px solid #444444;
 }
 
 .message > * {
@@ -166,24 +166,24 @@ td {
 
 .message.user {
   align-self: flex-end;
-  background-color: #232323;
+  background-color: #222222;
 }
 
 .message.bot {
   align-self: flex-start;
-  background-color: #232323;
+  background-color: #222222;
 }
 
 blockquote {
-    border-left: solid 5px #8D99AE;
+    border-left: solid 5px #444444;
     color: #FFFFFF;
     margin-left: 2em;
     padding-left: 1em;
-    background-color: #232323;
+    background-color: #222222;
 }
 
 pre {
-    background-color: #232323;
+    background-color: #222222;
     color: #FFFFFF;
     padding: 1em;
     border-radius: 8px;
@@ -198,7 +198,7 @@ code {
 }
 
 p code {
-    background-color: #232323;
+    background-color: #222222;
     color: #FFFFFF;
     padding: 2px 4px;
     border-radius: 5px;
@@ -216,7 +216,7 @@ p code {
   height: 50px;
   margin-bottom: 10px;
   padding: 5px;
-  border: 1px solid #8D99AE;
+  border: 1px solid #444444;
   border-radius: 8px;
   background-color: #121212;
   color: #FFFFFF;
@@ -224,8 +224,8 @@ p code {
 
 .message button {
   padding: 5px;
-  background-color: #8D99AE;
-  border: 1px solid #8D99AE;
+  background-color: #444444;
+  border: 1px solid #444444;
   border-radius: 8px;
   color: #FFFFFF;
   cursor: pointer;
@@ -235,8 +235,8 @@ p code {
   display: flex;
   justify-content: space-between;
   margin-top: 4px;
-  background-color: #232323;
-  border: 0.8px solid #8D99AE;
+  background-color: #222222;
+  border: 0.8px solid #444444;
   color: #FFFFFF;
 }
 
