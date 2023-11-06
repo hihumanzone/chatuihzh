@@ -1,7 +1,7 @@
 body {
   font-family: Helvetica, sans-serif;
-  background-color: #F6F9FC;
-  color: #333333;
+  background-color: #111111;
+  color: #FFFFFF;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -18,7 +18,7 @@ body {
   text-align: center;
   font-size: 20px;
   padding: 6px;
-  background-color: #E1E8ED;
+  background-color: #1E1E1E;
   border-radius: 8px;
   cursor: pointer;
 }
@@ -30,7 +30,7 @@ body {
 
 .class-h4 {
   text-align: center;
-  background-color: #F6F9FC;
+  background-color: #111111;
   padding: 10px;
   margin: 20px 0;
   border-radius: 8px;
@@ -39,7 +39,7 @@ body {
 #model-list li {
   margin-top: 6px;
   border: 1px solid #8D99AE;
-  background-color: #E1E8ED;
+  background-color: #1E1E1E;
   border-radius: 8px;
   cursor: pointer;
   padding: 7px;
@@ -53,9 +53,9 @@ body {
   min-width: 300px;
   margin: 50px auto;
   padding: 25px;
-  background-color: #FFFFFF;
+  background-color: #1E1E1E;
   border-radius: 15px;
-  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 2px 2px 10px rgba(10, 10, 10, 0.75);
 }
 
 #chat-history {
@@ -66,7 +66,7 @@ body {
   padding: 15px;
   border: 1px solid #8D99AE;
   border-radius: 8px;
-  background-color: #E1E8ED;
+  background-color: #1E1E1E;
 }
 
 #model-menu {
@@ -88,8 +88,8 @@ body {
   padding: 10px;
   border: 1px solid #8D99AE;
   border-radius: 8px;
-  background-color: #F6F9FC;
-  color: #333333;
+  background-color: #111111;
+  color: #FFFFFF;
 }
 
 #system-role-input {
@@ -154,7 +154,7 @@ td {
   max-width: 70%;
   word-wrap: break-word;
   white-space: pre-wrap;
-  color: #333333;
+  color: #FFFFFF;
   border-radius: 10px;
   border: 1px solid #8D99AE;
 }
@@ -166,40 +166,40 @@ td {
 
 .message.user {
   align-self: flex-end;
-  background-color: #F6F9FC;
+  background-color: #1E1E1E;
 }
 
 .message.bot {
   align-self: flex-start;
-  background-color: #F6F9FC;
+  background-color: #1E1E1E;
 }
 
 blockquote {
     border-left: solid 5px #8D99AE;
-    color: #444;
+    color: #BBBBBB;
     margin-left: 2em;
     padding-left: 1em;
-    background-color: #E1E8ED;
+    background-color: #1E1E1E;
 }
 
 pre {
-    background-color: #E1E8ED;
-    color: #444;
+    background-color: #111111;
+    color: #BBBBBB;
     padding: 1em;
     border-radius: 8px;
     overflow-x: auto;
 }
 
 code {
-    background-color: #F6F9FC;
-    color: #444;
+    background-color: #1E1E1E;
+    color: #BBBBBB;
     padding: 0.2em 0.4em;
     border-radius: 3px;
 }
 
 p code {
-    background-color: #E1E8ED;
-    color: #444;
+    background-color: #1E1E1E;
+    color: #BBBBBB;
     padding: 2px 4px;
     border-radius: 5px;
 }
@@ -218,8 +218,8 @@ p code {
   padding: 5px;
   border: 1px solid #8D99AE;
   border-radius: 8px;
-  background-color: #F6F9FC;
-  color: #333333;
+  background-color: #1E1E1E;
+  color: #FFFFFF;
 }
 
 .message button {
@@ -235,9 +235,9 @@ p code {
   display: flex;
   justify-content: space-between;
   margin-top: 4px;
-  background-color: #F6F9FC;
+  background-color: #1E1E1E;
   border: 0.8px solid #8D99AE;
-  color: #333333;
+  color: #FFFFFF;
 }
 
 .action-button-edit,
