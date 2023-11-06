@@ -18,7 +18,7 @@ body {
   text-align: center;
   font-size: 20px;
   padding: 6px;
-  background-color: #262d34;
+  background-color: #555555;
   border-radius: 8px;
   cursor: pointer;
 }
@@ -55,7 +55,6 @@ body {
   padding: 25px;
   background-color: #333333;
   border-radius: 15px;
-  box-shadow: 0 3px 15px rgba(255, 255, 255, 0.2);
 }
 
 #chat-history {
@@ -109,12 +108,21 @@ body {
 
 #send-button,
 #copy-button,
-#refresh-button,
 #clear-button,
 #about {
   margin-top: 4px;
   padding: 10px 20px;
   background-color: #555555;
+  border: 1px solid #555555;
+  border-radius: 8px;
+  color: #EEEEEE;
+  cursor: pointer;
+}
+
+#refresh-button {
+  margin-top: 4px;
+  padding: 10px 20px;
+  background-color: #222222;
   border: 1px solid #555555;
   border-radius: 8px;
   color: #EEEEEE;
@@ -142,10 +150,9 @@ td {
   border: 1px solid #EEEEEE;
 }
 
-#refresh-button {
-  text-align: center;
-  width: 100%;
-  background-color: #EEEEEE;
+#refresh-button:hover,
+#about:hover {
+  background-color: #555555;
 }
 
 .message {
