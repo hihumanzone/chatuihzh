@@ -18,7 +18,7 @@ body {
   text-align: center;
   font-size: 20px;
   padding: 6px;
-  background-color: #434343;
+  background-color: #252525;
   border-radius: 8px;
   cursor: pointer;
 }
@@ -112,7 +112,7 @@ body {
 #about {
   margin-top: 4px;
   padding: 10px 20px;
-  background-color: #555555;
+  background-color: #2F2F2F;
   border: 1px solid #555555;
   border-radius: 8px;
   color: #F1F1F1;
@@ -242,7 +242,7 @@ p code {
   display: flex;
   justify-content: space-between;
   margin-top: 4px;
-  background-color: #1F1F1F;
+  background-color: #252525;
   border: 0.8px solid #555555;
   color: #F1F1F1;
 }
