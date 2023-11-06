@@ -74,7 +74,6 @@ body {
 }
 
 #model-menu {
-  display: flex;
   padding: 30px;
   margin-bottom: 40px;
   border-bottom: 2px solid #555555;
@@ -111,9 +110,7 @@ body {
 
 #api-key-input,
 #api-endpoint-input,
-#system-role-input {
-  flex-grow: 1;
-}
+#system-role-input {}
 
 #send-button,
 #copy-button,
