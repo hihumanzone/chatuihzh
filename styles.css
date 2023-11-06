@@ -53,7 +53,7 @@ body {
   min-width: 300px;
   margin: 50px auto;
   padding: 25px;
-  background-color: #252525;
+  background-color: #1F1F1F;
   border-radius: 15px;
 }
 
@@ -65,7 +65,7 @@ body {
   padding: 15px;
   border: 1px solid #555555;
   border-radius: 8px;
-  background-color: #292929;
+  background-color: #1B1B1B;
 }
 
 #model-menu {
