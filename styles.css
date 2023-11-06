@@ -37,7 +37,7 @@ body {
   border-radius: 8px;
 }
 
-#model-list span {
+#model-list div {
   margin-top: 6px;
   border: 1px solid #555555;
   background-color: #1F1F1F;
@@ -75,7 +75,7 @@ body {
   border-bottom: 2px solid #555555;
 }
 
-#model-list span.selected {
+#model-list div.selected {
   font-weight: bold;
   background-color: #292929;
 }
