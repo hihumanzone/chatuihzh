@@ -65,9 +65,9 @@
         } else {
           modelMenu.style.display = 'none';
         }
-      } else if (target.tagName === 'LI' && target.parentElement.id === 'model-list') {
-        const model = target.dataset.model;
-        selectModel(model);
+} else if (target.tagName === 'DIV' && target.parentElement.id === 'model-list') {
+  const model = target.dataset.model;
+  selectModel(model);
       } else if (target.classList.contains('copy-code-button')) {
         const codeBlock = target.parentElement.querySelector('pre');
         if (codeBlock) {
