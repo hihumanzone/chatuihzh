@@ -29,7 +29,7 @@ function toggleModelMenu() {
 }
 
 function selectModel(model) {
-  const modelOptions = document.querySelectorAll('ul li');
+  const modelOptions = document.querySelectorAll('.model-list span');
   modelOptions.forEach((option) => option.classList.remove('selected'));
 
   const selectedModelOption = document.querySelector(`ul li[data-model="${model}"]`);
