@@ -29,19 +29,19 @@ function toggleModelMenu() {
 }
 
 function selectModel(model) {
- const modelOptions = document.querySelectorAll('#model-list div');
- modelOptions.forEach((option) => option.classList.remove('selected'));
+  const modelOptions = document.querySelectorAll('#model-list div');
+  modelOptions.forEach((option) => option.classList.remove('selected'));
 
- const selectedModelOption = document.querySelector(`#model-list div[data-model="${model}"]`);
- if (selectedModelOption) {
-   selectedModelOption.classList.add('selected');
- }
+  const selectedModelOption = document.querySelector(`#model-list div[data-model="${model}"]`);
+  if (selectedModelOption) {
+    selectedModelOption.classList.add('selected');
+  }
 
- selectedModel = model;
- localStorage.setItem('selectedModel', selectedModel);
+  selectedModel = model;
+  localStorage.setItem('selectedModel', selectedModel);
 
- toggleModelMenu();
- updateModelHeading();
+  toggleModelMenu();
+  updateModelHeading();
 }
 
 messageInput.addEventListener('input', () => {
