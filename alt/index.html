@@ -21,7 +21,7 @@ body {
     border-radius: 5px;
     padding: 20px;
     margin-bottom: 20px;
-    height: 500px;
+    height: 300px;
     overflow-y: auto;
 }
 .chat-box .message {
@@ -32,11 +32,14 @@ body {
 }
 .chat-box .message.user {
     background: #dcf8c6;
-    align-self: flex-end;
+    text-align: right;
 }
 .chat-box .message.assistant {
     background: #e5e5ea;
-    align-self: flex-start;
+    text-align: left;
+}
+.chat-box .message.loading {
+    text-align: center;
 }
 .chat-controls {
     display: flex;
@@ -63,8 +66,12 @@ body {
 #apiSettings {
     margin-bottom: 20px;
 }
-#apiKey {
-    min-width: 200px;
+#apiKey, #apiEndpoint {
+    min-width: 300px;
+    margin-right: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
 }
 </style>
 </head>
@@ -78,12 +85,36 @@ body {
         <!-- Messages will be added here dynamically -->
     </div>
     <div class="chat-controls">
-        <input class="chat-input" id="userInput" type="text" placeholder="Say something..." onkeydown="if(event.key === 'Enter') { sendMessage(); }" />
+        <input class="chat-input" id="userInput" type="text" placeholder="Say something..." onkeydown="if(event.keyCode === 13) { sendMessage(); }" />
         <button class="button" onclick="sendMessage()">Send</button>
     </div>
 </div>
 
 <script>
+// Helper functions to manage cookies
+function setCookie(name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + (days*24*60*60*1000));
+    const expires = "expires="+ d.toUTCString();
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+}
+
+function getCookie(name) {
+    const cname = name + "=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(cname) === 0) {
+            return c.substring(cname.length, c.length);
+        }
+    }
+    return "";
+}
+
 const chatBox = document.getElementById('chatBox');
 const userInput = document.getElementById('userInput');
 const apiKeyInput = document.getElementById('apiKey');
@@ -92,6 +123,11 @@ const apiEndpointInput = document.getElementById('apiEndpoint');
 let messages = [];
 
 function appendMessage(role, content) {
+    const loadingMessage = chatBox.querySelector('.loading');
+    if (loadingMessage) {
+        chatBox.removeChild(loadingMessage);
+    }
+    
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', role);
     messageDiv.textContent = content;
@@ -99,18 +135,45 @@ function appendMessage(role, content) {
     chatBox.scrollTo(0, chatBox.scrollHeight);
 }
 
+function displayLoading() {
+    const loadingDiv = document.createElement('div');
+    loadingDiv.classList.add('message', 'loading');
+    loadingDiv.textContent = 'Loading...';
+    chatBox.appendChild(loadingDiv);
+    chatBox.scrollTo(0, chatBox.scrollHeight);
+}
+
+// Load API settings from cookies on page load
+window.onload = function() {
+    const storedApiKey = getCookie('apiKey');
+    const storedApiEndpoint = getCookie('apiEndpoint');
+    
+    if (storedApiKey) {
+        apiKeyInput.value = storedApiKey;
+    }
+    
+    if (storedApiEndpoint) {
+        apiEndpointInput.value = storedApiEndpoint;
+    }
+};
+
 function sendMessage() {
     const content = userInput.value.trim();
     const apiKey = apiKeyInput.value.trim();
     const apiEndpoint = apiEndpointInput.value.trim();
+    
+    // Save API settings in cookies
+    setCookie('apiKey', apiKey, 30);
+    setCookie('apiEndpoint', apiEndpoint, 30);
 
     if (!content || !apiKey || !apiEndpoint) {
         alert('Please enter a message, API key, and endpoint.');
         return;
     }
-
-    appendMessage('user', content);
     
+    appendMessage('user', content);
+    displayLoading();
+
     const requestBody = {
         model: "gpt-3.5-turbo",
         messages: messages.concat([{role: "user", content: content}])
@@ -132,6 +195,7 @@ function sendMessage() {
     })
     .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
+        appendMessage('assistant', 'Error: Could not reach the server.');
     });
 
     // Reset the input field
