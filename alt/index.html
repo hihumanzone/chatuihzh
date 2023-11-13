@@ -3,13 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dark Theme Chat UI</title>
+<title>Dark Theme Chat UI with Settings</title>
 <!-- Include the KaTeX CSS for LaTeX rendering -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.css" integrity="sha384-zB1R0o8wRlQdEM1mQoaesN5c5Ct66F9bHGSU1auMubwCohUVkK3ff+j5Ka6q0x40" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.css" 
+    integrity="sha384-zB1R0o8wRlQdEM1mQoaesN5c5Ct66F9bHGSU1auMubwCohUVkK3ff+j5Ka6q0x40" crossorigin="anonymous">
 <!-- Include the Markdown-it for Markdown rendering -->
 <script src="https://cdn.jsdelivr.net/npm/markdown-it@12.3.2/dist/markdown-it.min.js"></script>
 <!-- Include the KaTeX library for LaTeX rendering within Markdown -->
-<script src="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.js" integrity="sha384-kL3+9S00ouE5BPgccpphiXKGirknyCeV5e7JMATjzL/rle7PntTvCjGzyASdv7rI" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.js" 
+    integrity="sha384-kL3+9S00ouE5BPgccpphiXKGirknyCeV5e7JMATjzL/rle7PntTvCjGzyASdv7rI" crossorigin="anonymous"></script>
 <style>
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -73,32 +75,80 @@ body {
     background: #3a3a3a;
     cursor: not-allowed;
 }
-#apiSettings {
-    margin-bottom: 20px;
+.settings-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
 }
-#apiKey, #apiEndpoint {
-    min-width: 300px;
-    margin-right: 10px;
-    padding: 10px;
-    border: none;
+.settings-menu {
+    display: none;
+    position: fixed;
+    top: 0; right: 0; bottom: 0; left: 0;
+    background: rgba(0, 0, 0, 0.75);
+    justify-content: center;
+    align-items: center;
+}
+.settings-content {
+    background: #2e2e2e;
+    padding: 20px;
     border-radius: 5px;
-    color: #ffffff;
-    background: #252525;
+}
+.settings-field {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    color: #fff;
+    background: #3e3e3e;
+    border: none;
+    width: 100%;
+}
+#settingsClose {
+    float: right;
+    cursor: pointer;
+    font-size: 24px;
 }
 </style>
 </head>
 <body>
 <div class="chat-container">
-    <div id="apiSettings">
-        <input id="apiKey" type="text" placeholder="Enter your OpenAI API Key" />
-        <input id="apiEndpoint" type="text" placeholder="Enter API Endpoint" value="https://api.openai.com/v1/chat/completions" />
-    </div>
+    <span class="settings-button" onclick="toggleSettingsMenu()">⚙️</span>
     <div class="chat-box" id="chatBox">
         <!-- Messages will be added here dynamically -->
     </div>
     <div class="chat-controls">
         <input class="chat-input" id="userInput" type="text" placeholder="Say something..." onkeydown="if(event.keyCode === 13) { sendMessage(); }" />
         <button class="button" onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<div class="settings-menu" id="settingsMenu">
+    <div class="settings-content">
+        <span id="settingsClose" onclick="toggleSettingsMenu()">✖️</span>
+        <h2>Settings</h2>
+        <label for="apiKey">OpenAI API Key:</label>
+        <input id="apiKey" class="settings-field" type="text" placeholder="Enter your OpenAI API Key" />
+        <label for="apiEndpoint">API Endpoint:</label>
+        <input id="apiEndpoint" class="settings-field" type="text" placeholder="Enter API Endpoint" value="https://api.openai.com/v1/chat/completions" />
+        <label for="modelSelect">Choose a Model:</label>
+        <select id="modelSelect" class="settings-field">
+            <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+            <option value="gpt-3.5-turbo-0314">gpt-3.5-turbo-0314</option>
+            <option value="gpt-3.5-turbo-0613">gpt-3.5-turbo-0613</option>
+            <option value="gpt-3.5-turbo-1106">gpt-3.5-turbo-1106</option>
+            <option value="gpt-3.5-turbo-16k">gpt-3.5-turbo-16k</option>
+            <option value="gpt-3.5-turbo-16k-0314">gpt-3.5-turbo-16k-0314</option>
+            <option value="gpt-3.5-turbo-16k-0613">gpt-3.5-turbo-16k-0613</option>
+            <option value="gpt-4">gpt-4</option>
+            <option value="gpt-4-0314">gpt-4-0314</option>
+            <option value="gpt-4-0613">gpt-4-0613</option>
+            <option value="gpt-4-1106-preview">gpt-4-1106-preview</option>
+            <option value="gpt-4-32k">gpt-4-32k</option>
+            <option value="gpt-4-32k-0314">gpt-4-32k-0314</option>
+            <option value="gpt-4-32k-0613">gpt-4-32k-0613</option>
+        </select>
+        <button class="button" onclick="saveSettings()">Save Settings</button>
     </div>
 </div>
 
@@ -127,83 +177,96 @@ function getCookie(name) {
     return "";
 }
 
+// Global variables
 const chatBox = document.getElementById('chatBox');
 const userInput = document.getElementById('userInput');
 const apiKeyInput = document.getElementById('apiKey');
 const apiEndpointInput = document.getElementById('apiEndpoint');
+const modelSelect = document.getElementById('modelSelect');
+const settingsMenu = document.getElementById('settingsMenu');
 const markdown = window.markdownit();
-
 let messages = [];
+let openAIModel = 'gpt-3.5-turbo';
 
+// Function to append messages to chat
 function appendMessage(role, rawContent) {
-    const loadingMessage = chatBox.querySelector('.loading');
-    if (loadingMessage) {
-        chatBox.removeChild(loadingMessage);
-    }
-    
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', role);
-    messageDiv.innerHTML = markdown.render(rawContent); // Render Markdown to HTML
-    chatBox.appendChild(messageDiv);
     
-    // KaTeX Rendering
-    messageDiv.querySelectorAll('.katex').forEach(katexElem => {
-        const katexText = katexElem.textContent;
+    // Delimit LaTeX code with $$...$$ for block and $...$ for inline
+    const contentWithKatex = rawContent.replace(/\$\$([^$]+)\$\$/gm, (match, p1) => {
         try {
-            katex.render(katexText, katexElem);
-        } catch (e) {
-            katexElem.style.color = 'red';
-            katexElem.textContent = 'Error rendering LaTeX';
+            return katex.renderToString(p1, { displayMode: true });
+        } catch {
+            return `<span class="katex-error">Error rendering LaTeX: ${match}</span>`;
+        }
+    }).replace(/\$([^$]+)\$/gm, (match, p1) => {
+        try {
+            return katex.renderToString(p1, { displayMode: false });
+        } catch {
+            return `<span class="katex-error">Error rendering LaTeX: ${match}</span>`;
         }
     });
 
+    messageDiv.innerHTML = markdown.render(contentWithKatex); // Render Markdown with KaTeX to HTML
+    chatBox.appendChild(messageDiv);
     chatBox.scrollTo(0, chatBox.scrollHeight);
 }
 
-function displayLoading() {
-    const loadingDiv = document.createElement('div');
-    loadingDiv.classList.add('message', 'loading');
-    loadingDiv.textContent = 'Loading...';
-    chatBox.appendChild(loadingDiv);
-    chatBox.scrollTo(0, chatBox.scrollHeight);
+// Function to toggle the settings menu visibility
+function toggleSettingsMenu() {
+    settingsMenu.style.display = settingsMenu.style.display === 'flex' ? 'none' : 'flex';
 }
 
-// Load API settings from cookies on page load
+// Function to save settings and close the settings menu
+function saveSettings() {
+    setCookie('apiKey', apiKeyInput.value.trim(), 365);
+    setCookie('apiEndpoint', apiEndpointInput.value.trim(), 365);
+    setCookie('model', modelSelect.value, 365);
+    openAIModel = modelSelect.value;
+    toggleSettingsMenu();
+}
+
+// Function to load settings from cookies
 window.onload = function() {
     const storedApiKey = getCookie('apiKey');
     const storedApiEndpoint = getCookie('apiEndpoint');
+    const storedModel = getCookie('model');
     
-    if (storedApiKey) {
-        apiKeyInput.value = storedApiKey;
-    }
-    
-    if (storedApiEndpoint) {
-        apiEndpointInput.value = storedApiEndpoint;
+    if (storedApiKey) apiKeyInput.value = storedApiKey;
+    if (storedApiEndpoint) apiEndpointInput.value = storedApiEndpoint;
+    if (storedModel) {
+        modelSelect.value = storedModel;
+        openAIModel = storedModel;
     }
 };
 
+// Function to send message and fetch reply from OpenAI API
 function sendMessage() {
+    // Prevents sending empty messages
     const content = userInput.value.trim();
+    if (!content) {
+        alert('Please enter a message.');
+        return;
+    }
+
     const apiKey = apiKeyInput.value.trim();
     const apiEndpoint = apiEndpointInput.value.trim();
     
-    // Save API settings in cookies
-    setCookie('apiKey', apiKey, 30);
-    setCookie('apiEndpoint', apiEndpoint, 30);
-
-    if (!content || !apiKey || !apiEndpoint) {
-        alert('Please enter a message, API key, and endpoint.');
+    if (!apiKey || !apiEndpoint) {
+        alert('Please configure API settings.');
         return;
     }
     
     appendMessage('user', content);
-    displayLoading();
-
+    messages.push({role: "user", content: content});
+    
+    // Send API request
     const requestBody = {
-        model: "gpt-3.5-turbo",
-        messages: messages.concat([{role: "user", content: content}])
+        model: openAIModel,
+        messages: messages
     };
-
+    
     fetch(apiEndpoint, {
         method: 'POST',
         headers: {
@@ -223,12 +286,7 @@ function sendMessage() {
         appendMessage('assistant', 'Error: Could not reach the server.');
     });
 
-    // Reset the input field
-    userInput.value = '';
-    // Add the last user message to the messages array
-    if(content) {
-        messages.push({role: "user", content: content});
-    }
+    userInput.value = ''; // Clear input field
 }
 </script>
 </body>
