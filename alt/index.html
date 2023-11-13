@@ -3,23 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chat with GPT</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
+<title>Dark Theme Chat UI</title>
+<!-- Include the KaTeX CSS for LaTeX rendering -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.css" integrity="sha384-zB1R0o8wRlQdEM1mQoaesN5c5Ct66F9bHGSU1auMubwCohUVkK3ff+j5Ka6q0x40" crossorigin="anonymous">
+<!-- Include the Markdown-it for Markdown rendering -->
+<script src="https://cdn.jsdelivr.net/npm/markdown-it@12.3.2/dist/markdown-it.min.js"></script>
+<!-- Include the KaTeX library for LaTeX rendering within Markdown -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.13.18/dist/katex.min.js" integrity="sha384-kL3+9S00ouE5BPgccpphiXKGirknyCeV5e7JMATjzL/rle7PntTvCjGzyASdv7rI" crossorigin="anonymous"></script>
 <style>
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #1a1a1a;
+    background: #121212;
     margin: 0;
-    padding: 0;
-    color: #ddd;
+    padding: 20px;
+    color: #ffffff;
 }
 .chat-container {
     max-width: 800px;
     margin: auto;
-    padding: 20px;
 }
 .chat-box {
-    background: #333;
+    background: #1e1e1e;
     border-radius: 5px;
     padding: 20px;
     margin-bottom: 20px;
@@ -31,20 +35,19 @@ body {
     margin: 5px;
     border-radius: 5px;
     position: relative;
+    word-wrap: break-word;
 }
 .chat-box .message.user {
-    background: #0b93f6;
-    align-self: flex-end;
-    color: white;
+    background: #005c97;
+    color: #f8f8f8;
 }
 .chat-box .message.assistant {
-    background: #4e4e50;
-    color: white;
-    align-self: flex-start;
+    background: #2b2b2b;
+    color: #cccccc;
 }
 .chat-box .message.loading {
+    color: #bbbbbb;
     text-align: center;
-    color: #999;
 }
 .chat-controls {
     display: flex;
@@ -53,10 +56,10 @@ body {
     flex-grow: 1;
     padding: 10px;
     margin-right: 10px;
-    border: 1px solid #777;
+    border: none;
     border-radius: 5px;
-    background: #333;
-    color: #ddd;
+    color: #f8f8f8;
+    background: #252525;
 }
 .button {
     padding: 10px 20px;
@@ -67,7 +70,7 @@ body {
     cursor: pointer;
 }
 .button:disabled {
-    background: #555;
+    background: #3a3a3a;
     cursor: not-allowed;
 }
 #apiSettings {
@@ -77,18 +80,12 @@ body {
     min-width: 300px;
     margin-right: 10px;
     padding: 10px;
-    border: 1px solid #777;
+    border: none;
     border-radius: 5px;
-    background: #333;
-    color: #ddd;
+    color: #ffffff;
+    background: #252525;
 }
 </style>
-
-<!-- KaTeX for LaTeX rendering -->
-<script src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js" crossorigin="anonymous"></script>
-
-<!-- Showdown for Markdown -->
-<script src="https://cdn.jsdelivr.net/npm/showdown@1.10.0/dist/showdown.min.js"></script>
 </head>
 <body>
 <div class="chat-container">
@@ -134,14 +131,11 @@ const chatBox = document.getElementById('chatBox');
 const userInput = document.getElementById('userInput');
 const apiKeyInput = document.getElementById('apiKey');
 const apiEndpointInput = document.getElementById('apiEndpoint');
+const markdown = window.markdownit();
 
 let messages = [];
 
-function appendMessage(role, content, renderMarkdownAndLatex = false) {
-    if (renderMarkdownAndLatex) {
-        content = renderContent(content);
-    }
-    
+function appendMessage(role, rawContent) {
     const loadingMessage = chatBox.querySelector('.loading');
     if (loadingMessage) {
         chatBox.removeChild(loadingMessage);
@@ -149,8 +143,20 @@ function appendMessage(role, content, renderMarkdownAndLatex = false) {
     
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', role);
-    messageDiv.innerHTML = renderMarkdownAndLatex ? content : document.createTextNode(content).textContent;
+    messageDiv.innerHTML = markdown.render(rawContent); // Render Markdown to HTML
     chatBox.appendChild(messageDiv);
+    
+    // KaTeX Rendering
+    messageDiv.querySelectorAll('.katex').forEach(katexElem => {
+        const katexText = katexElem.textContent;
+        try {
+            katex.render(katexText, katexElem);
+        } catch (e) {
+            katexElem.style.color = 'red';
+            katexElem.textContent = 'Error rendering LaTeX';
+        }
+    });
+
     chatBox.scrollTo(0, chatBox.scrollHeight);
 }
 
@@ -209,7 +215,7 @@ function sendMessage() {
     .then(response => response.json())
     .then(data => {
         const assistantMessage = data.choices[0].message.content.trim();
-        appendMessage('assistant', assistantMessage, true); // Pass true to indicate content should be rendered
+        appendMessage('assistant', assistantMessage);
         messages.push({role: "assistant", content: assistantMessage});
     })
     .catch(error => {
@@ -217,29 +223,12 @@ function sendMessage() {
         appendMessage('assistant', 'Error: Could not reach the server.');
     });
 
-    userInput.value = ''; // Reset the input field
-    messages.push({role: "user", content: content}); // Add user's message to the messages array
-}
-
-// Rendering Markdown and LaTeX
-function renderContent(content) {
-    // Use showdown library for Markdown
-    const converter = new showdown.Converter();
-    let html = converter.makeHtml(content);
-
-    // Render LaTeX using KaTeX
-    html = html.replace(/\$([^\$]+)\$/g, (match, tex) => {
-        try {
-            return katex.renderToString(tex, {
-                throwOnError: false // Do not throw on errors, render them as is
-            });
-        } catch (e) {
-            console.error('Error rendering LaTeX:', e);
-            return tex;
-        }
-    });
-
-    return html;
+    // Reset the input field
+    userInput.value = '';
+    // Add the last user message to the messages array
+    if(content) {
+        messages.push({role: "user", content: content});
+    }
 }
 </script>
 </body>
