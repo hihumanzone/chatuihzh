@@ -61,31 +61,25 @@
       });
     }
   </script>
-  <script>
-    document.addEventListener('click', function(event) {
-      const target = event.target;
-      if (target.id === 'settings') {
-        const modelMenu = document.getElementById('model-menu');
-        if (modelMenu.style.display === 'none') {
-          modelMenu.style.display = 'block';
-        } else {
-          modelMenu.style.display = 'none';
-        }
-} else if (target.tagName === 'DIV' && target.parentElement.id === 'model-list') {
-  const model = target.dataset.model;
-  selectModel(model);
-      } else if (target.classList.contains('copy-code-button')) {
-        const codeBlock = target.parentElement.querySelector('pre');
-        if (codeBlock) {
-          copyToClipboard(codeBlock.textContent);
-          alert('Code copied to clipboard');
-        }
-      } else if (target.id === 'clear-button') {
-        clearChatHistory();
-      } else if (target.id === 'refresh-button') {
-        saveInputsAndRefresh();
+<script>
+  document.addEventListener('click', function(event) {
+    const target = event.target;
+    if (target.id === 'settings') {
+      const modelMenu = document.getElementById('model-menu');
+      if (modelMenu.style.display === 'none') {
+        modelMenu.style.display = 'block';
+      } else {
+        modelMenu.style.display = 'none';
       }
-    });
-  </script>
+    } else if (target.tagName === 'DIV' && target.parentElement.id === 'model-list') {
+      const model = target.dataset.model;
+      selectModel(model);
+    } else if (target.id === 'clear-button') {
+      clearChatHistory();
+    } else if (target.id === 'refresh-button') {
+      saveInputsAndRefresh();
+    }
+  });
+</script>
 </body>
 </html>
