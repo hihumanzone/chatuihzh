@@ -219,6 +219,18 @@ p code {
     border-radius: 5px;
 }
 
+.copy-code-button {
+  margin-top: 8px;
+  padding: 4px 8px;
+  font-size: 14px;
+  background-color: #555555;
+  color: #ffffff;
+  border: 1px solid #3f3f3f;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-block;
+}
+
 .message form {
   display: flex;
   flex-direction: column;
