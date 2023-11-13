@@ -54,7 +54,7 @@ function updateModelHeading() {
   modelHeading.textContent = `${selectedModel}`;
 }
 
-const ENDPOINT = apiEndpoint || 'https://nyx-beta.samirawm7.repl.co/openai/chat/completions';
+const ENDPOINT = apiEndpoint || 'https://api.openai.com/v1/chat/completions';
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
