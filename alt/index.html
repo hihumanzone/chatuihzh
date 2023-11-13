@@ -4,12 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chat with GPT</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css">
 <style>
 body {
-    font-family: Arial, sans-serif;
-    background: #f4f4f4;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #1a1a1a;
     margin: 0;
     padding: 0;
+    color: #ddd;
 }
 .chat-container {
     max-width: 800px;
@@ -17,11 +19,11 @@ body {
     padding: 20px;
 }
 .chat-box {
-    background: #fff;
+    background: #333;
     border-radius: 5px;
     padding: 20px;
     margin-bottom: 20px;
-    height: 300px;
+    height: 500px;
     overflow-y: auto;
 }
 .chat-box .message {
@@ -31,15 +33,18 @@ body {
     position: relative;
 }
 .chat-box .message.user {
-    background: #dcf8c6;
-    text-align: right;
+    background: #0b93f6;
+    align-self: flex-end;
+    color: white;
 }
 .chat-box .message.assistant {
-    background: #e5e5ea;
-    text-align: left;
+    background: #4e4e50;
+    color: white;
+    align-self: flex-start;
 }
 .chat-box .message.loading {
     text-align: center;
+    color: #999;
 }
 .chat-controls {
     display: flex;
@@ -48,8 +53,10 @@ body {
     flex-grow: 1;
     padding: 10px;
     margin-right: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid #777;
     border-radius: 5px;
+    background: #333;
+    color: #ddd;
 }
 .button {
     padding: 10px 20px;
@@ -60,7 +67,7 @@ body {
     cursor: pointer;
 }
 .button:disabled {
-    background: #c5d9ed;
+    background: #555;
     cursor: not-allowed;
 }
 #apiSettings {
@@ -70,10 +77,18 @@ body {
     min-width: 300px;
     margin-right: 10px;
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid #777;
     border-radius: 5px;
+    background: #333;
+    color: #ddd;
 }
 </style>
+
+<!-- KaTeX for LaTeX rendering -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.js" crossorigin="anonymous"></script>
+
+<!-- Showdown for Markdown -->
+<script src="https://cdn.jsdelivr.net/npm/showdown@1.10.0/dist/showdown.min.js"></script>
 </head>
 <body>
 <div class="chat-container">
@@ -122,7 +137,11 @@ const apiEndpointInput = document.getElementById('apiEndpoint');
 
 let messages = [];
 
-function appendMessage(role, content) {
+function appendMessage(role, content, renderMarkdownAndLatex = false) {
+    if (renderMarkdownAndLatex) {
+        content = renderContent(content);
+    }
+    
     const loadingMessage = chatBox.querySelector('.loading');
     if (loadingMessage) {
         chatBox.removeChild(loadingMessage);
@@ -130,7 +149,7 @@ function appendMessage(role, content) {
     
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message', role);
-    messageDiv.textContent = content;
+    messageDiv.innerHTML = renderMarkdownAndLatex ? content : document.createTextNode(content).textContent;
     chatBox.appendChild(messageDiv);
     chatBox.scrollTo(0, chatBox.scrollHeight);
 }
@@ -190,7 +209,7 @@ function sendMessage() {
     .then(response => response.json())
     .then(data => {
         const assistantMessage = data.choices[0].message.content.trim();
-        appendMessage('assistant', assistantMessage);
+        appendMessage('assistant', assistantMessage, true); // Pass true to indicate content should be rendered
         messages.push({role: "assistant", content: assistantMessage});
     })
     .catch(error => {
@@ -198,14 +217,30 @@ function sendMessage() {
         appendMessage('assistant', 'Error: Could not reach the server.');
     });
 
-    // Reset the input field
-    userInput.value = '';
-    // Add the last user message to the messages array
-    if(content) {
-        messages.push({role: "user", content: content});
-    }
+    userInput.value = ''; // Reset the input field
+    messages.push({role: "user", content: content}); // Add user's message to the messages array
 }
 
+// Rendering Markdown and LaTeX
+function renderContent(content) {
+    // Use showdown library for Markdown
+    const converter = new showdown.Converter();
+    let html = converter.makeHtml(content);
+
+    // Render LaTeX using KaTeX
+    html = html.replace(/\$([^\$]+)\$/g, (match, tex) => {
+        try {
+            return katex.renderToString(tex, {
+                throwOnError: false // Do not throw on errors, render them as is
+            });
+        } catch (e) {
+            console.error('Error rendering LaTeX:', e);
+            return tex;
+        }
+    });
+
+    return html;
+}
 </script>
 </body>
 </html>
