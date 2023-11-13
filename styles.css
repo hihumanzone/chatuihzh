@@ -35,6 +35,8 @@ body {
   text-align: center;
   font-size: 18px;
   padding: 4px;
+  color: #F1F1F1;
+  border: 1px solid #555555;
   background-color: #2F2F2F;
   border-radius: 8px;
   cursor: pointer;
@@ -118,7 +120,6 @@ body {
 #copy-button,
 #clear-button,
 #refresh-button,
-#settings,
 #about {
   margin-top: 4px;
   padding: 8px;
