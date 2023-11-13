@@ -14,15 +14,6 @@ body {
   margin-bottom: 8px;
 }
 
-.settings {
-  text-align: center;
-  font-size: 18px;
-  padding: 4px;
-  background-color: #2F2F2F;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
 .class-h3 {
   text-align: center;
   font-size: 16px;
@@ -118,6 +109,7 @@ body {
 #copy-button,
 #clear-button,
 #refresh-button,
+#settings,
 #about {
   margin-top: 4px;
   padding: 8px;
@@ -126,6 +118,15 @@ body {
   border: 1px solid #555555;
   border-radius: 8px;
   color: #F1F1F1;
+  cursor: pointer;
+}
+
+.settings {
+  text-align: center;
+  font-size: 18px;
+  padding: 4px;
+  background-color: #2F2F2F;
+  border-radius: 8px;
   cursor: pointer;
 }
 
