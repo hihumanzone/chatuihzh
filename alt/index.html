@@ -1,18 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>GPT Chat Interface</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat with GPT</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+.chat-container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+}
+.chat-box {
+    background: #fff;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+    height: 500px;
+    overflow-y: auto;
+}
+.chat-box .message {
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 5px;
+    position: relative;
+}
+.chat-box .message.user {
+    background: #dcf8c6;
+    align-self: flex-end;
+}
+.chat-box .message.assistant {
+    background: #e5e5ea;
+    align-self: flex-start;
+}
+.chat-controls {
+    display: flex;
+}
+.chat-input {
+    flex-grow: 1;
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+.button {
+    padding: 10px 20px;
+    background: #0b93f6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.button:disabled {
+    background: #c5d9ed;
+    cursor: not-allowed;
+}
+#apiSettings {
+    margin-bottom: 20px;
+}
+#apiKey {
+    min-width: 200px;
+}
+</style>
 </head>
 <body>
-    <div id="chat-container">
-        <div id="chat-box"></div>
-        <input type="text" id="api-endpoint" placeholder="API Endpoint">
-        <input type="text" id="api-key" placeholder="OpenAI API Key">
-        <textarea id="user-input" placeholder="Your message..."></textarea>
-        <button id="send-btn">Send</button>
+<div class="chat-container">
+    <div id="apiSettings">
+        <input id="apiKey" type="text" placeholder="Enter your OpenAI API Key" />
+        <input id="apiEndpoint" type="text" placeholder="Enter API Endpoint" value="https://api.openai.com/v1/chat/completions" />
     </div>
-    <script src="scripts.js"></script>
+    <div class="chat-box" id="chatBox">
+        <!-- Messages will be added here dynamically -->
+    </div>
+    <div class="chat-controls">
+        <input class="chat-input" id="userInput" type="text" placeholder="Say something..." onkeydown="if(event.key === 'Enter') { sendMessage(); }" />
+        <button class="button" onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+const chatBox = document.getElementById('chatBox');
+const userInput = document.getElementById('userInput');
+const apiKeyInput = document.getElementById('apiKey');
+const apiEndpointInput = document.getElementById('apiEndpoint');
+
+let messages = [];
+
+function appendMessage(role, content) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', role);
+    messageDiv.textContent = content;
+    chatBox.appendChild(messageDiv);
+    chatBox.scrollTo(0, chatBox.scrollHeight);
+}
+
+function sendMessage() {
+    const content = userInput.value.trim();
+    const apiKey = apiKeyInput.value.trim();
+    const apiEndpoint = apiEndpointInput.value.trim();
+
+    if (!content || !apiKey || !apiEndpoint) {
+        alert('Please enter a message, API key, and endpoint.');
+        return;
+    }
+
+    appendMessage('user', content);
+    
+    const requestBody = {
+        model: "gpt-3.5-turbo",
+        messages: messages.concat([{role: "user", content: content}])
+    };
+
+    fetch(apiEndpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify(requestBody)
+    })
+    .then(response => response.json())
+    .then(data => {
+        const assistantMessage = data.choices[0].message.content.trim();
+        appendMessage('assistant', assistantMessage);
+        messages.push({role: "assistant", content: assistantMessage});
+    })
+    .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+    });
+
+    // Reset the input field
+    userInput.value = '';
+    // Add the last user message to the messages array
+    if(content) {
+        messages.push({role: "user", content: content});
+    }
+}
+
+</script>
 </body>
 </html>
