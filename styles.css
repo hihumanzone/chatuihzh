@@ -176,7 +176,7 @@ td {
 
 .message > * {
   margin-bottom: -28px;
-  margin-top: 0px;
+  margin-top: -14px;
 }
 
 .message.user {
