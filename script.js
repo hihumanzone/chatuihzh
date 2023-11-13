@@ -90,7 +90,9 @@ function createAndAppendMessage(content, owner) {
   message.classList.add('message', owner);
   message.dataset.raw = content;
 
-  let displayedText = content;
+  const messageText = document.createElement('div');
+  messageText.classList.add('message-text');
+  message.appendChild(messageText);
 
   MathJax.Hub.Config({
     tex2jax: {
@@ -103,8 +105,21 @@ function createAndAppendMessage(content, owner) {
   });
 
   const md = window.markdownit();
-  displayedText = md.render(displayedText);
-  message.innerHTML = displayedText;
+  const displayedText = md.render(content);
+  messageText.innerHTML = displayedText;
+
+  const codeBlocks = message.querySelectorAll('pre code');
+  codeBlocks.forEach(code => {
+    const copyCodeButton = document.createElement('button');
+    copyCodeButton.classList.add('copy-code-button');
+    copyCodeButton.textContent = 'Copy Code';
+    copyCodeButton.addEventListener('click', () => {
+      copyToClipboard(code.innerText || code.textContent);
+      alert('Code copied to clipboard');
+    });
+    const codeBlockContainer = code.parentNode;
+    codeBlockContainer.appendChild(copyCodeButton);
+  });
 
   const actionButtons = document.createElement('div');
   actionButtons.classList.add('action-buttons');
@@ -139,7 +154,7 @@ function createAndAppendMessage(content, owner) {
 
   chatHistory.insertBefore(message, aiThinkingMsg);
   chatHistory.scrollTop = chatHistory.scrollHeight;
-  MathJax.Hub.Queue(['Typeset', MathJax.Hub, message]);
+  MathJax.Hub.Queue(['Typeset', MathJax.Hub, messageText]);
 }
 
 function copyMessage(content) {
