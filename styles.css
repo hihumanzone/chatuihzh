@@ -1,130 +1,159 @@
-/* Reset styles */
-* {
-  margin: 30px;
-  padding: 0;
+/* Reset some built-in styles for a consistent look */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-/* Apply Material You color palette */
-:root {
-  --primary-color: #6750A4;
-  --on-primary-color: #FFFFFF;
-  --surface-color: #FFFBFE;
-  --on-surface-color: #1C1B1F;
-  --error-color: #B3261E;
-  --background-color: #FFFBFE;
-  --accent-color: #03DAC5;
-}
-
-/* Style the body with a background color and set text defaults */
 body {
-  background-color: var(--background-color);
-  font-family: 'Roboto', sans-serif; /* Material Design recommends Roboto */
-  color: var(--on-surface-color);
+  font-family: 'Roboto', sans-serif;
+  background-color: #f5f5f5;
+  color: #202124;
+  line-height: 1.5;
+  font-size: 16px;
 }
 
-/* Style for buttons */
-button {
-  padding: 8px 16px;
+/* Classes and styles based on Material Design 3 */
+.settings, #refresh-button, #clear-button, #send-button, .copy-code-button, .action-button-copy, .action-button-delete, .action-button-regen {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  padding: 10px 16px;
+  background-color: #ffffff;
+  color: #202124;
   border: none;
-  border-radius: 16px;
-  background: var(--primary-color);
-  color: var(--on-primary-color);
-  font-weight: 500; /* Material You uses medium typography often */
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
-  box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2),
-              0px 2px 2px 0px rgba(0,0,0,0.14),
-              0px 1px 5px 0px rgba(0,0,0,0.12); /* Elevation as per Material Design 3 */
-}
-
-button:active {
-  /* Slightly darker shade on active */
-  background: #5E4CA9;
-  transform: translateY(2px); /* Simulated press effect */
-}
-
-/* Style for the settings and send buttons, inheriting general button styles */
-.settings, #send-button, #clear-button, #refresh-button {
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-top: 10px; /* Spacing between elements */
-}
-
-/* Style for the "model-menu" container */
-#model-menu {
-  padding: 20px;
-  background-color: var(--surface-color);
   border-radius: 8px;
-  margin: 20px;
-  box-shadow: 0px 8px 10px -5px rgba(0,0,0,0.2),
-              0px 16px 24px 2px rgba(0,0,0,0.14),
-              0px 6px 30px 5px rgba(0,0,0,0.12);
-  display: none; /* By default, settings menu is hidden */
+  cursor: pointer;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 1px 3px 1px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.settings:hover, #refresh-button:hover, #clear-button:hover, #send-button:hover, .copy-code-button:hover, .action-button-copy:hover, .action-button-delete:hover, .action-button-regen:hover {
+  background-color: #e0e0e0;
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
+}
+
+.settings:focus, #refresh-button:focus, #clear-button:focus, #send-button:focus, .copy-code-button:focus, .action-button-copy:focus, .action-button-delete:focus, .action-button-regen:focus {
+  outline: none;
+  background-color: #ebebeb;
+}
+
+#model-menu {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+  display: none; /* Initially hidden */
+}
+
+#model-list div {
+  padding: 10px 15px;
+  margin: 5px 0;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+#model-list div:hover {
+  background-color: #e0e0e0;
+  cursor: pointer;
+}
+
+#model-list div.selected {
+  background-color: #d1e8ff;
+  font-weight: 600;
 }
 
 .options {
-  font-weight: 500;
-  margin-top: 16px;
-  margin-bottom: 8px;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
 }
 
-/* Specific styles for input fields */
-input[type="text"], input[type="password"], textarea {
-  width: calc(100% - 40px);
-  margin: 10px 0;
+textarea, input[type="password"], #api-endpoint-input {
+  width: 100%;
   padding: 10px;
-  border: none;
-  border-radius: 8px;
-  background-color: var(--surface-color);
-  color: var(--on-surface-color);
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+  margin: 0.5rem 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #ffffff;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-/* Dividers */
-#model-list > div:not(:last-child) {
-  border-bottom: 1px solid #EAEAEA;
+textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
-#model-list > div {
-  padding: 12px 0;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-#model-list > div:hover, #model-list > div.selected {
-  background-color: var(--accent-color);
-  color: var(--on-primary-color);
-}
-
-/* Style for chat history */
+/* Chat message styles inspired by material design */
 #chat-history {
-  max-height: 500px;
+  max-height: 70vh;
   overflow-y: auto;
+  margin: 20px 0;
   padding: 10px;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075);
 }
 
-.generating {
-  color: var(--primary-color);
-  font-style: italic;
+.message {
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Textarea adjustments */
-textarea {
-  padding: 12px;
-  border-radius: 16px;
-  border: none;
-  width: calc(100% - 48px);
-  margin: 10px 0;
-  background-color: var(--surface-color);
-  color: var(--on-surface-color);
-  resize: none; /* Disabling textarea resize */
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
-  transition: box-shadow 0.3s;
+.message.user {
+  background-color: #f0f0f0;
+  align-self: flex-end;
 }
 
-textarea:focus {
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.12); /* Heightened focus effect */
-  outline: none; /* Remove default outline */
+.message.bot {
+  background-color: #e6f4ff;
+  align-self: flex-start;
+}
+
+.message .action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.message-text {
+  white-space: pre-wrap;
+}
+
+.copy-code-button, .action-button-copy, .action-button-delete, .action-button-regen {
+  min-width: 70px;
+}
+
+/* Scrollbar styling for modern browsers */
+#chat-history::-webkit-scrollbar {
+  width: 6px;
+  background-color: #f5f5f5;
+}
+
+#chat-history::-webkit-scrollbar-thumb {
+  background-color: #c1c1c1;
+  border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  .settings, #refresh-button, #clear-button, #send-button {
+    width: 100%;
+    margin: 10px 0;
+  }
+
+  #model-menu {
+    margin: 10px 0;
+  }
 }
