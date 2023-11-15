@@ -62,8 +62,8 @@ body {
 #model-list div {
   cursor: pointer;
   background-color: #e0e0e0;
-  padding: 10vh;
-  border-radius: 5px;
+  padding: 2vh;
+  border-radius: 8px;
   transition: background-color 0.3s;
   display: flex;
   justify-content: center;
