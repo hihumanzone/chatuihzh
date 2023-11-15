@@ -123,19 +123,19 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 
 @media screen and (orientation: landscape) {
   #chat-history {
-    height: 50vh;
+    height: 55vh;
   }
 }
 
 @media (fullscreen) {
   #chat-history {
-    height: 80vh;
+    height: 90vh;
   }
 }
 
 @media screen and (orientation: landscape) and (fullscreen) {
   #chat-history {
-    height: 50vh;
+    height: 40vh;
   }
 }
 
