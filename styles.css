@@ -228,48 +228,41 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   justify-content: center;
 }
 
-/* General styles for container */
-.markdown-container {
-  line-height: 1.6;
-  font-size: 16px;
-  color: #333;
-}
-
-/* Table styles */
-.markdown-container table {
+.table {
   border-collapse: collapse;
   margin: 1em 0;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border: 0.8px solid #000;
   width: 100%;
 }
 
-.markdown-container th,
-.markdown-container td {
-  border: 1px solid #ddd;
+.th,
+.td {
+  border: 1px solid #000;
   padding: 8px;
-  text-align: left;
+
 }
 
-.markdown-container th {
+.th {
   background-color: #f9f9f9;
   font-weight: bold;
 }
 
-.markdown-container tr:nth-child(even) {
+.tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 
-/* Blockquote styles */
-.markdown-container blockquote {
+.blockquote {
   padding: 0.5em 1em;
   margin: 0.8em 0;
-  border-left: 0.25em solid #dfe2e5;
+  border-left: 0.25em solid ##b8b8b8;
   background-color: #f8f8f8;
-  color: #6a737d;
+  color: #000;
   font-style: italic;
 }
 
-/* Code block styles */
-.markdown-container pre {
+.pre {
   background-color: #f6f8fa;
   border-radius: 3px;
   padding: 1em;
@@ -278,42 +271,39 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   font-family: 'Courier New', Courier, monospace;
 }
 
-.markdown-container code {
+.code {
   background-color: #f6f8fa;
   border-radius: 3px;
   padding: 0.2em 0.4em;
   font-family: 'Courier New', Courier, monospace;
 }
 
-/* When code is within a pre block for a code block */
-.markdown-container pre code {
+.pre code {
   background-color: transparent;
   padding: 0;
 }
 
-/* List styles */
-.markdown-container ul,
-.markdown-container ol {
+.ul,
+.ol {
+  margin-left: 10vh;
   padding-left: 2em;
   margin: 1em 0;
 }
 
-.markdown-container ul li,
-.markdown-container ol li {
+.ul li,
+.ol li {
   margin-top: 0.5em;
 }
 
-/* Nested lists */
-.markdown-container ul ul,
-.markdown-container ul ol,
-.markdown-container ol ul,
-.markdown-container ol ol {
+.ul ul,
+.ul ol,
+.ol ul,
+.ol ol {
   margin-top: 0;
   margin-bottom: 0;
 }
 
-/* Horizontal Rule */
-.markdown-container hr {
+.hr {
   border: 0;
   border-top: 1px solid #ddd;
   margin: 2em 0;
