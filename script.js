@@ -9,7 +9,7 @@ const systemRoleInput = document.getElementById('system-role-input');
 let messages = [{
   role: 'system',
   content: localStorage.getItem('systemRole') || '',
-}, ];
+}];
 
 let apiKey = localStorage.getItem('apiKey') || '';
 let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
@@ -35,6 +35,13 @@ function selectModel(model) {
   selectedModel = model;
   localStorage.setItem('selectedModel', selectedModel);
 
+  // Assuming toggleModelMenu() is defined elsewhere in the code.
+  toggleModelMenu();
+}
+
+function toggleModelMenu() {
+  // This function should toggle the visibility of the model menu.
+  // Assuming it's defined elsewhere or you need to define it.
 }
 
 messageInput.addEventListener('input', () => {
@@ -62,7 +69,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     messages: messages,
   };
 
-  const response = await fetch(ENDPOINT, {
+  const response = await fetch(apiEndpoint || ENDPOINT, {
     method: 'POST',
     headers: headers,
     body: JSON.stringify(data),
@@ -86,10 +93,10 @@ function createAndAppendMessage(content, owner) {
     tex2jax: {
       inlineMath: [
         ['$', '$'],
-        ['\\(', '\\)']
+        ['\\(', '\\)'],
       ],
-      processEscapes: true
-    }
+      processEscapes: true,
+    },
   });
 
   const md = window.markdownit();
@@ -97,7 +104,7 @@ function createAndAppendMessage(content, owner) {
   messageText.innerHTML = displayedText;
 
   const codeBlocks = message.querySelectorAll('pre code');
-  codeBlocks.forEach(code => {
+  codeBlocks.forEach((code) => {
     const copyCodeButton = document.createElement('button');
     copyCodeButton.classList.add('copy-code-button');
     copyCodeButton.textContent = 'Copy Code';
@@ -156,11 +163,11 @@ function copyMessage(content) {
 
 function deleteMessage(messageElement, content) {
   chatHistory.removeChild(messageElement);
-  messages = messages.filter(msg => msg.content !== content);
+  messages = messages.filter((msg) => msg.content !== content);
 }
 
 async function regenerateMessage(messageElement, owner) {
-  const messageIdx = messages.findIndex(msg => msg.content === messageElement.dataset.raw && msg.role === owner);
+  const messageIdx = messages.findIndex((msg) => msg.content === messageElement.dataset.raw && msg.role === owner);
   messages.splice(messageIdx, 1);
   chatHistory.removeChild(messageElement);
   const userMessage = messages[messages.length - 1].content;
@@ -182,6 +189,9 @@ async function sendMessage() {
     alert('Please enter a message.');
     return;
   }
+
+  localStorage.setItem('apiKey', apiKey);
+  localStorage.setItem('apiEndpoint', apiEndpoint);
 
   createAndAppendMessage(message, 'user');
   messageInput.value = '';
@@ -208,14 +218,14 @@ function copyToClipboard(text) {
 }
 
 function clearChatHistory() {
-  Array.from(chatHistory.getElementsByClassName('message')).forEach(message => {
+  Array.from(chatHistory.getElementsByClassName('message')).forEach((message) => {
     chatHistory.removeChild(message);
   });
 
   messages = [{
     role: 'system',
     content: localStorage.getItem('systemRole') || '',
-  }, ];
+  }];
 }
 
 systemRoleInput.addEventListener('keydown', (event) => {
@@ -229,12 +239,14 @@ systemRoleInput.addEventListener('keydown', (event) => {
   }
 });
 
-window.addEventListener('load');
+window.addEventListener('load', () => {
+  // Code to be executed on window load.
+});
 
 function saveInputsAndRefresh() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
-  let systemRole = systemRoleInput.value.trim();
+  systemRole = systemRoleInput.value.trim();
 
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
