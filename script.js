@@ -20,7 +20,6 @@ apiKeyInput.value = apiKey;
 apiEndpointInput.value = apiEndpoint;
 systemRoleInput.value = systemRole;
 selectModel(selectedModel);
-updateModelHeading();
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
@@ -83,16 +82,6 @@ function createAndAppendMessage(content, owner) {
   const messageText = document.createElement('div');
   messageText.classList.add('message-text');
   message.appendChild(messageText);
-
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [
-        ['$', '$'],
-        ['\\(', '\\)']
-      ],
-      processEscapes: true
-    }
-  });
 
   const md = window.markdownit();
   const displayedText = md.render(content);
@@ -184,9 +173,6 @@ async function sendMessage() {
     alert('Please enter a message.');
     return;
   }
-
-  localStorage.setItem('apiKey', apiKey);
-  localStorage.setItem('apiEndpoint', apiEndpoint);
 
   createAndAppendMessage(message, 'user');
   messageInput.value = '';
