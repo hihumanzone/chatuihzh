@@ -56,25 +56,27 @@ body {
 
 #model-list {
   display: grid;
-  grid-gap: 10px; /* or your preferred space between boxes */
+  grid-gap: 10px;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  /* This will create a flexible number of columns depending on available space,
-  with each box having a minimum width of 150px and a maximum width of 1fr (fraction of available space) */
 }
 
-/* Enhance the styling of each model box */
 #model-list div {
   padding: 20px;
-  margin: 0; /* To reset the previous 5px margin if any */
+  height: 10vh;
+  margin: 0;
   border-radius: 5px;
   transition: background-color 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
+  background-color: #e0e0e0;
 }
 
-/* Now remove the selected model extra properties if exists, as it might conflict with the new grid */
+#model-list div:hover {
+  background-color: #ccc;
+}
+
 #model-list div.selected {
   background-color: #d1e8ff;
   font-weight: 600;
