@@ -143,76 +143,66 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   border-radius: 10px;
 }
 
-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  min-height: 100vh;
-  padding: 20px;
-}
+/* Additional or updated styles based on the new requirements */
 
+/* About button styling */
 #about {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
   padding: 10px 16px;
+  background-color: #ffffff;
+  color: #202124;
   border: none;
   border-radius: 8px;
-  background-color: #6200ee; /* Example primary color for the About button */
-  color: #fff;
-  font-weight: 500;
   cursor: pointer;
-  text-transform: uppercase; /* Typical Material Design button styling */
-  margin-top: 16px;
-  text-decoration: none;
-  display: inline-block;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 1px 3px 1px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 #about:hover {
-  background-color: #3700b3; /* Darker shade for hover state */
+  background-color: #e0e0e0;
 }
 
+/* Center Settings and Clear buttons */
 #settings, #clear-button {
-  margin: 0 10px; /* Add spacing between the buttons */
+  display: block;
+  margin: 10px auto; /* centers the buttons horizontally */
 }
 
-/* Center the Settings and Clear buttons */
-.settings-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-top: 16px;
-}
-
-/* Align the Send button to the right of the message input */
-.message-input-container {
-  width: calc(100% - 40px);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px; /* Space between input field and Send button */
+/* Send button and message input */
+#send-button {
+  padding: 10px 16px;
+  margin-left: 8px; /* provides spacing between button and input */
 }
 
 #message-input {
-  flex-grow: 1;
-  margin-right: 10px; /* Ensure spacing between input and Send button */
+  flex-grow: 1; /* allows the input field to take up the remaining space */
+  margin-left: 10px; /* aligns with the design and provides spacing */
 }
 
-#send-button {
-  min-width: 80px; /* Minimum width to still look like a button */
+/* Container for Send button and message input */
+.send-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-/* Improved styling for action buttons */
-.action-button-copy, .action-button-delete, .action-button-regen {
-  font-size: 14px;
-  padding: 5px 8px;
+/* Adjust the height of the textarea to fit content automatically */
+#message-input {
+  height: 48px; /* default height */
+  padding: 10px;
   border-radius: 4px;
 }
 
-@media screen and (max-width: 768px) {
-  /* For smaller screen sizes, make the layout a bit more responsive by adjusting paddings and button sizes */
-  #about, .settings, #clear-button, #send-button, .copy-code-button, .action-button-copy, .action-button-delete, .action-button-regen {
-    padding: 8px 12px;
+/* Adjust responsiveness to ensure inline form displays correctly */
+@media (max-width: 768px) {
+  .send-container {
+    flex-direction: column;
+    align-items: stretch;
   }
-  .message-input-container {
-    width: calc(100% - 20px);
+  
+  #settings, #clear-button, #about {
+    width: 100%;
+    margin: 10px 0;
   }
 }
