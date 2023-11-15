@@ -58,12 +58,12 @@ body {
 #model-list {
   display: grid;
   grid-gap: 10px;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
 }
 
 #model-list div {
-  padding: 20px;
-  height: 10vh;
+  padding: 15px;
+  height: 8vh;
   margin: 0;
   border-radius: 5px;
   transition: background-color 0.3s;
