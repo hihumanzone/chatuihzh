@@ -238,7 +238,6 @@ table {
 table th, table td {
   padding: 0.5em 0.75em;
   border: 1px solid #ddd;
-  background-color: #f7f7f7;
 }
 
 table th {
@@ -248,7 +247,7 @@ table th {
 
 /* Markdown Blockquotes Styling */
 blockquote {
-  padding: 0em 0em 0em 0em;
+  padding: 0em 0em 0em 2em;
   margin: 0;
   background-color: #f5f5f5;
   border-left: 10px solid #ccc;
