@@ -62,16 +62,17 @@ body {
 
 @media screen and (orientation: landscape) {
   #model-list {
-    grid-template-columns: repeat(auto-fit, minmax(25vh, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(20vh, 1fr));
   }
 
   #model-list div {
-    height: 10vh;
-    width: 10vh;
+    height: 30vh;
+    width: 30vh;
   }
 }
 
 #model-list div {
+  justify-content: center;
   text-align: center;
   cursor: pointer;
   background-color: #e0e0e0;
