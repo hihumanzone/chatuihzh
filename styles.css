@@ -1,101 +1,183 @@
-:root {
-  /* Define the color palette */
-  --primary-color: #6750A4; /* Material You default Purple 500 */
-  --primary-container-color: #EADDFF; /* Material You default Purple 100 */
-  --on-primary-color: #ffffff;
-  --surface-color: #ffffff;
-  --on-surface-color: #1e1e1e;
-  --error-color: #B00020;
-  --error-container-color: #FFDAD4;
-  --on-error-color: #ffffff;
-  --background-color: #ffffff;
-  --on-background-color: #1e1e1e;
-  --button-box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 4px 0px;
-  
-  /* Basic typography */
-  --font-family: 'Roboto', sans-serif; /* Roboto is the default font for Material Design */
-  --font-size-base: 1rem; /* 16px */
-  --font-size-small: 0.875rem; /* 14px */
-  --line-height-base: 1.5;
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
 }
 
 body {
-  background: var(--background-color);
-  color: var(--on-background-color);
-  font-family: var(--font-family);
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-base);
+  background-color: #FFF;
+  color: #202124;
 }
 
-.settings, #refresh-button, #clear-button, #send-button {
-  background-color: var(--primary-container-color);
-  color: var(--primary-color);
-  padding: 10px 20px;
-  border: none;
+/* Common Spacing System */
+.space-small {
+  margin: 4px;
+}
+
+.space-medium {
+  margin: 8px;
+}
+
+.space-large {
+  margin: 16px;
+}
+
+/* Model Menu Styling */
+#model-menu {
+  background-color: #EEE;
+  padding: 16px;
   border-radius: 8px;
+  max-width: 360px;
+  margin: auto;
+  display: none; /* By default it's hidden */
+}
+
+/* Options Inside Model Menu */
+.options {
+  margin-bottom: 8px;
+}
+
+/* List of Models */
+#model-list div {
+  padding: 8px;
+  margin-bottom: 4px;
+  border-radius: 4px;
   cursor: pointer;
-  box-shadow: var(--button-box-shadow);
-  font-family: var(--font-family);
-  transition: transform 100ms ease-out;
 }
 
-.settings:hover, #refresh-button:hover, #clear-button:hover, #send-button:hover {
-  background-color: var(--primary-color);
-  color: var(--on-primary-color);
-  transform: translateY(-2px);
+#model-list div:hover,
+#model-list div.selected {
+  background-color: #E0E0E0;
 }
 
-.settings:active, #refresh-button:active, #clear-button:active, #send-button:active {
-  transform: translateY(0);
-}
-
-input, textarea {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 10px;
+/* Input Fields Following Material Design */
+input[type="text"],
+input[type="password"],
+textarea {
   width: 100%;
-  box-sizing: border-box;
-  margin-bottom: 16px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: none;
+  background-color: #F5F5F5;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 textarea {
   resize: vertical;
-  min-height: 50px;
+  min-height: 80px;
 }
 
-.message {
-  margin: 8px 0;
-  padding: 10px;
-  background-color: var(--surface-color);
+/* Chat History Container */
+#chat-history {
+  background-color: #F0F0F0;
+  padding: 16px;
   border-radius: 8px;
-  box-shadow: var(--button-box-shadow);
+  margin: 16px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
+/* Individual Messages */
+.message {
+  background-color: #FFF;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  position: relative;
+}
+
+/* User and Bot specific messages */
 .message.user {
+  margin-left: auto;
+  background-color: #E0F7FA;
   align-self: flex-end;
-  background-color: var(--primary-container-color);
 }
 
 .message.bot {
+  margin-right: auto;
   align-self: flex-start;
-  background-color: var(--surface-color);
 }
 
-.message .action-buttons button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--primary-color);
-  margin-right: 8px;
-}
-
-#chat-history {
-  border-top: 1px solid #e0e0e0;
-  padding: 16px;
-  overflow-y: auto;
-  max-height: 300px; /* adjust as needed */
+/* Action Buttons */
+.action-buttons {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  position: absolute;
+  top: 8px;
+  right: 8px;
 }
 
-/* Add more styles as needed... */
+/* Button Styling */
+button {
+  background-color: #6200EE;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  margin: 8px 0;
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.24);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+button:hover {
+  background-color: #3700B3;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.32);
+}
+
+/* Settings Button - Outline Style */
+.settings {
+  background-color: transparent;
+  color: #6200EE;
+  border: 2px solid #6200EE;
+}
+
+/* Clear Chat History Button */
+#clear-button, #about {
+  background-color: #FFF;
+  color: #6200EE;
+  border: 2px solid #6200EE;
+}
+
+/* Send Button Specific Styling */
+#send-button {
+  background-color: #03DAC6;
+  color: #000;
+}
+
+#send-button:hover {
+  background-color: #00BFA5;
+}
+
+/* Copy Code Button and Other Action Buttons */
+.copy-code-button {
+  background: #CFD8DC;
+  color: #455A64;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  margin-left: 8px;
+}
+
+.action-button-copy,
+.action-button-delete,
+.action-button-regen {
+  background-color: #E0E0E0;
+  color: #202124;
+  border: none;
+  padding: 4px 6px;
+  font-size: 0.8em;
+}
+
+/* Responsive Handling for Mobile Devices */
+@media (max-width: 768px) {
+  #model-menu {
+    width: 90%;
+  }
+}
