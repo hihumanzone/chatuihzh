@@ -235,13 +235,15 @@ table {
   margin-bottom: 1em;
 }
 
-table th, table td {
+table td {
   padding: 0.5em 0.75em;
   border: 1px solid #ddd;
+  background-color: #f7f7f7;
 }
 
 table th {
-  font-weight: bold;
+  padding: 0.5em 0.75em;
+  border: 2px solid #ddd;
   background-color: #f9f9f9;
 }
 
@@ -291,24 +293,11 @@ p code, li code {
 
 /* Markdown Lists Styling */
 ul, ol {
-  padding-left: 2em;
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
+  padding-left: 1.2em;
 }
 
 li {
-  margin-bottom: 0.5em;
   line-height: 1.6;
-}
-
-li p {
-  margin-bottom: 0.5em;
-}
-
-/* Styling nested lists */
-li > ul, li > ol {
-  margin-top: 0.5em;
-  margin-bottom: 0;
 }
 
 /* Adjust styles for nested lists within a list item */
