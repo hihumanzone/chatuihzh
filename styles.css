@@ -110,6 +110,7 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 }
 
 #chat-history {
+  height: 100vh;
   overflow-y: auto;
   margin: 5px 0;
   padding: 10px;
@@ -122,12 +123,6 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 @media screen and (orientation: landscape) {
   #chat-history {
   height: 50vh;
-  }
-}
-
-@media screen and (orientation: potrait) {
-  #chat-history {
-  height: 100vh;
   }
 }
 
