@@ -1,156 +1,134 @@
-/* General Styling */
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Roboto', sans-serif;
-    background-color: #ECEFF1;
+/* Material You Design Default Theme CSS */
+
+/* System Adaptive Colors */
+:root {
+  --md-sys-color-primary: #6750a4;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #eaddff;
+  --md-sys-color-on-primary-container: #21005d;
+  --md-sys-color-secondary: #625b71;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #e8def8;
+  --md-sys-color-on-secondary-container: #1d192b;
+  --md-sys-color-error: #b3261e;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-error-container: #f9dedc;
+  --md-sys-color-on-error-container: #410e0b;
+  --md-sys-color-background: #fffbfe;
+  --md-sys-color-on-background: #1c1b1f;
+  --md-sys-color-surface: #fffbfe;
+  --md-sys-color-on-surface: #1c1b1f;
+  --md-sys-color-outline: #79747e;
 }
 
+/* Typography */
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-background);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+/* Reusable box shadows for elevation */
+.shadow-1 {
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+}
+
+.shadow-2 {
+  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.24);
+}
+
+/* Containers */
+#model-menu, #chat-history {
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  border-radius: 8px;
+  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
+  padding: 16px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+/* Inputs and textareas */
+input[type='text'], input[type='password'], textarea {
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+}
+
+input[type='text']:focus, input[type='password']:focus, textarea:focus {
+  outline: none;
+  border-color: var(--md-sys-color-primary);
+}
+
+/* Buttons */
 button {
-    font-family: 'Roboto', sans-serif;
-    font-size: 14px;
-    text-transform: uppercase;
-    color: #FFFFFF;
-    background-color: #2196F3;
-    border: none;
-    padding: 10px 20px;
-    margin: 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin: 4px;
 }
 
 button:hover {
-    background-color: #1976D2;
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
 }
 
-input, textarea {
-    font-family: 'Roboto', sans-serif;
-    margin: 10px;
-    padding: 10px;
-    border: 1px solid #B0BEC5;
-    border-radius: 4px;
-    background-color: #FFFFFF;
-    font-size: 14px;
-    width: calc(100% - 22px);
-    box-sizing: border-box;
+button:active {
+  background-color: var(--md-sys-color-secondary);
+  color: var(--md-sys-color-on-secondary);
 }
 
-input:focus, textarea:focus {
-    border-color: #2196F3;
-    outline: none;
+button.settings {
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 
-/* Layout for model-menu section */
-#model-menu {
-    background-color: #FFFFFF;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.26);
-    display: flex;
-    flex-direction: column;
-    margin: 10px;
-    padding: 15px;
-    display: none; /* To be toggled by JS */
-}
-
-.options {
-    font-weight: 500;
-    color: #546E7A;
-    padding: 8px 0;
-}
-
-/* Model list styling */
+/* Interactive elements */
 #model-list div {
-    color: #455A64;
-    padding: 8px;
-    transition: background-color 0.3s ease;
-    cursor: pointer;
+  cursor: pointer;
+  padding: 8px;
+  transition: background-color 0.2s;
 }
 
-#model-list div:hover, #model-list div.selected {
-    background-color: #CFD8DC;
+#model-list div:hover {
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
 }
 
-/* Message Styling */
-#chat-history {
-    margin: 10px;
-    padding: 10px;
-    max-height: 300px;
-    overflow-y: auto;
-    background-color: #FFFFFF;
-    border-radius: 4px;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.12), inset 0 1px 2px rgba(0,0,0,0.24);
+#model-list div.selected {
+  background-color: var(--md-sys-color-secondary);
+  color: var(--md-sys-color-on-secondary);
 }
 
+/* Messages */
 .message {
-    margin: 5px;
-    padding: 10px;
-    border-radius: 4px;
-    background-color: #ECEFF1;
-    border-left: 5px solid;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 4px;
 }
 
 .message.user {
-    border-color: #8BC34A; /* Green for the user messages */
-    align-self: flex-end;
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  align-self: flex-end;
 }
 
 .message.bot {
-    border-color: #FFC107; /* Amber for bot messages */
-    align-self: flex-start;
-}
-
-.message-system {
-    border-color: #9E9E9E; /* Grey for system messages */
-}
-
-.message-text {
-    white-space: pre-wrap; /* To respect newline characters */
-}
-
-
-/* Action buttons */
-.action-buttons {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 10px;
-}
-
-.action-button-copy,
-.action-button-delete,
-.action-button-regen {
-    background-color: #B0BEC5;
-    color: #FFFFFF;
-}
-
-.copy-code-button {
-    padding: 5px 10px;
-    margin-top: 10px;
-    background-color: #B0BEC5;
-    color: white;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.copy-code-button:hover {
-    background-color: #90A4AE;
-}
-
-.generating {
-    text-align: center;
-    font-style: italic;
-    margin: 10px;
-}
-
-/* Responsive design for small screens */
-@media (max-width: 600px) {
-    h1, button, input, textarea {
-        font-size: 16px;
-    }
-
-    #model-menu {
-        padding: 12px;
-    }
+  background-color: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
 }
