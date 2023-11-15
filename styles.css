@@ -1,41 +1,36 @@
 /* styles.css */
 
 :root {
-  /* Dark theme colors */
-  --background-color: #121212;
-  --primary-text-color: #e0e0e0;
-  --secondary-text-color: #bcbcbc;
-  --primary-color: #bb86fc;
-  --secondary-color: #3700b3;
-  --error-color: #cf6679;
-  --button-background-color: #333333;
-  --button-background-hover-color: #444444;
+  --background-color: #fff;
+  --primary-text-color: #202124;
+  --secondary-text-color: #575757;
+  --primary-color: #6750a4; /* Example primary color from the Material You palette */
+  --secondary-color: #eaddff; /* Lighter shade for hover states */
+  --error-color: #b00020;
+  --button-background-color: #e0e0e0;
+  --button-background-hover-color: #aeaeae;
   --border-radius: 16px;
-  --box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --inner-spacing: 20px;
+  --outer-margin: 20px;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-html, body {
+body {
   font-family: 'Roboto', sans-serif;
   background-color: var(--background-color);
   color: var(--primary-text-color);
-  line-height: 1.6;
-  margin: 0;
-  padding: 0;
-  padding: 20px;
+  margin: var(--outer-margin);
 }
 
 button {
   font-family: 'Roboto', sans-serif;
-  padding: 10px 20px;
+  padding: var(--inner-spacing);
   border: none;
   outline: none;
   border-radius: var(--border-radius);
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s;
+  box-shadow: var(--box-shadow);
   background-color: var(--button-background-color);
   color: var(--primary-text-color);
 }
@@ -45,89 +40,36 @@ button:hover {
 }
 
 .settings, .send-button {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
   background-color: var(--primary-color);
+  color: var(--background-color);
 }
 
 .settings:hover, .send-button:hover {
   background-color: var(--secondary-color);
 }
 
-.message {
-  margin-bottom: 10px;
-  border-radius: var(--border-radius);
-  padding: 10px;
-  box-shadow: var(--box-shadow);
-}
-
-.message.user {
-  background: var(--primary-color);
-  color: var(--background-color);
-  align-self: flex-end;
-}
-
-.message.bot {
-  background: var(--button-background-color);
-  align-self: flex-start;
-}
-
-#chat-history {
-  max-height: calc(80vh - 40px);
-  overflow-y: auto;
-  padding: 20px;
-  margin-top: 10px;
-}
-
-#message-input {
-  width: calc(100% - 40px);
-  padding: 10px;
-  margin-top: 10px;
-  border: 2px solid var(--primary-color);
-  border-radius: var(--border-radius);
-  outline: none;
-  resize: none;
-  background: none;
-  color: var(--primary-text-color);
+button.settings, button.clear-button {
+  display: block;
+  margin: 0 auto var(--inner-spacing) auto;
 }
 
 #model-menu {
-  display: none;
-  background: var(--button-background-color);
-  padding: 20px;
+  width: calc(100% - 2 * var(--outer-margin));
+  margin: var(--inner-spacing) auto var(--inner-spacing) auto;
+  padding: var(--inner-spacing);
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 90%;
-  max-width: 400px;
-}
-
-#model-menu .options {
-  margin-bottom: 5px;
-  color: var(--secondary-text-color);
-}
-
-#model-menu input, #model-menu button, #model-menu textarea {
-  width: calc(100% - 20px);
-  padding: 10px;
-  margin-bottom: 10px;
-  border: none;
-  border-bottom: 2px solid var(--primary-color);
-  border-radius: var(--border-radius);
-  outline: none;
-  background: none;
-  color: var(--primary-text-color);
+  background-color: var(--background-color);
+  display: none;
 }
 
 #model-list div {
-  padding: 10px;
-  margin-bottom: 5px;
+  padding: var(--inner-spacing);
+  margin-bottom: var(--inner-spacing);
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s;
+  border-radius: var(--border-radius);
+  background-color: var(--button-background-color);
 }
 
 #model-list div:hover {
@@ -139,33 +81,79 @@ button:hover {
   color: var(--background-color);
 }
 
-.generating {
-  text-align: center;
-  padding: 10px 0;
+#chat-history, #message-input, #system-role-input {
+  width: calc(100% - 2 * var(--inner-spacing));
+  margin: var(--inner-spacing) auto;
 }
 
-.action-button-copy, .action-button-delete, .action-button-regen {
-  margin-right: 5px;
-  background: none;
-  color: var(--primary-text-color);
+#message-input {
+  padding: var(--inner-spacing);
+  border: 2px solid var(--primary-color);
+  border-radius: var(--border-radius);
+  outline: none;
+  resize: none;
+}
+
+.message {
+  margin-bottom: var(--inner-spacing);
+  border-radius: var(--border-radius);
+  padding: var(--inner-spacing);
+  box-shadow: var(--box-shadow);
+}
+
+.message.user {
+  background: var(--primary-color);
+  color: var(--background-color);
+}
+
+.message.bot {
+  background: var(--button-background-color);
+}
+
+#ai-thinking {
+  display: none;
+}
+
+.generating {
+  text-align: center;
+  padding: var(--inner-spacing);
 }
 
 .action-buttons {
-  margin-top: 10px;
-  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: var(--inner-spacing);
+}
+
+.action-button-copy, .action-button-delete, .action-button-regen {
+  padding: 5px 10px;
+  border-radius: var(--border-radius);
 }
 
 .copy-code-button {
+  padding: 5px 10px;
   margin-left: 10px;
-  background: none;
-  color: var(--primary-text-color);
+  border-radius: var(--border-radius);
+  background-color: var(--primary-color);
+  color: var(--background-color);
 }
 
-/* Centering the "Clear Chat History" button */
-#clear-button {
-  position: absolute;
-  right: 20px;
-  top: 20px;
-}
+/* Responsive media queries for improved mobile experience */
+@media (max-width: 768px) {
+  :root {
+    --outer-margin: 10px;
+  }
 
-/* Add any additional styles if needed */
+  body {
+    margin: var(--outer-margin);
+  }
+
+  #model-menu {
+    width: calc(100% - 2 * var(--outer-margin));
+  }
+
+  #chat-history, #message-input, #system-role-input {
+    width: calc(100% - 2 * var(--outer-margin));
+  }
+}
