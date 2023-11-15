@@ -74,7 +74,7 @@ body {
 
 #model-list div:hover {
   background-color: #ccc;
-  curser: pointer;
+  cursor: pointer;
 }
 
 #model-list div.selected {
