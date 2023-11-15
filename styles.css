@@ -130,6 +130,8 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 
 .message {
   margin-bottom: 40px;
+  margin-left: 10px;
+  margin-left: 10px;
   padding: 10px;
   border-radius: 5px;
   background-color: #f0f0f0;
@@ -139,13 +141,11 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 .message.user {
   background-color: #f0f0f0;
   align-self: flex-end;
-  width: 90%
 }
 
 .message.bot {
   background-color: #e6f4ff;
   align-self: flex-start;
-  width: 90%
 }
 
 .message > * {
