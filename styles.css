@@ -1,115 +1,150 @@
 :root {
+  /* Assign MDC default theme colors */
   --mdc-theme-primary: #6200ee;
   --mdc-theme-secondary: #018786;
   --mdc-theme-background: #fff;
   --mdc-theme-surface: #fff;
   --mdc-theme-error: #b00020;
-  --mdc-theme-on-primary: #ffffff;
-  --mdc-theme-on-secondary: #ffffff;
-  --mdc-theme-on-error: #ffffff;
-  --mdc-type-scale-button: 0.875rem;
-  --mdc-type-scale-caption: 0.75rem;
-  
-  --border-radius: 8px;
-  --elevation-1: 0px 2px 1px -1px rgba(0,0,0,0.2), 
-                 0px 1px 1px 0px rgba(0,0,0,0.14), 
-                 0px 1px 3px 0px rgba(0,0,0,0.12);
+  --mdc-theme-on-primary: #fff;
+  --mdc-theme-on-secondary: #fff;
+  --mdc-theme-on-error: #fff;
+  --mdc-theme-on-surface: #000;
 }
 
 body {
-  margin: 0;
-  padding: 0;
+  /* Apply Material You Design body style */
   font-family: 'Roboto', sans-serif;
   background-color: var(--mdc-theme-background);
+  color: var(--mdc-theme-on-surface);
+  margin: 0;
+  padding: 16px; /* 1rem */
 }
 
-.settings,
-#refresh-button,
-#send-button,
-#clear-button,
-#about,
-.action-button-copy,
-.action-button-delete,
-.action-button-regen,
-.copy-code-button {
-  font-size: var(--mdc-type-scale-button);
-  padding: 6px 16px;
+/* Common reset and box-sizing setup */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Apply MDC styles to buttons */
+button {
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Style for the buttons with MDC classes */
+.mdc-button {
+  --mdc-theme-primary: var(--mdc-theme-primary);
+  --mdc-theme-on-primary: var(--mdc-theme-on-primary);
+}
+
+.mdc-button--raised {
   background-color: var(--mdc-theme-primary);
   color: var(--mdc-theme-on-primary);
-  border: none;
-  border-radius: var(--border-radius);
-  box-shadow: var(--elevation-1);
-  cursor: pointer;
-  text-transform: uppercase;
-  margin: 4px;
-  transition: background-color 0.2s ease-in-out;
 }
 
-.settings:hover,
-#refresh-button:hover,
-#send-button:hover,
-#clear-button:hover,
-#about:hover,
-.action-button-copy:hover,
-.action-button-delete:hover,
-.action-button-regen:hover,
-.copy-code-button:hover {
-  background-color: var(--mdc-theme-secondary);
-  color: var(--mdc-theme-on-secondary);
+/* Settings and other specific buttons */
+.settings, #clear-button, #refresh-button, #send-button {
+  margin-top: 16px; /* space below the button or group */
 }
 
-#model-menu {
-  background-color: var(--mdc-theme-surface);
-  border-radius: var(--border-radius);
-  box-shadow: var(--elevation-1);
-  padding: 16px;
-  display: none;
-}
-
-#message-input {
-  width: 100%;
+/* Style for the chat input area */
+textarea {
+  resize: none;
   padding: 10px;
-  margin-top: 10px;
-  border-radius: var(--border-radius);
-  border: 1px solid #ddd;
-  font-size: var(--mdc-type-scale-button);
+  margin-bottom: 20px; /* space below the textarea */
+  border: 1px solid #ddd; /* light gray border */
+  border-radius: 4px; /* rounded corners */
+  width: 100%;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
 }
 
+/* Style for the chat history */
+#chat-history {
+  max-height: 80vh;
+  overflow-y: auto;
+  margin-bottom: 20px; /* space below the chat history */
+}
+
+/* Style for messages */
 .message {
-  background-color: var(--mdc-theme-surface);
-  border-radius: var(--border-radius);
-  padding: 16px;
-  margin: 8px;
+  padding: 10px;
+  margin-bottom: 12px;
+  background: var(--mdc-theme-surface);
+  border-radius: 4px;
+  border: 1px solid #e0e0e0; /* light gray border */
   position: relative;
 }
 
-.message-text {
-  font-size: var(--mdc-type-scale-caption);
+/* Specific styles for bot and user messages to differentiate them */
+.message.bot {
+  background-color: #e7f1ff; /* light blue background for bot messages */
 }
 
 .message.user {
-  align-self: flex-end;
+  background-color: #f1ffe7; /* light green background for user messages */
+}
+
+/* Style for the generated message marker */
+.generating {
+  font-style: italic;
+  color: #999; /* subtle text for generating marker */
+}
+
+/* Make sure action buttons are placed at the bottom of the message */
+.action-buttons {
+  display: flex;
+  gap: 8px; /* space between action buttons */
+  margin-top: 10px; /* space above the action buttons */
+}
+
+/* Common styles for all action buttons (copy, delete, regenerate) */
+.action-button-copy,
+.action-button-delete,
+.action-button-regen {
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Styling for the model selection menu */
+#model-menu {
+  display: none;
+  background: var(--mdc-theme-surface);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.24);
+  border-radius: 4px;
+  padding: 20px;
+  margin-top: 16px; /* space between settings button and model menu */
+}
+
+/* Style each option inside the model selection */
+.options {
+  margin-bottom: 14px;
+}
+
+/* Styling for the model list */
+#model-list {
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+}
+
+/* Style for individual models */
+#model-list div {
+  cursor: pointer;
+  padding: 10px;
+  border: 1px solid var(--mdc-theme-primary);
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* Highlight selected model */
+#model-list div.selected {
   background-color: var(--mdc-theme-primary);
   color: var(--mdc-theme-on-primary);
 }
 
-.message.bot {
-  align-self: flex-start;
-  background-color: var(--mdc-theme-secondary);
-  color: var(--mdc-theme-on-secondary);
+/* Styling for AI generating/thinking indicator */
+#ai-thinking {
+  display: none;
+  justify-content: center;
 }
-
-.action-buttons {
-  display: flex;
-  justify-content: flex-end;
-}
-
-#chat-history {
-  margin-bottom: 16px;
-}
-
-.generating {
-  font-style: italic;
-}
-
-/* This snippet uses default Material You Design colors. You can customize the colors as you wish. */
