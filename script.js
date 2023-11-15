@@ -35,7 +35,6 @@ function selectModel(model) {
   selectedModel = model;
   localStorage.setItem('selectedModel', selectedModel);
 
-  toggleModelMenu();
 }
 
 messageInput.addEventListener('input', () => {
@@ -82,6 +81,16 @@ function createAndAppendMessage(content, owner) {
   const messageText = document.createElement('div');
   messageText.classList.add('message-text');
   message.appendChild(messageText);
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [
+        ['$', '$'],
+        ['\\(', '\\)']
+      ],
+      processEscapes: true
+    }
+  });
 
   const md = window.markdownit();
   const displayedText = md.render(content);
