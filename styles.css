@@ -1,187 +1,180 @@
 :root {
-  /* Define default colors */
-  --primary-color: #6750a4; /* Example primary color (can be dynamic) */
-  --on-primary-color: #ffffff;
-  --background-color: #ffffff;
-  --on-background-color: #121212;
-  --secondary-color: #625b71; /* Example secondary color */
-  --error-color: #b00020;
-  --surface-color: #ffffff;
-  --on-surface-color: #121212;
+  --primary: #6750a4; /* A sample primary color */
+  --primary-variant: #eaddff; /* Lighter variant */
+  --on-primary: #ffffff; /* Text color on top of the primary color */
+  --background: #f2e7fe; /* Background color */
+  --surface: #ffffff; /* Surface color for cards, dialog */
+  --error: #b00020;
+  --on-surface: #202124; /* Text color on surface */
+  --on-background: #202124; /* Text color on background */
+  --input-background: #e4dcef; /* Input field background color */
+  --input-placeholder: #999; /* Placeholder color */
+  --shadow: rgba(0, 0, 0, 0.2); /* Shadow color */
+}
 
-  /* Dynamic theming properties, placeholder values */
-  --dynamic-accent: var(--primary-color);
-  --dynamic-on-accent: var(--on-primary-color);
-
-  /* Component sizing */
-  --border-radius: 12px;
-  --button-padding: 0.75rem 1.5rem;
-
-  /* Typography */
-  --font-family: 'Roboto', sans-serif;
-  --headline-font: 1.5rem;
-  --subtitle-font: 1.125rem;
-  --button-font: 1rem;
-  --caption-font: 0.875rem;
+/* General Resets */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
 }
 
 body {
-  margin: 0;
-  background-color: var(--background-color);
-  color: var(--on-background-color);
-  font-family: var(--font-family);
+  background: var(--background);
+  color: var(--on-background);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Resets button styling */
-button,
-input[type="button"],
-input[type="submit"] {
-  background: none;
-  color: inherit;
-  border: none;
-  padding: 0;
-  font: inherit;
-  cursor: pointer;
+/* Utility classes for shadows */
+.shadow-2dp {
+  box-shadow: 0px 2px 2px 0px var(--shadow);
 }
 
-/* Basic styling for buttons */
-.settings,
-#refresh-button,
-#clear-button,
-#send-button {
-  font-size: var(--button-font);
-  border-radius: var(--border-radius);
-  padding: var(--button-padding);
-  text-transform: uppercase;
-  background-color: var(--dynamic-accent);
-  color: var(--dynamic-on-accent);
-  border: none;
+.shadow-4dp {
+  box-shadow: 0px 4px 4px 0px var(--shadow);
+}
+
+/* Button styling */
+button {
   cursor: pointer;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  margin: 0.5rem;
+  border-radius: 4px;
   transition: background-color 0.3s ease;
 }
 
-.settings:hover,
-#refresh-button:hover,
-#clear-button:hover,
-#send-button:hover {
-  background-color: var(--secondary-color);
+button.settings,
+button#refresh-button,
+button#clear-button,
+button#send-button {
+  background: var(--primary);
+  color: var(--on-primary);
+  text-transform: uppercase;
+  font-weight: 500;
 }
 
-/* Styling for chat container */
-#chat-container {
-  max-width: 800px;
-  margin: 0 auto;
+button.settings:hover,
+button#refresh-button:hover,
+button#clear-button:hover,
+button#send-button:hover {
+  background: var(--primary-variant);
+}
+
+/* Chat messages */
+#chat-history .message {
+  background: var(--surface);
   padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-/* Chat history and models styling */
-#chat-history, #model-menu {
-  border: 1px solid #e0e0e0;
-  border-radius: var(--border-radius);
-  padding: 1rem;
-  background-color: var(--surface-color);
-  color: var(--on-surface-color);
-}
-
-/* Text input field styling */
-#message-input {
-  width: 100%;
-  padding: 1rem;
-  border-radius: var(--border-radius);
-  border: 1px solid #e0e0e0;
-  resize: none;
-}
-
-/* Focus state for inputs and buttons */
-input:focus, button:focus, textarea:focus {
-  outline: 2px solid var(--dynamic-accent);
-}
-
-/* Option labels styling */
-.options {
-  font-size: var(--subtitle-font);
-  margin: 0 0 0.5rem 0;
-}
-
-/* Selection of model display */
-#model-list div {
-  padding: 0.5rem;
-  border-radius: var(--border-radius);
-}
-
-#model-list div:hover {
-  background-color: var(--secondary-color);
-  color: var(--on-surface-color);
-}
-
-/* Applied when a model is selected */
-.selected {
-  background-color: var(--dynamic-accent);
-  color: var(--dynamic-on-accent);
-}
-
-.message {
-  margin-bottom: 1rem;
-  padding: 1rem;
-  border-radius: var(--border-radius);
-  background-color: var(--surface-color);
-  color: var(--on-surface-color);
+  margin: 0.5rem 0;
+  border-radius: 8px;
   position: relative;
 }
 
-/* Message owner specific styles */
-.message.user {
-  align-self: flex-end;
-  background-color: var(--dynamic-accent);
-  color: var(--dynamic-on-accent);
+#chat-history .message.user {
+  align-self: end;
+  background: var(--primary);
+  color: var(--on-primary);
 }
 
-.message.bot {
-  align-self: flex-start;
-  background-color: var(--surface-color);
-  color: var(--on-surface-color);
-}
-
-.action-buttons {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.copy-code-button {
-  padding: 0.25rem 0.5rem;
-  font-size: var(--caption-font);
-  border-radius: var(--border-radius);
-  background-color: var(--dynamic-accent);
-  color: var(--on-primary-color);
+textarea#message-input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 1rem;
   border: none;
-  margin-top: 0.5rem;
+  outline: none;
+  border-radius: 8px;
+  background-color: var(--input-background);
+  color: var(--on-surface);
+  resize: none; /* Disable resize handle */
+  overflow: auto; /* Ensure scrollbar appears when needed */
+  min-height: 50px; /* Minimum height */
 }
 
-.copy-code-button:hover {
-  background-color: var(--secondary-color);
+textarea#message-input::placeholder {
+  color: var(--input-placeholder);
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+#model-menu {
+  background: var(--surface);
+  padding: 1rem;
+  border-radius: 8px;
+  display: none; /* Initially hidden */
 }
 
-::-webkit-scrollbar-track {
-  background: var(--surface-color);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--secondary-color);
+/* Selected model style */
+#model-list div.selected {
+  background: var(--primary-variant);
+  color: var(--on-primary);
+  padding: 0.5rem 1rem;
+  margin: 0.25rem 0;
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--dynamic-accent);
+/* Input fields */
+input[type="password"],
+input[type="text"],
+textarea#system-role-input {
+  width: 100%;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--input-background);
+  color: var(--on-surface);
 }
 
-/* Respective media queries for responsive layouts, if needed, would go here */
+input[type="password"]:focus,
+input[type="text"]:focus,
+textarea#system-role-input:focus {
+  outline: 2px solid var(--primary);
+}
 
-/* Further customizations can include dynamic theming based on user preferences */
+/* Align utilities */
+.generating {
+  text-align: center;
+  padding: 1rem;
+}
+
+/* Layout styling */
+#model-menu,
+#chat-history {
+  max-width: 700px;
+  margin: auto;
+  padding-bottom: 1rem;
+}
+
+/* Action buttons */
+.action-buttons button {
+  background: var(--surface);
+  color: var(--on-surface);
+  margin: 0;
+  padding: 0.5rem;
+}
+
+.action-buttons .action-button-copy,
+.action-buttons .action-button-delete,
+.action-buttons .action-button-regen {
+  border-radius: 4px;
+  margin-left: 0.5rem;
+}
+
+.action-buttons .copy-code-button {
+  margin-left: auto;
+  background: var(--primary);
+  color: var(--on-primary);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  button.settings,
+  button#refresh-button,
+  button#clear-button,
+  button#send-button {
+    padding: 0.5rem 1rem;
+  }
+}
