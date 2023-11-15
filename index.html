@@ -14,7 +14,7 @@
   <div id="chat-container">
     <button id="settings" class="settings">Settings</button>
     <div id="model-menu">
- <div class="class-h3">Switch Models:</div>
+ <div class="options">Switch Models:</div>
  <div id="model-list">
  <div data-model="gpt-3.5-turbo">GPT-3.5 Turbo</div>
  <div data-model="gpt-3.5-turbo-0314">GPT-3.5 0314</div>
@@ -31,11 +31,11 @@
  <div data-model="gpt-4-32k-0314">GPT-4 32k 0314</div>
  <div data-model="gpt-4-32k-0613">GPT-4 32k 0613</div>
 </div>
-      <div class="class-h3">API Endpoint:</div>
+      <div class="options">API Endpoint:</div>
       <input id="api-endpoint-input" placeholder="Enter the API endpoint">
-      <div class="class-h3">API Key:</div>
+      <div class="options">API Key:</div>
       <input type="password" id="api-key-input" placeholder="Enter your API key">
-      <div class="class-h3">System Role:</div>
+      <div class="options">System Role:</div>
       <textarea id="system-role-input" placeholder="Enter the system role" style="display: block;"></textarea>
       <br> <br>
       <button id="refresh-button">Apply Changes</button>
@@ -44,7 +44,7 @@
     <button id="clear-button">Clear Chat History</button>
     <div id="chat-history">
     <div id="ai-thinking" style="display: none;">
-    <div class="class-h4">--Generating--</div>
+    <div class="generating">--Generating--</div>
     </div>
     </div>
     <textarea id="message-input" placeholder="Type your message"></textarea>
