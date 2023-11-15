@@ -40,6 +40,12 @@ body {
   background-color: #ebebeb;
 }
 
+.options {
+  text-align: right;
+  border-bottom: 0.8px solid #000;
+  margin-top: 40px;
+}
+
 #model-menu {
   background-color: #ffffff;
   padding: 20px;
