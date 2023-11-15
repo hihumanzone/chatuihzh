@@ -84,7 +84,7 @@ textarea, input[type="password"], #api-endpoint-input {
 
 #system-role-input {
   resize: none;
-  height: 10vh;
+  height: 20vh;
 }
 
 textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
