@@ -62,11 +62,11 @@ body {
 
 @media screen and (orientation: landscape) {
   #model-list {
-    grid-template-columns: repeat(auto-fit, minmax(40vh, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(25vh, 1fr));
   }
 
   #model-list div {
-    padding: 4vh;
+    padding: 10vh;
   }
 }
 
