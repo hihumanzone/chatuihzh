@@ -59,6 +59,16 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(10vh, 1fr));
 }
 
+@media screen and (orientation: landscape) {
+  #model-list {
+    grid-template-columns: repeat(auto-fit, minmax(15vh, 1fr));
+  }
+
+  #model-list div {
+    padding: 1vh;
+  }
+}
+
 #model-list div {
   cursor: pointer;
   background-color: #e0e0e0;
@@ -68,17 +78,18 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 10vh;
 }
 
 #model-list div:hover {
   background-color: #ccc;
-  cursor: pointer;
 }
 
 #model-list div.selected {
   background-color: #d1e8ff;
   font-weight: 600;
 }
+
 
 .options {
   font-size: 1rem;
