@@ -24,10 +24,6 @@ updateModelHeading();
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
-function toggleModelMenu() {
-  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
-}
-
 function selectModel(model) {
   const modelOptions = document.querySelectorAll('#model-list div');
   modelOptions.forEach((option) => option.classList.remove('selected'));
@@ -41,18 +37,12 @@ function selectModel(model) {
   localStorage.setItem('selectedModel', selectedModel);
 
   toggleModelMenu();
-  updateModelHeading();
 }
 
 messageInput.addEventListener('input', () => {
   messageInput.style.height = 'auto';
   messageInput.style.height = `${messageInput.scrollHeight}px`;
 });
-
-function updateModelHeading() {
-  const modelHeading = document.querySelector('.class-h1');
-  modelHeading.textContent = `${selectedModel}`;
-}
 
 const ENDPOINT = apiEndpoint || 'https://api.openai.com/v1/chat/completions';
 
@@ -244,7 +234,7 @@ systemRoleInput.addEventListener('keydown', (event) => {
   }
 });
 
-window.addEventListener('load', updateModelHeading);
+window.addEventListener('load');
 
 function saveInputsAndRefresh() {
   apiKey = apiKeyInput.value.trim();
