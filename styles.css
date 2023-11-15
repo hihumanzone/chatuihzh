@@ -133,6 +133,12 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   }
 }
 
+@media screen and (orientation: landscape), (fullscreen) {
+  #chat-history {
+    height: 55vh;
+  }
+}
+
 .message {
   margin-bottom: 40px;
   margin-left: 5px;
