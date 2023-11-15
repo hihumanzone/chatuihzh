@@ -139,12 +139,13 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 .message.user {
   background-color: #f0f0f0;
   align-self: flex-end;
-  max-width: 70%
+  width: 90%
 }
 
 .message.bot {
   background-color: #e6f4ff;
   align-self: flex-start;
+  width: 90%
 }
 
 .message > * {
