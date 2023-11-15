@@ -178,7 +178,7 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 
 #message-input {
   flex-grow: 1; /* allows the input field to take up the remaining space */
-  margin-left: 10px; /* aligns with the design and provides spacing */
+  resize: none;
 }
 
 /* Container for Send button and message input */
