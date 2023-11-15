@@ -82,6 +82,10 @@ textarea, input[type="password"], #api-endpoint-input {
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
+#system-role-input {
+  resize: none;
+}
+
 textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   border-color: #80bdff;
   outline: 0;
