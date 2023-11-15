@@ -205,3 +205,9 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   padding: 10px;
   border-radius: 4px;
 }
+
+#ai-thinking {
+  text-align: center;
+  color: grey;
+  font-style: italic;
+}
