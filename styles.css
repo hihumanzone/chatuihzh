@@ -13,6 +13,7 @@ body {
   color: #202124;
   line-height: 1.5;
   font-size: 16px;
+  margin: 14px;
 }
 
 /* Classes and styles based on Material Design 3 */
@@ -89,7 +90,7 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 
 /* Chat message styles inspired by material design */
 #chat-history {
-  max-height: 70vh;
+  height: 70vh;
   overflow-y: auto;
   margin: 20px 0;
   padding: 10px;
