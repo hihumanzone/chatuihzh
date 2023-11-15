@@ -146,6 +146,10 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   align-self: flex-start;
 }
 
+.message > * {
+  margin-bottom: -14px;
+}
+
 .message .action-buttons {
   display: flex;
   gap: 8px;
