@@ -90,7 +90,7 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 
 /* Chat message styles inspired by material design */
 #chat-history {
-  height: 70vh;
+  height: 60vh;
   overflow-y: auto;
   margin: 20px 0;
   padding: 10px;
