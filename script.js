@@ -35,13 +35,11 @@ function selectModel(model) {
   selectedModel = model;
   localStorage.setItem('selectedModel', selectedModel);
 
-  // Assuming toggleModelMenu() is defined elsewhere in the code.
   toggleModelMenu();
 }
 
 function toggleModelMenu() {
-  // This function should toggle the visibility of the model menu.
-  // Assuming it's defined elsewhere or you need to define it.
+  modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
 }
 
 messageInput.addEventListener('input', () => {
@@ -237,10 +235,6 @@ systemRoleInput.addEventListener('keydown', (event) => {
     localStorage.setItem('systemRole', systemRoleInput.value);
     messages[0].content = systemRoleInput.value;
   }
-});
-
-window.addEventListener('load', () => {
-  // Code to be executed on window load.
 });
 
 function saveInputsAndRefresh() {
