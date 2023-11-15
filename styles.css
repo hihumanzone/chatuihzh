@@ -1,150 +1,101 @@
 :root {
-  /* Assign MDC default theme colors */
-  --mdc-theme-primary: #6200ee;
-  --mdc-theme-secondary: #018786;
-  --mdc-theme-background: #fff;
-  --mdc-theme-surface: #fff;
-  --mdc-theme-error: #b00020;
-  --mdc-theme-on-primary: #fff;
-  --mdc-theme-on-secondary: #fff;
-  --mdc-theme-on-error: #fff;
-  --mdc-theme-on-surface: #000;
+  /* Define the color palette */
+  --primary-color: #6750A4; /* Material You default Purple 500 */
+  --primary-container-color: #EADDFF; /* Material You default Purple 100 */
+  --on-primary-color: #ffffff;
+  --surface-color: #ffffff;
+  --on-surface-color: #1e1e1e;
+  --error-color: #B00020;
+  --error-container-color: #FFDAD4;
+  --on-error-color: #ffffff;
+  --background-color: #ffffff;
+  --on-background-color: #1e1e1e;
+  --button-box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 4px 0px;
+  
+  /* Basic typography */
+  --font-family: 'Roboto', sans-serif; /* Roboto is the default font for Material Design */
+  --font-size-base: 1rem; /* 16px */
+  --font-size-small: 0.875rem; /* 14px */
+  --line-height-base: 1.5;
 }
 
 body {
-  /* Apply Material You Design body style */
-  font-family: 'Roboto', sans-serif;
-  background-color: var(--mdc-theme-background);
-  color: var(--mdc-theme-on-surface);
-  margin: 0;
-  padding: 16px; /* 1rem */
+  background: var(--background-color);
+  color: var(--on-background-color);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
 }
 
-/* Common reset and box-sizing setup */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+.settings, #refresh-button, #clear-button, #send-button {
+  background-color: var(--primary-container-color);
+  color: var(--primary-color);
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: var(--button-box-shadow);
+  font-family: var(--font-family);
+  transition: transform 100ms ease-out;
 }
 
-/* Apply MDC styles to buttons */
-button {
-  font-family: 'Roboto', sans-serif;
+.settings:hover, #refresh-button:hover, #clear-button:hover, #send-button:hover {
+  background-color: var(--primary-color);
+  color: var(--on-primary-color);
+  transform: translateY(-2px);
 }
 
-/* Style for the buttons with MDC classes */
-.mdc-button {
-  --mdc-theme-primary: var(--mdc-theme-primary);
-  --mdc-theme-on-primary: var(--mdc-theme-on-primary);
+.settings:active, #refresh-button:active, #clear-button:active, #send-button:active {
+  transform: translateY(0);
 }
 
-.mdc-button--raised {
-  background-color: var(--mdc-theme-primary);
-  color: var(--mdc-theme-on-primary);
-}
-
-/* Settings and other specific buttons */
-.settings, #clear-button, #refresh-button, #send-button {
-  margin-top: 16px; /* space below the button or group */
-}
-
-/* Style for the chat input area */
-textarea {
-  resize: none;
+input, textarea {
+  border: 1px solid #ccc;
+  border-radius: 8px;
   padding: 10px;
-  margin-bottom: 20px; /* space below the textarea */
-  border: 1px solid #ddd; /* light gray border */
-  border-radius: 4px; /* rounded corners */
   width: 100%;
   box-sizing: border-box;
-  font-family: 'Roboto', sans-serif;
+  margin-bottom: 16px;
 }
 
-/* Style for the chat history */
-#chat-history {
-  max-height: 80vh;
-  overflow-y: auto;
-  margin-bottom: 20px; /* space below the chat history */
+textarea {
+  resize: vertical;
+  min-height: 50px;
 }
 
-/* Style for messages */
 .message {
+  margin: 8px 0;
   padding: 10px;
-  margin-bottom: 12px;
-  background: var(--mdc-theme-surface);
-  border-radius: 4px;
-  border: 1px solid #e0e0e0; /* light gray border */
-  position: relative;
-}
-
-/* Specific styles for bot and user messages to differentiate them */
-.message.bot {
-  background-color: #e7f1ff; /* light blue background for bot messages */
+  background-color: var(--surface-color);
+  border-radius: 8px;
+  box-shadow: var(--button-box-shadow);
 }
 
 .message.user {
-  background-color: #f1ffe7; /* light green background for user messages */
+  align-self: flex-end;
+  background-color: var(--primary-container-color);
 }
 
-/* Style for the generated message marker */
-.generating {
-  font-style: italic;
-  color: #999; /* subtle text for generating marker */
+.message.bot {
+  align-self: flex-start;
+  background-color: var(--surface-color);
 }
 
-/* Make sure action buttons are placed at the bottom of the message */
-.action-buttons {
+.message .action-buttons button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--primary-color);
+  margin-right: 8px;
+}
+
+#chat-history {
+  border-top: 1px solid #e0e0e0;
+  padding: 16px;
+  overflow-y: auto;
+  max-height: 300px; /* adjust as needed */
   display: flex;
-  gap: 8px; /* space between action buttons */
-  margin-top: 10px; /* space above the action buttons */
-}
-
-/* Common styles for all action buttons (copy, delete, regenerate) */
-.action-button-copy,
-.action-button-delete,
-.action-button-regen {
-  font-family: 'Roboto', sans-serif;
-}
-
-/* Styling for the model selection menu */
-#model-menu {
-  display: none;
-  background: var(--mdc-theme-surface);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.24);
-  border-radius: 4px;
-  padding: 20px;
-  margin-top: 16px; /* space between settings button and model menu */
-}
-
-/* Style each option inside the model selection */
-.options {
-  margin-bottom: 14px;
-}
-
-/* Styling for the model list */
-#model-list {
-  display: flex;
-  gap: 8px;
   flex-direction: column;
 }
 
-/* Style for individual models */
-#model-list div {
-  cursor: pointer;
-  padding: 10px;
-  border: 1px solid var(--mdc-theme-primary);
-  border-radius: 4px;
-  text-align: center;
-}
-
-/* Highlight selected model */
-#model-list div.selected {
-  background-color: var(--mdc-theme-primary);
-  color: var(--mdc-theme-on-primary);
-}
-
-/* Styling for AI generating/thinking indicator */
-#ai-thinking {
-  display: none;
-  justify-content: center;
-}
+/* Add more styles as needed... */
