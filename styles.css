@@ -1,165 +1,187 @@
 :root {
-  --surface-color: #fff;
-  --primary-color: #6750A4;
-  --primary-variant-color: #453379;
-  --secondary-color: #625B71;
-  --error-color: #B00020;
-  --background-color: #FAFAFA;
-  --on-primary-color: #FFFFFF;
-  --on-secondary-color: #FFFFFF;
-  --on-error-color: #FFFFFF;
-  --on-background-color: #1C1B1F;
-  --on-surface-color: #1C1B1F;
+  /* Define default colors */
+  --primary-color: #6750a4; /* Example primary color (can be dynamic) */
+  --on-primary-color: #ffffff;
+  --background-color: #ffffff;
+  --on-background-color: #121212;
+  --secondary-color: #625b71; /* Example secondary color */
+  --error-color: #b00020;
+  --surface-color: #ffffff;
+  --on-surface-color: #121212;
 
+  /* Dynamic theming properties, placeholder values */
+  --dynamic-accent: var(--primary-color);
+  --dynamic-on-accent: var(--on-primary-color);
+
+  /* Component sizing */
+  --border-radius: 12px;
+  --button-padding: 0.75rem 1.5rem;
+
+  /* Typography */
   --font-family: 'Roboto', sans-serif;
-  --border-radius: 16px;
-  --elevation: 4px;
-
-  --container-padding: 16px;
-  --item-spacing: 8px;
-  --button-height: 56px;
-
-  --transition-duration: 250ms;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: var(--font-family);
+  --headline-font: 1.5rem;
+  --subtitle-font: 1.125rem;
+  --button-font: 1rem;
+  --caption-font: 0.875rem;
 }
 
 body {
+  margin: 0;
   background-color: var(--background-color);
   color: var(--on-background-color);
+  font-family: var(--font-family);
 }
 
-#chat-container {
-  max-width: 600px;
-  margin: auto;
-  padding: var(--container-padding);
-  background: var(--surface-color);
-  box-shadow: 0 var(--elevation) var(--elevation) rgba(0, 0, 0, 0.2);
-  border-radius: var(--border-radius);
-  display: flex;
-  flex-direction: column;
-  gap: var(--item-spacing);
+/* Resets button styling */
+button,
+input[type="button"],
+input[type="submit"] {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
 }
 
+/* Basic styling for buttons */
 .settings,
 #refresh-button,
 #clear-button,
 #send-button {
-  background-color: var(--primary-color);
-  color: var(--on-primary-color);
-  border: none;
+  font-size: var(--button-font);
   border-radius: var(--border-radius);
-  padding: var(--item-spacing);
-  height: var(--button-height);
+  padding: var(--button-padding);
+  text-transform: uppercase;
+  background-color: var(--dynamic-accent);
+  color: var(--dynamic-on-accent);
+  border: none;
   cursor: pointer;
-  transition: background-color var(--transition-duration);
+  transition: background-color 0.3s ease;
 }
 
 .settings:hover,
 #refresh-button:hover,
 #clear-button:hover,
 #send-button:hover {
-  background-color: var(--primary-variant-color);
+  background-color: var(--secondary-color);
 }
 
-#model-menu {
-  display: none;
+/* Styling for chat container */
+#chat-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+  display: flex;
   flex-direction: column;
-  gap: var(--item-spacing);
+  gap: 1rem;
 }
 
+/* Chat history and models styling */
+#chat-history, #model-menu {
+  border: 1px solid #e0e0e0;
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  background-color: var(--surface-color);
+  color: var(--on-surface-color);
+}
+
+/* Text input field styling */
+#message-input {
+  width: 100%;
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  border: 1px solid #e0e0e0;
+  resize: none;
+}
+
+/* Focus state for inputs and buttons */
+input:focus, button:focus, textarea:focus {
+  outline: 2px solid var(--dynamic-accent);
+}
+
+/* Option labels styling */
 .options {
-  font-weight: bold;
-  margin-top: var(--item-spacing);
+  font-size: var(--subtitle-font);
+  margin: 0 0 0.5rem 0;
 }
 
+/* Selection of model display */
 #model-list div {
-  padding: var(--item-spacing);
-  transition: background-color var(--transition-duration);
-  cursor: pointer;
+  padding: 0.5rem;
   border-radius: var(--border-radius);
 }
 
 #model-list div:hover {
   background-color: var(--secondary-color);
-  color: var(--on-secondary-color);
+  color: var(--on-surface-color);
 }
 
+/* Applied when a model is selected */
 .selected {
-  background-color: var(--secondary-color);
-  color: var(--on-secondary-color);
-}
-
-#model-list div:not(.selected):hover {
-  background-color: var(--secondary-color);
-  color: var(--on-secondary-color);
-}
-
-input, textarea {
-  width: 100%;
-  padding: var(--item-spacing);
-  margin-bottom: var(--item-spacing);
-  border: 1px solid #ccc;
-  border-radius: var(--border-radius);
-  transition: border-color var(--transition-duration);
-}
-
-input:focus, textarea:focus {
-  outline: none;
-  border-color: var(--primary-color);
-}
-
-#chat-history {
-  overflow-y: auto;
-  max-height: 400px;
-  margin-bottom: var(--item-spacing);
+  background-color: var(--dynamic-accent);
+  color: var(--dynamic-on-accent);
 }
 
 .message {
+  margin-bottom: 1rem;
+  padding: 1rem;
   border-radius: var(--border-radius);
-  margin-bottom: var(--item-spacing);
-  padding: var(--item-spacing);
+  background-color: var(--surface-color);
+  color: var(--on-surface-color);
   position: relative;
 }
 
+/* Message owner specific styles */
 .message.user {
-  background-color: var(--primary-color);
-  color: var(--on-primary-color);
   align-self: flex-end;
+  background-color: var(--dynamic-accent);
+  color: var(--dynamic-on-accent);
 }
 
 .message.bot {
-  background-color: var(--secondary-color);
-  color: var(--on-secondary-color);
   align-self: flex-start;
+  background-color: var(--surface-color);
+  color: var(--on-surface-color);
 }
 
-.message .action-buttons {
-  display: none;
-  position: absolute;
-  right: var(--item-spacing);
-  top: var(--item-spacing);
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
 }
 
-.message:hover .action-buttons {
-  display: block;
-}
-
-.action-button-copy,
-.action-button-delete,
-.action-button-regen {
-  background-color: transparent;
+.copy-code-button {
+  padding: 0.25rem 0.5rem;
+  font-size: var(--caption-font);
+  border-radius: var(--border-radius);
+  background-color: var(--dynamic-accent);
+  color: var(--on-primary-color);
   border: none;
-  color: inherit;
-  cursor: pointer;
-  margin-left: var(--item-spacing);
+  margin-top: 0.5rem;
 }
 
-.generating {
-  font-style: italic;
+.copy-code-button:hover {
+  background-color: var(--secondary-color);
 }
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--secondary-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--dynamic-accent);
+}
+
+/* Respective media queries for responsive layouts, if needed, would go here */
+
+/* Further customizations can include dynamic theming based on user preferences */
