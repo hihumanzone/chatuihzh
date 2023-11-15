@@ -62,7 +62,7 @@ body {
 
 @media screen and (orientation: landscape) {
   #model-list {
-    grid-template-columns: repeat(auto-fit, minmax(20vh, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(40vh, 1fr));
   }
 
   #model-list div {
@@ -71,6 +71,7 @@ body {
 }
 
 #model-list div {
+  text-align: center;
   cursor: pointer;
   background-color: #e0e0e0;
   padding: 2vh;
