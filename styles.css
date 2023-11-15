@@ -147,7 +147,7 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 }
 
 .message > * {
-  margin-bottom: -14px;
+  margin-bottom: -40px;
 }
 
 .message .action-buttons {
