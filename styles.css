@@ -143,17 +143,78 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   border-radius: 10px;
 }
 
+/* Additional or updated styles based on the new requirements */
+
+/* About button styling */
+#about {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.875rem;
+  padding: 10px 16px;
+  background-color: #ffffff;
+  color: #202124;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 1px 3px 1px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+#about:hover {
+  background-color: #e0e0e0;
+}
+
+/* Center Settings and Clear buttons */
+#settings, #clear-button {
+  display: block;
+  margin: 10px auto; /* centers the buttons horizontally */
+}
+
+/* Send button and message input */
+#send-button {
+  padding: 10px 16px;
+  margin-right: 8px; /* provides spacing between button and input */
+}
+
+#message-input {
+  flex-grow: 1; /* allows the input field to take up the remaining space */
+  margin-right: 10px; /* aligns with the design and provides spacing */
+}
+
+/* Container for Send button and message input */
+.send-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Adjust the height of the textarea to fit content automatically */
+#message-input {
+  height: 48px; /* default height */
+  padding: 10px;
+  border-radius: 4px;
+}
+
+/* Adjust responsiveness to ensure inline form displays correctly */
 @media (max-width: 768px) {
-  body {
-    padding: 10px;
+  .send-container {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .settings, #refresh-button, #clear-button, #send-button {
+  #message-input {
+    order: 1; /* move input above the button on narrow screens */
+    margin-right: 0;
+    margin-bottom: 10px; /* adds spacing between the input and button */
+  }
+
+  #send-button {
+    order: 2; /* move button below the input on narrow screens */
     width: 100%;
-    margin: 10px 0;
+    margin-right: 0;
   }
 
-  #model-menu {
+  #settings, #clear-button, #about {
+    width: 100%;
     margin: 10px 0;
   }
 }
