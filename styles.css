@@ -104,10 +104,6 @@ textarea, input[type="password"], #api-endpoint-input {
   height: 20vh;
 }
 
-#system-role-input, #api-endpoint-input, #api-key-input {
-  width: 98vw;
-}
-
 textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   border-color: #80bdff;
   outline: 0;
