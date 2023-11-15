@@ -13,6 +13,7 @@ body {
   line-height: 1.5;
   font-size: 16px;
   margin: 14px;
+  margin-top: 5px;
 }
 
 .settings, #refresh-button, #clear-button, #send-button, .copy-code-button, .action-button-copy, .action-button-delete, .action-button-regen {
@@ -110,7 +111,7 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 }
 
 #chat-history {
-  height: 80vh;
+  height: 70vh;
   overflow-y: auto;
   margin: 5px 0;
   padding: 10px;
