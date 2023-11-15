@@ -54,6 +54,7 @@ body {
 }
 
 #model-list div {
+  background-color: #e0e0e0;
   padding: 10px 15px;
   margin: 5px 0;
   border-radius: 5px;
@@ -61,7 +62,6 @@ body {
 }
 
 #model-list div:hover {
-  background-color: #e0e0e0;
   cursor: pointer;
 }
 
