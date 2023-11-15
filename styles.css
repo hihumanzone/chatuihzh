@@ -203,6 +203,7 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 }
 
 .button-container {
+  gap: 10px;
   display: flex;
   justify-content: center;
 }
