@@ -130,8 +130,8 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 
 .message {
   margin-bottom: 40px;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: 5px;
+  margin-right: 5px;
   padding: 10px;
   border-radius: 5px;
   background-color: #f0f0f0;
