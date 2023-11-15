@@ -227,3 +227,94 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   display: flex;
   justify-content: center;
 }
+
+/* General styles for container */
+.markdown-container {
+  line-height: 1.6;
+  font-size: 16px;
+  color: #333;
+}
+
+/* Table styles */
+.markdown-container table {
+  border-collapse: collapse;
+  margin: 1em 0;
+  width: 100%;
+}
+
+.markdown-container th,
+.markdown-container td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.markdown-container th {
+  background-color: #f9f9f9;
+  font-weight: bold;
+}
+
+.markdown-container tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Blockquote styles */
+.markdown-container blockquote {
+  padding: 0.5em 1em;
+  margin: 0.8em 0;
+  border-left: 0.25em solid #dfe2e5;
+  background-color: #f8f8f8;
+  color: #6a737d;
+  font-style: italic;
+}
+
+/* Code block styles */
+.markdown-container pre {
+  background-color: #f6f8fa;
+  border-radius: 3px;
+  padding: 1em;
+  overflow-x: auto;
+  margin: 1em 0;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.markdown-container code {
+  background-color: #f6f8fa;
+  border-radius: 3px;
+  padding: 0.2em 0.4em;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* When code is within a pre block for a code block */
+.markdown-container pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+/* List styles */
+.markdown-container ul,
+.markdown-container ol {
+  padding-left: 2em;
+  margin: 1em 0;
+}
+
+.markdown-container ul li,
+.markdown-container ol li {
+  margin-top: 0.5em;
+}
+
+/* Nested lists */
+.markdown-container ul ul,
+.markdown-container ul ol,
+.markdown-container ol ul,
+.markdown-container ol ol {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Horizontal Rule */
+.markdown-container hr {
+  border: 0;
+  border-top: 1px solid #ddd;
+  margin: 2em 0;
+}
