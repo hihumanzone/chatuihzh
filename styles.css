@@ -123,22 +123,9 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 
 @media screen and (orientation: landscape) {
   #chat-history {
-    height: 55vh;
+    height: 50vh;
   }
 }
-
-@media (fullscreen) {
-  #chat-history {
-    height: 90vh;
-  }
-}
-
-@media screen and (orientation: landscape) and (fullscreen) {
-  #chat-history {
-    height: 40vh;
-  }
-}
-
 
 .message {
   margin-bottom: 40px;
