@@ -1,220 +1,73 @@
-/* Reset some built-in styles for a consistent look */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 body {
-  font-family: 'Roboto', sans-serif;
-  background-color: #f5f5f5;
-  color: #202124;
-  line-height: 1.5;
-  font-size: 16px;
-}
-
-/* Classes and styles based on Material Design 3 */
-.settings, #refresh-button, #clear-button, #send-button, .copy-code-button, .action-button-copy, .action-button-delete, .action-button-regen {
-  font-family: 'Roboto', sans-serif;
-  font-size: 0.875rem;
-  padding: 10px 16px;
-  background-color: #ffffff;
-  color: #202124;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 1px 3px 1px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s, box-shadow 0.3s;
-}
-
-.settings:hover, #refresh-button:hover, #clear-button:hover, #send-button:hover, .copy-code-button:hover, .action-button-copy:hover, .action-button-delete:hover, .action-button-regen:hover {
-  background-color: #e0e0e0;
-  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
-}
-
-.settings:focus, #refresh-button:focus, #clear-button:focus, #send-button:focus, .copy-code-button:focus, .action-button-copy:focus, .action-button-delete:focus, .action-button-regen:focus {
-  outline: none;
-  background-color: #ebebeb;
-}
-
-#model-menu {
-  background-color: #ffffff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  margin: 20px 0;
-  display: none; /* Initially hidden */
-}
-
-#model-list div {
-  padding: 10px 15px;
-  margin: 5px 0;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-}
-
-#model-list div:hover {
-  background-color: #e0e0e0;
-  cursor: pointer;
-}
-
-#model-list div.selected {
-  background-color: #d1e8ff;
-  font-weight: 600;
-}
-
-.options {
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-}
-
-textarea, input[type="password"], #api-endpoint-input {
-  width: 100%;
-  padding: 10px;
-  margin: 0.5rem 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #ffffff;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
-  border-color: #80bdff;
-  outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-}
-
-/* Chat message styles inspired by material design */
-#chat-history {
-  max-height: 70vh;
-  overflow-y: auto;
-  margin: 20px 0;
-  padding: 10px;
-  background-color: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075);
-}
-
-.message {
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #f0f0f0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.message.user {
-  background-color: #f0f0f0;
-  align-self: flex-end;
-}
-
-.message.bot {
-  background-color: #e6f4ff;
-  align-self: flex-start;
-}
-
-.message .action-buttons {
   display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-  margin-top: 10px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  padding: 20px;
 }
 
-.message-text {
-  white-space: pre-wrap;
-}
-
-.copy-code-button, .action-button-copy, .action-button-delete, .action-button-regen {
-  min-width: 70px;
-}
-
-/* Scrollbar styling for modern browsers */
-#chat-history::-webkit-scrollbar {
-  width: 6px;
-  background-color: #f5f5f5;
-}
-
-#chat-history::-webkit-scrollbar-thumb {
-  background-color: #c1c1c1;
-  border-radius: 10px;
-}
-
-/* Additional or updated styles based on the new requirements */
-
-/* About button styling */
 #about {
-  font-family: 'Roboto', sans-serif;
-  font-size: 0.875rem;
   padding: 10px 16px;
-  background-color: #ffffff;
-  color: #202124;
   border: none;
   border-radius: 8px;
+  background-color: #6200ee; /* Example primary color for the About button */
+  color: #fff;
+  font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 1px 3px 1px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s, box-shadow 0.3s;
+  text-transform: uppercase; /* Typical Material Design button styling */
+  margin-top: 16px;
+  text-decoration: none;
+  display: inline-block;
 }
 
 #about:hover {
-  background-color: #e0e0e0;
+  background-color: #3700b3; /* Darker shade for hover state */
 }
 
-/* Center Settings and Clear buttons */
 #settings, #clear-button {
-  display: block;
-  margin: 10px auto; /* centers the buttons horizontally */
+  margin: 0 10px; /* Add spacing between the buttons */
 }
 
-/* Send button and message input */
-#send-button {
-  padding: 10px 16px;
-  margin-right: 8px; /* provides spacing between button and input */
+/* Center the Settings and Clear buttons */
+.settings-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
 }
 
-#message-input {
-  flex-grow: 1; /* allows the input field to take up the remaining space */
-  margin-right: 10px; /* aligns with the design and provides spacing */
-}
-
-/* Container for Send button and message input */
-.send-container {
+/* Align the Send button to the right of the message input */
+.message-input-container {
+  width: calc(100% - 40px);
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  justify-content: space-between;
+  gap: 10px; /* Space between input field and Send button */
 }
 
-/* Adjust the height of the textarea to fit content automatically */
 #message-input {
-  height: 48px; /* default height */
-  padding: 10px;
+  flex-grow: 1;
+  margin-right: 10px; /* Ensure spacing between input and Send button */
+}
+
+#send-button {
+  min-width: 80px; /* Minimum width to still look like a button */
+}
+
+/* Improved styling for action buttons */
+.action-button-copy, .action-button-delete, .action-button-regen {
+  font-size: 14px;
+  padding: 5px 8px;
   border-radius: 4px;
 }
 
-/* Adjust responsiveness to ensure inline form displays correctly */
-@media (max-width: 768px) {
-  .send-container {
-    flex-direction: column;
-    align-items: stretch;
+@media screen and (max-width: 768px) {
+  /* For smaller screen sizes, make the layout a bit more responsive by adjusting paddings and button sizes */
+  #about, .settings, #clear-button, #send-button, .copy-code-button, .action-button-copy, .action-button-delete, .action-button-regen {
+    padding: 8px 12px;
   }
-
-  #message-input {
-    order: 1; /* move input above the button on narrow screens */
-    margin-right: 0;
-    margin-bottom: 10px; /* adds spacing between the input and button */
-  }
-
-  #send-button {
-    order: 2; /* move button below the input on narrow screens */
-    width: 100%;
-    margin-right: 0;
-  }
-
-  #settings, #clear-button, #about {
-    width: 100%;
-    margin: 10px 0;
+  .message-input-container {
+    width: calc(100% - 20px);
   }
 }
