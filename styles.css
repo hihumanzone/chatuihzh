@@ -205,6 +205,4 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 .button-container {
   display: flex;
   justify-content: center;
-  gap: 10px;
-  margin-bottom: 20px;
 }
