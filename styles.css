@@ -65,7 +65,7 @@ body {
   }
 
   #model-list div {
-    padding: 1vh;
+    padding: 3vh;
   }
 }
 
@@ -78,7 +78,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 10vh;
 }
 
 #model-list div:hover {
