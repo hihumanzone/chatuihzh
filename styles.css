@@ -1,172 +1,156 @@
-/* Reset some default styles */
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed, 
-figure, figcaption, footer, header, hgroup, 
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    font-size: 100%;
-    font: inherit;
-    vertical-align: baseline;
-}
-
-/* Page setup */
+/* Apply base font consistent with Material Design */
 body {
-    font-family: 'Roboto', sans-serif;
-    line-height: 1.5;
-    background-color: #fff;
-    color: #212121;
+  font-family: 'Roboto', sans-serif;
+  background: #FAFAFA;
+  margin: 0;
+  padding: 0;
+  color: #212121;
 }
 
-/* Common styles */
-
-.settings, .message, #send-button, #clear-button, #refresh-button, .action-button-copy, .action-button-delete, .action-button-regen, .copy-code-button {
-    padding: 8px 16px;
-    font-size: 14px;
-    font-family: 'Roboto', sans-serif;
-    border: none;
-    outline: none;
-    color: #fff;
-    background-color: #6200ee; /* Primary color */
-    text-transform: uppercase;
-    margin: 4px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.24);
+/* Style settings button */
+.settings {
+  background-color: #E0E0E0;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  margin: 12px;
+  cursor: pointer;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.24);
+  transition: box-shadow 0.2s;
 }
 
-.settings:hover, .message:hover, #send-button:hover, #clear-button:hover, #refresh-button:hover, .action-button-copy:hover, .action-button-delete:hover, .action-button-regen:hover, .copy-code-button:hover {
-    box-shadow: 0 3px 6px rgba(0,0,0,0.23), 0 3px 6px rgba(0,0,0,0.25);
+.settings:hover {
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.24);
 }
 
-/* Chat history */
-#chat-history {
-    background-color: #eeeeee;
-    padding: 16px;
-    max-height: 80vh;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 16px;
-    border-radius: 4px;
+/* Style for all text input fields and text areas */
+input[type='text'],
+input[type='password'],
+textarea {
+  border: none;
+  padding: 16px;
+  margin: 8px 0;
+  border-radius: 4px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.2s;
+  background-color: white;
+  width: calc(100% - 32px);
+  font-size: 16px;
 }
 
-.message {
-    background-color: #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    border-radius: 4px;
-    padding: 8px 16px;
+input[type='text']:focus,
+input[type='password']:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.24);
 }
 
-/* Text input */
-#message-input {
-    width: calc(100% - 32px); /* Full width minus padding */
-    box-sizing: border-box;
-    padding: 8px 16px;
-    border: 1px solid #ccc; /* Border color */
-    margin-bottom: 16px;
-    border-radius: 4px;
-    outline: none;
-    resize: none;
-}
-
-#message-input:focus {
-    border-color: #6200ee; /* Primary color */
-}
-
-/* Model menu */
-#model-menu {
-    background-color: #ffffff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    padding: 16px;
-    border-radius: 4px;
-    display: none; /* Initially hidden */
-    position: absolute;
-    right: 16px;
-    top: 48px; /* below the settings button */
-    z-index: 10;
-}
-
-.options {
-    font-size: 16px;
-    margin-bottom: 8px;
-}
-
-/* Input and textarea */
-#api-endpoint-input, #api-key-input, #system-role-input,
-#api-endpoint-input:focus, #api-key-input:focus, #system-role-input:focus {
-    width: calc(100% - 32px); /* Full width minus padding */
-    box-sizing: border-box;
-    padding: 8px 16px;
-    border: 1px solid #ccc; /* Border color */
-    border-radius: 4px;
-    margin-bottom: 16px;
-}
-
-#api-endpoint-input:focus, #api-key-input:focus, #system-role-input:focus {
-    border-color: #6200ee; /* Highlight color */
-}
-
-/* Select model list */
-#model-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    margin-bottom: 16px;
-}
-
+/* Style for the clickable divs in model-list */
 #model-list div {
-    padding: 4px 8px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.2s ease;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  cursor: pointer;
+  margin: 4px 0;
 }
 
 #model-list div:hover {
-    background-color: rgba(0,0,0,0.04); /* Light ripple effect */
+  background-color: #E0E0E0;
 }
 
 /* Selected model */
 .selected {
-    background-color: #6200ee; /* Primary color */
-    color: #fff;
+  background-color: #B0BEC5;
 }
 
-/* About button */
-#about {
-    background-color: #03dac6; /* Secondary color */
-    border: none;
-    color: #000;
-    font-size: 14px;
-    padding: 8px 16px;
-    text-transform: uppercase;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+/* Styles for chat history and messages */
+#chat-history {
+  max-height: 70vh;
+  overflow-y: auto;
 }
 
-#about:hover {
-    background-color: #018786; /* Darken secondary color on hover */
+.message {
+  background-color: white;
+  border-radius: 4px;
+  margin: 8px;
+  padding: 12px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.12);
+  word-wrap: break-word;
+  max-width: 80%;
 }
 
-/* Override button text transform for better readability */
+/* Differently aligns messages from 'bot' and 'user' */
+.message.user {
+  margin-left: auto;
+  background-color: #E3F2FD;
+}
+
+.message.bot {
+  margin-right: auto;
+  background-color: #FFEBEE;
+}
+
+/* Generic button styles */
 button {
-    text-transform: none;
+  background-color: #E0E0E0;
+  color: #212121;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  margin: 8px;
+  cursor: pointer;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.24);
+  transition: box-shadow 0.2s;
 }
 
-/* Add some spacing at the bottom */
-body {
-    padding-bottom: 16px;
+button:hover {
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.24);
+}
+
+/* Hide model menu initially */
+#model-menu {
+  display: none;
+  padding: 16px;
+  background-color: white;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.24);
+  position: absolute;
+  right: 16px;
+  top: 48px;
+  border-radius: 4px;
+  width: 300px;
+  z-index: 100;
+}
+
+/* Style for message text */
+.message-text {
+  font-size: 16px;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+
+.action-buttons button {
+  margin-left: 4px;
+}
+
+/* Styles for action buttons within each message */
+.copy-code-button,
+.action-button-copy,
+.action-button-delete,
+.action-button-regen {
+  border: none;
+  background: #E0E0E0;
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+.copy-code-button:hover,
+.action-button-copy:hover,
+.action-button-delete:hover,
+.action-button-regen:hover {
+  background: #CCCCCC;
 }
