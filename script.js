@@ -222,31 +222,15 @@ async function sendMessage() {
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
-  try {
-    const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
+  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
 
-    // Check for non-2XX response status or any other error in the response, and throw an error.
-    if (!jsonResponse.ok) {
-      throw new Error(`HTTP error! Status: ${jsonResponse.status}`);
-    }
+  const botResponse = jsonResponse.choices[0].message.content;
+  messages.push({
+    role: 'assistant',
+    content: botResponse,
+  });
 
-    const botResponseContent = await jsonResponse.json();
-
-    // Assume jsonResponse contains a valid JSON with a desired structure,
-    // e.g., { choices: [ { message: { content: ... } } ] }
-    const botResponse = botResponseContent.choices[0].message.content;
-    messages.push({
-      role: 'assistant',
-      content: botResponse,
-    });
-
-    createAndAppendMessage(botResponse, 'bot');
-  } catch (error) {
-    // Display the error message to the chat history
-    console.error('Failed to get bot response:', error);
-    const errorMessage = `Error: Failed to communicate with AI service. ${error.message}`;
-    createAndAppendMessage(errorMessage, 'system');
-  }
+  createAndAppendMessage(botResponse, 'bot');
 }
 
 function copyToClipboard(text) {
