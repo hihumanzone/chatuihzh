@@ -8,8 +8,8 @@
 
 body {
   font-family: 'Roboto', sans-serif;
-  background-color: #0a0a0a;
-  color: #dfdedb;
+  background-color: #0A0A0A;
+  color: #DFDEDB;
   line-height: 1.5;
   font-size: 16px;
   margin: 14px;
@@ -21,7 +21,7 @@ body {
   font-size: 0.875rem;
   padding: 10px 16px;
   background-color: #000000;
-  color: #dfdedb;
+  color: #DFDEDB;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -30,7 +30,7 @@ body {
 }
 
 .settings:hover, #refresh-button:hover, #clear-button:hover, #send-button:hover, .copy-code-button:hover, .action-button-copy:hover, .action-button-delete:hover, .action-button-regen:hover {
-  background-color: #1f1f1f;
+  background-color: #1F1F1F;
   box-shadow: 0 2px 4px -1px rgba(255, 255, 255, 0.2), 0 4px 5px 0 rgba(255, 255, 255, 0.14), 0 1px 10px 0 rgba(255, 255, 255, 0.12);
 }
 
@@ -41,7 +41,7 @@ body {
 
 .options {
   text-align: right;
-  border-bottom: 0.8px solid #ffffff;
+  border-bottom: 0.8px solid #FFFFFF;
   margin-top: 40px;
 }
 
@@ -70,7 +70,7 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  background-color: #1f1f1f;
+  background-color: #1F1F1F;
 }
 
 #model-list div:hover {
@@ -78,7 +78,7 @@ body {
 }
 
 #model-list div.selected {
-  background-color: #2e1700;
+  background-color: #2E1700;
   font-weight: 600;
 }
 
@@ -104,7 +104,7 @@ textarea, input[type="password"], #api-endpoint-input {
 }
 
 textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
-  border-color: #7f4200;
+  border-color: #7F4200;
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(255, 132, 0, 0.25);
 }
@@ -132,17 +132,17 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   margin-right: 5px;
   padding: 10px;
   border-radius: 15px;
-  background-color: #0f0f0f;
+  background-color: #0F0F0F;
   box-shadow: 0 1px 3px rgba(255, 255, 255, 0.1);
 }
 
 .message.user {
-  background-color: #0f0f0f;
+  background-color: #0F0F0F;
   align-self: flex-end;
 }
 
 .message.bot {
-  background-color: #190b00;
+  background-color: #190B00;
   align-self: flex-start;
 }
 
@@ -167,11 +167,11 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 
 #chat-history::-webkit-scrollbar {
   width: 6px;
-  background-color: #0a0a0a;
+  background-color: #0A0A0A;
 }
 
 #chat-history::-webkit-scrollbar-thumb {
-  background-color: #3e3e3e;
+  background-color: #3E3E3E;
   border-radius: 10px;
 }
 
@@ -180,7 +180,7 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   font-size: 0.875rem;
   padding: 10px 16px;
   background-color: #000000;
-  color: #dfdedb;
+  color: #DFDEDB;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -189,7 +189,7 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 }
 
 #about:hover {
-  background-color: #1f1f1f;
+  background-color: #1F1F1F;
 }
 
 #settings, #clear-button {
@@ -253,14 +253,14 @@ table th {
 blockquote {
   padding: 0em 0em 0em 2em;
   margin: 0;
-  background-color: #0a0a0a;
+  background-color: #0A0A0A;
   border-left: 10px solid #333333;
   color: #999999;
   font-style: italic;
 }
 
 pre, code {
-  background-color: #0a0a0a;
+  background-color: #0A0A0A;
   border-radius: 4px;
 }
 
