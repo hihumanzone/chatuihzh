@@ -8,8 +8,8 @@
 
 body {
   font-family: 'Roboto', sans-serif;
-  background-color: #0A0A0A;
-  color: #DFDEDB;
+  background-color: #0a0a0a;
+  color: #dfdedb;
   line-height: 1.5;
   font-size: 16px;
   margin: 14px;
@@ -21,7 +21,7 @@ body {
   font-size: 0.875rem;
   padding: 10px 16px;
   background-color: #000000;
-  color: #DFDEDB;
+  color: #dfdedb;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -30,7 +30,7 @@ body {
 }
 
 .settings:hover, #refresh-button:hover, #clear-button:hover, #send-button:hover, .copy-code-button:hover, .action-button-copy:hover, .action-button-delete:hover, .action-button-regen:hover {
-  background-color: #1F1F1F;
+  background-color: #1f1f1f;
   box-shadow: 0 2px 4px -1px rgba(255, 255, 255, 0.2), 0 4px 5px 0 rgba(255, 255, 255, 0.14), 0 1px 10px 0 rgba(255, 255, 255, 0.12);
 }
 
@@ -41,7 +41,7 @@ body {
 
 .options {
   text-align: right;
-  border-bottom: 0.8px solid #000;
+  border-bottom: 0.8px solid #ffffff;
   margin-top: 40px;
 }
 
@@ -70,15 +70,15 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  background-color: #1F1F1F;
+  background-color: #1f1f1f;
 }
 
 #model-list div:hover {
-  background-color: #ccc;
+  background-color: #333333;
 }
 
 #model-list div.selected {
-  background-color: #2E1700;
+  background-color: #2e1700;
   font-weight: 600;
 }
 
@@ -91,7 +91,7 @@ textarea, input[type="password"], #api-endpoint-input {
   width: 100%;
   padding: 10px;
   margin: 0.5rem 0;
-  border: 1px solid #ccc;
+  border: 1px solid #333333;
   border-radius: 4px;
   background-color: #000000;
   box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.075);
@@ -104,7 +104,7 @@ textarea, input[type="password"], #api-endpoint-input {
 }
 
 textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
-  border-color: #7F4200;
+  border-color: #7f4200;
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(255, 132, 0, 0.25);
 }
@@ -115,7 +115,7 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   margin: 5px 0;
   padding: 10px;
   background-color: #000000;
-  border: 1px solid #ddd;
+  border: 1px solid #222222;
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(255, 255, 255, 0.075);
 }
@@ -132,17 +132,17 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   margin-right: 5px;
   padding: 10px;
   border-radius: 15px;
-  background-color: #0F0F0F;
+  background-color: #0f0f0f;
   box-shadow: 0 1px 3px rgba(255, 255, 255, 0.1);
 }
 
 .message.user {
-  background-color: #0F0F0F;
+  background-color: #0f0f0f;
   align-self: flex-end;
 }
 
 .message.bot {
-  background-color: #190B00;
+  background-color: #190b00;
   align-self: flex-start;
 }
 
@@ -167,11 +167,11 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 
 #chat-history::-webkit-scrollbar {
   width: 6px;
-  background-color: #0A0A0A;
+  background-color: #0a0a0a;
 }
 
 #chat-history::-webkit-scrollbar-thumb {
-  background-color: #3E3E3E;
+  background-color: #3e3e3e;
   border-radius: 10px;
 }
 
@@ -180,7 +180,7 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   font-size: 0.875rem;
   padding: 10px 16px;
   background-color: #000000;
-  color: #DFDEDB;
+  color: #dfdedb;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -189,7 +189,7 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 }
 
 #about:hover {
-  background-color: #1F1F1F;
+  background-color: #1f1f1f;
 }
 
 #settings, #clear-button {
@@ -240,27 +240,27 @@ table {
 
 table td {
   padding: 0.5em 0.75em;
-  border: 1px solid #ddd;
+  border: 1px solid #222222;
   background-color: #080808;
 }
 
 table th {
   padding: 0.5em 0.75em;
-  border: 2px solid #ddd;
+  border: 2px solid #222222;
   background-color: #060606;
 }
 
 blockquote {
   padding: 0em 0em 0em 2em;
   margin: 0;
-  background-color: #0A0A0A;
-  border-left: 10px solid #ccc;
-  color: #666;
+  background-color: #0a0a0a;
+  border-left: 10px solid #333333;
+  color: #999999;
   font-style: italic;
 }
 
 pre, code {
-  background-color: #0A0A0A;
+  background-color: #0a0a0a;
   border-radius: 4px;
 }
 
