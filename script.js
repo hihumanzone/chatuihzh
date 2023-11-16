@@ -23,54 +23,6 @@ selectModel(selectedModel);
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
-document.getElementById('custom-model-switch').addEventListener('change', function(event) {
-  const customModelInput = document.getElementById('custom-model-input');
-  if (event.target.checked) {
-    document.getElementById('model-list').style.display = 'none';
-    customModelInput.style.display = 'block';
-    selectedModel = customModelInput.value.trim(); // Use the custom model input if the switch is checked.
-    localStorage.setItem('useCustomModelName', 'true');
-  } else {
-    document.getElementById('model-list').style.display = 'block';
-    customModelInput.style.display = 'none';
-    selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo'; // Use the last selected predefined model.
-    localStorage.setItem('useCustomModelName', 'false');
-  }
-});
-
-document.getElementById('custom-model-input').addEventListener('input', function(event) {
-  localStorage.setItem('customModelName', event.target.value.trim());
-  selectedModel = event.target.value.trim(); // Update selectedModel as user types in the custom model input.
-});
-
-function handleCustomModelSwitchState() {
-  const useCustomModelName = localStorage.getItem('useCustomModelName') === 'true';
-  const customModelSwitch = document.getElementById('custom-model-switch');
-  const customModelInput = document.getElementById('custom-model-input');
-  
-  if (useCustomModelName) {
-    document.getElementById('model-list').style.display = 'none';
-    customModelInput.style.display = 'block';
-    customModelSwitch.checked = true;
-    
-    const customModelName = localStorage.getItem('customModelName') || '';
-    customModelInput.value = customModelName;
-    selectedModel = customModelName;
-  } else {
-    document.getElementById('model-list').style.display = 'block';
-    customModelInput.style.display = 'none';
-    customModelSwitch.checked = false;
-    
-    selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
-    selectModel(selectedModel); // Select the model in the list when not using a custom name.
-  }
-}
-
-document.addEventListener('DOMContentLoaded', function(event) {
-  handleCustomModelSwitchState();
-  // Rest of the existing code that should run on page load...
-});
-
 function selectModel(model) {
   const modelOptions = document.querySelectorAll('#model-list div');
   modelOptions.forEach((option) => option.classList.remove('selected'));
