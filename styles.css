@@ -8,8 +8,8 @@
 
 body {
   font-family: 'Roboto', sans-serif;
-  background-color: #090909;
-  color: #C9C8C5;
+  background-color: #080808;
+  color: #ACABA9;
   line-height: 1.5;
   font-size: 16px;
   margin: 14px;
@@ -21,7 +21,7 @@ body {
   font-size: 0.875rem;
   padding: 10px 16px;
   background-color: #000000;
-  color: #C9C8C5;
+  color: #ACABA9;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -30,18 +30,18 @@ body {
 }
 
 .settings:hover, #refresh-button:hover, #clear-button:hover, #send-button:hover, .copy-code-button:hover, .action-button-copy:hover, .action-button-delete:hover, .action-button-regen:hover {
-  background-color: #1C1C1C;
+  background-color: #181818;
   box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
 }
 
 .settings:focus, #refresh-button:focus, #clear-button:focus, #send-button:focus, .copy-code-button:focus, .action-button-copy:focus, .action-button-delete:focus, .action-button-regen:focus {
   outline: none;
-  background-color: #121212;
+  background-color: #0F0F0F;
 }
 
 .options {
   text-align: right;
-  border-bottom: 0.8px solid #E6E6E6;
+  border-bottom: 0.8px solid #C4C4C4;
   margin-top: 40px;
 }
 
@@ -70,15 +70,15 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  background-color: #1C1C1C;
+  background-color: #181818;
 }
 
 #model-list div:hover {
-  background-color: #2E2E2E;
+  background-color: #272727;
 }
 
 #model-list div.selected {
-  background-color: #291500;
+  background-color: #231200;
   font-weight: 600;
 }
 
@@ -91,7 +91,7 @@ textarea, input[type="password"], #api-endpoint-input {
   width: 100%;
   padding: 10px;
   margin: 0.5rem 0;
-  border: 1px solid #2E2E2E;
+  border: 1px solid #272727;
   border-radius: 4px;
   background-color: #000000;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
@@ -104,7 +104,7 @@ textarea, input[type="password"], #api-endpoint-input {
 }
 
 textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
-  border-color: #723B00;
+  border-color: #623300;
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
@@ -115,7 +115,7 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   margin: 5px 0;
   padding: 10px;
   background-color: #000000;
-  border: 1px solid #1F1F1F;
+  border: 1px solid #1A1A1A;
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075);
 }
@@ -132,17 +132,17 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   margin-right: 5px;
   padding: 10px;
   border-radius: 15px;
-  background-color: #0E0E0E;
+  background-color: #0C0C0C;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .message.user {
-  background-color: #0E0E0E;
+  background-color: #0C0C0C;
   align-self: flex-end;
 }
 
 .message.bot {
-  background-color: #170A00;
+  background-color: #130800;
   align-self: flex-start;
 }
 
@@ -167,11 +167,11 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 
 #chat-history::-webkit-scrollbar {
   width: 6px;
-  background-color: #090909;
+  background-color: #080808;
 }
 
 #chat-history::-webkit-scrollbar-thumb {
-  background-color: #383838;
+  background-color: #303030;
   border-radius: 10px;
 }
 
@@ -180,7 +180,7 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   font-size: 0.875rem;
   padding: 10px 16px;
   background-color: #000000;
-  color: #C9C8C5;
+  color: #ACABA9;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -189,7 +189,7 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 }
 
 #about:hover {
-  background-color: #1C1C1C;
+  background-color: #181818;
 }
 
 #settings, #clear-button {
@@ -240,27 +240,27 @@ table {
 
 table td {
   padding: 0.5em 0.75em;
-  border: 1px solid #1F1F1F;
-  background-color: #070707;
+  border: 1px solid #1A1A1A;
+  background-color: #060606;
 }
 
 table th {
   padding: 0.5em 0.75em;
-  border: 2px solid #1F1F1F;
+  border: 2px solid #1A1A1A;
   background-color: #050505;
 }
 
 blockquote {
   padding: 0em 0em 0em 2em;
   margin: 0;
-  background-color: #090909;
-  border-left: 10px solid #2E2E2E;
-  color: #8A8A8A;
+  background-color: #080808;
+  border-left: 10px solid #272727;
+  color: #767676;
   font-style: italic;
 }
 
 pre, code {
-  background-color: #090909;
+  background-color: #080808;
   border-radius: 4px;
 }
 
