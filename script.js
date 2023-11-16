@@ -47,6 +47,19 @@ messageInput.addEventListener('input', () => {
   messageInput.style.height = `${messageInput.scrollHeight}px`;
 });
 
+document.getElementById('custom-model-switch').addEventListener('change', function(event) {
+  const isCustomModel = event.target.checked;
+  if (isCustomModel) {
+    document.getElementById('model-list').style.display = 'none';
+    document.getElementById('custom-model-input').style.display = 'block';
+    selectedModel = "";
+  } else {
+    document.getElementById('model-list').style.display = 'block';
+    document.getElementById('custom-model-input').style.display = 'none';
+    selectModel(localStorage.getItem('selectedModel') || 'gpt-3.5-turbo');
+  }
+});
+
 const ENDPOINT = apiEndpoint || 'https://api.openai.com/v1/chat/completions';
 
 async function getBotResponse(apiKey, apiEndpoint, message) {
@@ -62,8 +75,11 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
 
   aiThinkingMsg.style.display = 'flex';
 
+  const isCustomModel = document.getElementById('custom-model-switch').checked;
+  const customModel = isCustomModel ? document.getElementById('custom-model-input').value.trim() : selectedModel;
+
   const data = {
-    model: selectedModel,
+    model: customModel,
     messages: messages,
   };
 
