@@ -51,9 +51,7 @@ function selectModel(model) {
     localStorage.setItem('selectedModel', selectedModel);
   }
   
-  const customModelSwitch = document.getElementById('custom-model-switch');
-  if (!customModelSwitch.checked) {
-  }
+  toggleModelMenu();
 }
 
 function toggleModelMenu() {
