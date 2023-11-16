@@ -23,14 +23,62 @@ selectModel(selectedModel);
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
+document.getElementById('custom-model-switch').addEventListener('change', function(event) {
+  const customModelInput = document.getElementById('custom-model-input');
+  if (event.target.checked) {
+    document.getElementById('model-list').style.display = 'none';
+    customModelInput.style.display = 'block';
+    selectedModel = customModelInput.value.trim(); // Use the custom model input if the switch is checked.
+    localStorage.setItem('useCustomModelName', 'true');
+  } else {
+    document.getElementById('model-list').style.display = 'block';
+    customModelInput.style.display = 'none';
+    selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo'; // Use the last selected predefined model.
+    localStorage.setItem('useCustomModelName', 'false');
+  }
+});
+
+document.getElementById('custom-model-input').addEventListener('input', function(event) {
+  localStorage.setItem('customModelName', event.target.value.trim());
+  selectedModel = event.target.value.trim(); // Update selectedModel as user types in the custom model input.
+});
+
+function handleCustomModelSwitchState() {
+  const useCustomModelName = localStorage.getItem('useCustomModelName') === 'true';
+  const customModelSwitch = document.getElementById('custom-model-switch');
+  const customModelInput = document.getElementById('custom-model-input');
+  
+  if (useCustomModelName) {
+    document.getElementById('model-list').style.display = 'none';
+    customModelInput.style.display = 'block';
+    customModelSwitch.checked = true;
+    
+    const customModelName = localStorage.getItem('customModelName') || '';
+    customModelInput.value = customModelName;
+    selectedModel = customModelName;
+  } else {
+    document.getElementById('model-list').style.display = 'block';
+    customModelInput.style.display = 'none';
+    customModelSwitch.checked = false;
+    
+    selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
+    selectModel(selectedModel); // Select the model in the list when not using a custom name.
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function(event) {
+  handleCustomModelSwitchState();
+  // Rest of the existing code that should run on page load...
+});
+
 function selectModel(model) {
   const modelOptions = document.querySelectorAll('#model-list div');
-  modelOptions.forEach((option) => {
-    option.classList.remove('selected');
-    if (option.dataset.model === model) {
-      option.classList.add('selected');
-    }
-  });
+  modelOptions.forEach((option) => option.classList.remove('selected'));
+
+  const selectedModelOption = document.querySelector(`#model-list div[data-model="${model}"]`);
+  if (selectedModelOption) {
+    selectedModelOption.classList.add('selected');
+  }
 
   selectedModel = model;
   localStorage.setItem('selectedModel', selectedModel);
@@ -45,36 +93,6 @@ function toggleModelMenu() {
 messageInput.addEventListener('input', () => {
   messageInput.style.height = 'auto';
   messageInput.style.height = `${messageInput.scrollHeight}px`;
-});
-
-document.getElementById('custom-model-switch').addEventListener('change', function(event) {
-  if (event.target.checked) {
-    document.getElementById('model-list').style.display = 'none';
-    document.getElementById('custom-model-input').style.display = 'block';
-    selectedModel = '';
-  } else {
-    document.getElementById('model-list').style.display = 'block';
-    document.getElementById('custom-model-input').style.display = 'none';
-    document.getElementById('custom-model-input').value = ''; // Clear the custom input field when switching back.
-    selectModel(localStorage.getItem('selectedModel') || 'gpt-3.5-turbo'); // Reset to the last selected model from the list.
-  }
-});
-
-document.addEventListener('DOMContentLoaded', function(event) {
-  const isCustomModelActive = localStorage.getItem('isCustomModelActive') === 'true';
-  const customModelName = localStorage.getItem('customModelName') || '';
-
-  if (isCustomModelActive) {
-    document.getElementById('custom-model-switch').checked = true;
-    document.getElementById('custom-model-input').value = customModelName;
-    document.getElementById('custom-model-input').style.display = 'block';
-    document.getElementById('model-list').style.display = 'none';
-    selectedModel = customModelName;
-  }
-});
-
-document.getElementById('custom-model-input').addEventListener('input', function(event) {
-  selectedModel = event.target.value.trim();
 });
 
 const ENDPOINT = apiEndpoint || 'https://api.openai.com/v1/chat/completions';
@@ -93,7 +111,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   aiThinkingMsg.style.display = 'flex';
 
   const data = {
-    model: selectedModel || document.getElementById('custom-model-input').value.trim(),
+    model: selectedModel,
     messages: messages,
   };
 
@@ -301,15 +319,7 @@ function saveInputsAndRefresh() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
   systemRole = systemRoleInput.value.trim();
-  const isCustomModelActive = document.getElementById('custom-model-switch').checked;
-  const customModelName = document.getElementById('custom-model-input').value.trim();
-  
-  if (isCustomModelActive) {
-    selectedModel = customModelName;
-  }
 
-  localStorage.setItem('isCustomModelActive', isCustomModelActive);
-  localStorage.setItem('customModelName', customModelName);
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
   localStorage.setItem('systemRole', systemRole);
