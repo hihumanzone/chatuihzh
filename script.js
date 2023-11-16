@@ -53,7 +53,6 @@ function selectModel(model) {
   
   const customModelSwitch = document.getElementById('custom-model-switch');
   if (!customModelSwitch.checked) {
-    toggleModelMenu();
   }
 }
 
