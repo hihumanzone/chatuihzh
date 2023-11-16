@@ -78,6 +78,10 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   return response.json();
 }
 
+// Global variable to track the element of the last bot message
+let lastBotMessageElement = null;
+
+// Full createAndAppendMessage function with "Regenerate" button logic
 function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
@@ -132,24 +136,43 @@ function createAndAppendMessage(content, owner) {
   actionButtons.appendChild(copyButton);
   actionButtons.appendChild(deleteButton);
 
-  if (owner === 'bot' && isLatestBotResponse) {
+  // Remove the "Regenerate" button from the last bot message
+  if (lastBotMessageElement && owner === 'bot') {
+    const lastRegenButton = lastBotMessageElement.querySelector('.action-button-regen');
+    if (lastRegenButton) {
+      lastRegenButton.remove();
+    }
+  }
+
+  // If the owner is 'bot', we need to add the "Regenerate" button and update the lastBotMessageElement
+  if (owner === 'bot') {
     const regenButton = document.createElement('button');
     regenButton.textContent = 'Regen';
     regenButton.classList.add('action-button-regen');
-    regenButton.addEventListener('click', () => {
-      regenerateMessage(message, owner);
-    });
+    regenButton.addEventListener('click', () => regenerateMessage(message, owner));
 
     actionButtons.appendChild(regenButton);
+    lastBotMessageElement = message; // Save the current bot message as the last one
   }
 
   message.appendChild(actionButtons);
-
   chatHistory.insertBefore(message, aiThinkingMsg);
   chatHistory.scrollTop = chatHistory.scrollHeight;
   MathJax.Hub.Queue(['Typeset', MathJax.Hub, messageText]);
 }
 
+function addRegenerateButton(messageElement) {
+  const regenButton = document.createElement('button');
+  regenButton.textContent = 'Regen';
+  regenButton.classList.add('action-button-regen');
+  regenButton.addEventListener('click', () => {
+    regenerateMessage(messageElement, 'bot');
+  });
+
+  const actionButtons = messageElement.querySelector('.action-buttons');
+  actionButtons.appendChild(regenButton);
+}
+                           
 function copyMessage(content) {
   if (content) {
     copyToClipboard(content);
@@ -162,7 +185,11 @@ function copyMessage(content) {
 function deleteMessage(messageElement, content) {
   chatHistory.removeChild(messageElement);
   messages = messages.filter((msg) => msg.content !== content);
+  if (lastBotMessageElement === messageElement) {
+    lastBotMessageElement = null;
+  }
 }
+
 
 async function regenerateMessage(messageElement, owner) {
   const messageIdx = messages.findIndex((msg) => msg.content === messageElement.dataset.raw && msg.role === owner);
@@ -191,49 +218,36 @@ async function sendMessage() {
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
 
-  // Append user's message
   createAndAppendMessage(message, 'user');
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
   try {
-    // Fetch and append bot's response
     const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
-  
-    if (jsonResponse.choices && jsonResponse.choices.length > 0 && jsonResponse.choices[0].message) {
-      const botResponse = jsonResponse.choices[0].message.content;
-      messages.push({
-        role: 'assistant',
-        content: botResponse,
-      });
 
-      // Remove the regenerate button from the last bot message, if any
-      removeRegenerateButtonFromLastBotMessage();
-
-      // Create and append bot's message as the latest, with the regenerate button
-      createAndAppendMessage(botResponse, 'bot', true);
-    } else {
-      throw new Error('No response received from the API.');
+    // Check for non-2XX response status or any other error in the response, and throw an error.
+    if (!jsonResponse.ok) {
+      throw new Error(`HTTP error! Status: ${jsonResponse.status}`);
     }
+
+    const botResponseContent = await jsonResponse.json();
+
+    // Assume jsonResponse contains a valid JSON with a desired structure,
+    // e.g., { choices: [ { message: { content: ... } } ] }
+    const botResponse = botResponseContent.choices[0].message.content;
+    messages.push({
+      role: 'assistant',
+      content: botResponse,
+    });
+
+    createAndAppendMessage(botResponse, 'bot');
   } catch (error) {
-    console.error('Error fetching bot response:', error);
-    alert('Failed to get a response from the bot. Please check the console for more details.');
-    // Optionally add UI element for the user to see the error message directly without checking console
-    createAndAppendMessage('Error: Unable to fetch response from bot.', 'system');
+    // Display the error message to the chat history
+    console.error('Failed to get bot response:', error);
+    const errorMessage = `Error: Failed to communicate with AI service. ${error.message}`;
+    createAndAppendMessage(errorMessage, 'system');
   }
 }
-
-// Removes the regenerate button from the last bot message
-function removeRegenerateButtonFromLastBotMessage() {
-  const lastBotMessage = chatHistory.querySelector('.bot:last-child');
-  if (lastBotMessage) {
-    const lastBotRegenButton = lastBotMessage.querySelector('.action-buttons .action-button-regen');
-    if (lastBotRegenButton) {
-      lastBotRegenButton.parentNode.removeChild(lastBotRegenButton);
-    }
-  }
-}
-
 
 function copyToClipboard(text) {
   const textarea = document.createElement('textarea');
