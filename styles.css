@@ -8,8 +8,8 @@
 
 body {
   font-family: 'Roboto', sans-serif;
-  background-color: #050505;
-  color: #6f6f6d;
+  background-color: #7a7a7a;
+  color: #101012;
   line-height: 1.5;
   font-size: 16px;
   margin: 14px;
@@ -20,8 +20,8 @@ body {
   font-family: 'Roboto', sans-serif;
   font-size: 0.875rem;
   padding: 10px 16px;
-  background-color: #000000;
-  color: #6f6f6d;
+  background-color: #7f7f7f;
+  color: #101012;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -30,23 +30,23 @@ body {
 }
 
 .settings:hover, #refresh-button:hover, #clear-button:hover, #send-button:hover, .copy-code-button:hover, .action-button-copy:hover, .action-button-delete:hover, .action-button-regen:hover {
-  background-color: #0f0f0f;
+  background-color: #707070;
   box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
 }
 
 .settings:focus, #refresh-button:focus, #clear-button:focus, #send-button:focus, .copy-code-button:focus, .action-button-copy:focus, .action-button-delete:focus, .action-button-regen:focus {
   outline: none;
-  background-color: #0a0a0a;
+  background-color: #757575;
 }
 
 .options {
   text-align: right;
-  border-bottom: 0.8px solid #7f7f7f;
+  border-bottom: 0.8px solid #000000;
   margin-top: 40px;
 }
 
 #model-menu {
-  background-color: #000000;
+  background-color: #7f7f7f;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -70,15 +70,15 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  background-color: #0f0f0f;
+  background-color: #707070;
 }
 
 #model-list div:hover {
-  background-color: #191919;
+  background-color: #666666;
 }
 
 #model-list div.selected {
-  background-color: #170b00;
+  background-color: #68747f;
   font-weight: 600;
 }
 
@@ -91,9 +91,9 @@ textarea, input[type="password"], #api-endpoint-input {
   width: 100%;
   padding: 10px;
   margin: 0.5rem 0;
-  border: 1px solid #191919;
+  border: 1px solid #666666;
   border-radius: 4px;
-  background-color: #000000;
+  background-color: #7f7f7f;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
@@ -104,7 +104,7 @@ textarea, input[type="password"], #api-endpoint-input {
 }
 
 textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
-  border-color: #3f2100;
+  border-color: #405e7f;
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
@@ -114,8 +114,8 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   overflow-y: auto;
   margin: 5px 0;
   padding: 10px;
-  background-color: #000000;
-  border: 1px solid #111111;
+  background-color: #7f7f7f;
+  border: 1px solid #6e6e6e;
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075);
 }
@@ -132,17 +132,17 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   margin-right: 5px;
   padding: 10px;
   border-radius: 15px;
-  background-color: #070707;
+  background-color: #787878;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .message.user {
-  background-color: #070707;
+  background-color: #787878;
   align-self: flex-end;
 }
 
 .message.bot {
-  background-color: #0c0500;
+  background-color: #737a7f;
   align-self: flex-start;
 }
 
@@ -167,11 +167,11 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 
 #chat-history::-webkit-scrollbar {
   width: 6px;
-  background-color: #050505;
+  background-color: #7a7a7a;
 }
 
 #chat-history::-webkit-scrollbar-thumb {
-  background-color: #1f1f1f;
+  background-color: #606060;
   border-radius: 10px;
 }
 
@@ -179,8 +179,8 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   font-family: 'Roboto', sans-serif;
   font-size: 0.875rem;
   padding: 10px 16px;
-  background-color: #000000;
-  color: #6f6f6d;
+  background-color: #7f7f7f;
+  color: #101012;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -189,7 +189,7 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 }
 
 #about:hover {
-  background-color: #0f0f0f;
+  background-color: #707070;
 }
 
 #settings, #clear-button {
@@ -240,27 +240,27 @@ table {
 
 table td {
   padding: 0.5em 0.75em;
-  border: 1px solid #111111;
-  background-color: #040404;
+  border: 1px solid #6e6e6e;
+  background-color: #7b7b7b;
 }
 
 table th {
   padding: 0.5em 0.75em;
-  border: 2px solid #111111;
-  background-color: #030303;
+  border: 2px solid #6e6e6e;
+  background-color: #7c7c7c;
 }
 
 blockquote {
   padding: 0em 0em 0em 2em;
   margin: 0;
-  background-color: #050505;
-  border-left: 10px solid #191919;
-  color: #4c4c4c;
+  background-color: #7a7a7a;
+  border-left: 10px solid #666666;
+  color: #333333;
   font-style: italic;
 }
 
 pre, code {
-  background-color: #050505;
+  background-color: #7a7a7a;
   border-radius: 4px;
 }
 
