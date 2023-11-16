@@ -25,37 +25,18 @@ document.getElementById('send-button').addEventListener('click', sendMessage);
 
 function selectModel(model) {
   const modelOptions = document.querySelectorAll('#model-list div');
-  modelOptions.forEach((option) => option.classList.remove('selected'));
-
-  // Check if the model is custom or from the list
-  const isCustomModel = document.getElementById('custom-model-switch').checked;
-  
-  if (isCustomModel) {
-    // If the custom model switch is active, hide the model list
-    document.getElementById('model-list').style.display = 'none';
-    document.getElementById('custom-model-input').style.display = 'block';
-    // Using the value from the custom model input if it is provided
-    selectedModel = document.getElementById('custom-model-input').value.trim();
-  } else {
-    // If the custom model switch is not active, show the model list and highlight the selected model
-    document.getElementById('model-list').style.display = 'block';
-    document.getElementById('custom-model-input').style.display = 'none';
-    // Update the selectedModel with the model from the list
-    selectedModel = model;
-    // Highlight the selected model in the UI
-    const selectedModelOption = document.querySelector(`#model-list div[data-model="${model}"]`);
-    if (selectedModelOption) {
-      selectedModelOption.classList.add('selected');
+  modelOptions.forEach((option) => {
+    option.classList.remove('selected');
+    if (option.dataset.model === model) {
+      option.classList.add('selected');
     }
-  }
-  
-  // Save the selected model to local storage
+  });
+
+  selectedModel = model;
   localStorage.setItem('selectedModel', selectedModel);
-  
-  // Hide or show the model menu depending on the toggle state
+
   toggleModelMenu();
 }
-
 
 function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
