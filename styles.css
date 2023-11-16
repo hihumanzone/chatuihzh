@@ -1,5 +1,5 @@
 html {
-  filter: invert(95%);
+  filter: brightness(5%) contrast(100%);
 }
 
 *,
