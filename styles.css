@@ -52,6 +52,7 @@ body {
   box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
   margin: 20px 0;
   margin-bottom: 50px;
+  display: none;
 }
 
 #model-list {
