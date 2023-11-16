@@ -203,7 +203,6 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
 }
 
 #message-input {
-  height: 20px;
   flex-grow: 1;
   resize: none;
 }
