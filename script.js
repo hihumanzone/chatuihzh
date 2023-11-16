@@ -132,7 +132,7 @@ function createAndAppendMessage(content, owner) {
   actionButtons.appendChild(copyButton);
   actionButtons.appendChild(deleteButton);
 
-  if (owner === 'bot') {
+  if (owner === 'bot' && isLatestBotResponse) {
     const regenButton = document.createElement('button');
     regenButton.textContent = 'Regen';
     regenButton.classList.add('action-button-regen');
@@ -191,19 +191,26 @@ async function sendMessage() {
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
 
-  createAndAppendMessage(message, 'user');
+  createAndAppendMessage(message, 'user', false);
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
-  const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
-
-  const botResponse = jsonResponse.choices[0].message.content;
-  messages.push({
-    role: 'assistant',
-    content: botResponse,
-  });
-
-  createAndAppendMessage(botResponse, 'bot');
+  try {
+    const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
+    if (jsonResponse.choices && jsonResponse.choices.length > 0) {
+      const botResponse = jsonResponse.choices[0].message.content;
+      messages.push({
+        role: 'assistant',
+        content: botResponse,
+      });
+      createAndAppendMessage(botResponse, 'bot', true);
+    } else {
+      createAndAppendMessage("I didn't get that. Can you rephrase or try again?", 'bot', false);
+    }
+  } catch (error) {
+    console.error('Error getting bot response:', error);
+    createAndAppendMessage("Oops, something went wrong and I couldn't send your message. Please try again later.", 'bot', false);
+  }
 }
 
 function copyToClipboard(text) {
