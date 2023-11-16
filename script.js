@@ -191,27 +191,49 @@ async function sendMessage() {
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
 
-  createAndAppendMessage(message, 'user', false);
+  // Append user's message
+  createAndAppendMessage(message, 'user');
   messageInput.value = '';
   messageInput.style.height = 'auto';
 
   try {
+    // Fetch and append bot's response
     const jsonResponse = await getBotResponse(apiKey, apiEndpoint, message);
-    if (jsonResponse.choices && jsonResponse.choices.length > 0) {
+  
+    if (jsonResponse.choices && jsonResponse.choices.length > 0 && jsonResponse.choices[0].message) {
       const botResponse = jsonResponse.choices[0].message.content;
       messages.push({
         role: 'assistant',
         content: botResponse,
       });
+
+      // Remove the regenerate button from the last bot message, if any
+      removeRegenerateButtonFromLastBotMessage();
+
+      // Create and append bot's message as the latest, with the regenerate button
       createAndAppendMessage(botResponse, 'bot', true);
     } else {
-      createAndAppendMessage("I didn't get that. Can you rephrase or try again?", 'bot', false);
+      throw new Error('No response received from the API.');
     }
   } catch (error) {
-    console.error('Error getting bot response:', error);
-    createAndAppendMessage("Oops, something went wrong and I couldn't send your message. Please try again later.", 'bot', false);
+    console.error('Error fetching bot response:', error);
+    alert('Failed to get a response from the bot. Please check the console for more details.');
+    // Optionally add UI element for the user to see the error message directly without checking console
+    createAndAppendMessage('Error: Unable to fetch response from bot.', 'system');
   }
 }
+
+// Removes the regenerate button from the last bot message
+function removeRegenerateButtonFromLastBotMessage() {
+  const lastBotMessage = chatHistory.querySelector('.bot:last-child');
+  if (lastBotMessage) {
+    const lastBotRegenButton = lastBotMessage.querySelector('.action-buttons .action-button-regen');
+    if (lastBotRegenButton) {
+      lastBotRegenButton.parentNode.removeChild(lastBotRegenButton);
+    }
+  }
+}
+
 
 function copyToClipboard(text) {
   const textarea = document.createElement('textarea');
