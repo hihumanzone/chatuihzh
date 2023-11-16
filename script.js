@@ -27,16 +27,35 @@ function selectModel(model) {
   const modelOptions = document.querySelectorAll('#model-list div');
   modelOptions.forEach((option) => option.classList.remove('selected'));
 
-  const selectedModelOption = document.querySelector(`#model-list div[data-model="${model}"]`);
-  if (selectedModelOption) {
-    selectedModelOption.classList.add('selected');
+  // Check if the model is custom or from the list
+  const isCustomModel = document.getElementById('custom-model-switch').checked;
+  
+  if (isCustomModel) {
+    // If the custom model switch is active, hide the model list
+    document.getElementById('model-list').style.display = 'none';
+    document.getElementById('custom-model-input').style.display = 'block';
+    // Using the value from the custom model input if it is provided
+    selectedModel = document.getElementById('custom-model-input').value.trim();
+  } else {
+    // If the custom model switch is not active, show the model list and highlight the selected model
+    document.getElementById('model-list').style.display = 'block';
+    document.getElementById('custom-model-input').style.display = 'none';
+    // Update the selectedModel with the model from the list
+    selectedModel = model;
+    // Highlight the selected model in the UI
+    const selectedModelOption = document.querySelector(`#model-list div[data-model="${model}"]`);
+    if (selectedModelOption) {
+      selectedModelOption.classList.add('selected');
+    }
   }
-
-  selectedModel = model;
+  
+  // Save the selected model to local storage
   localStorage.setItem('selectedModel', selectedModel);
-
+  
+  // Hide or show the model menu depending on the toggle state
   toggleModelMenu();
 }
+
 
 function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
@@ -45,6 +64,36 @@ function toggleModelMenu() {
 messageInput.addEventListener('input', () => {
   messageInput.style.height = 'auto';
   messageInput.style.height = `${messageInput.scrollHeight}px`;
+});
+
+document.getElementById('custom-model-switch').addEventListener('change', function(event) {
+  if (event.target.checked) {
+    document.getElementById('model-list').style.display = 'none';
+    document.getElementById('custom-model-input').style.display = 'block';
+    selectedModel = '';
+  } else {
+    document.getElementById('model-list').style.display = 'block';
+    document.getElementById('custom-model-input').style.display = 'none';
+    document.getElementById('custom-model-input').value = ''; // Clear the custom input field when switching back.
+    selectModel(localStorage.getItem('selectedModel') || 'gpt-3.5-turbo'); // Reset to the last selected model from the list.
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function(event) {
+  const isCustomModelActive = localStorage.getItem('isCustomModelActive') === 'true';
+  const customModelName = localStorage.getItem('customModelName') || '';
+
+  if (isCustomModelActive) {
+    document.getElementById('custom-model-switch').checked = true;
+    document.getElementById('custom-model-input').value = customModelName;
+    document.getElementById('custom-model-input').style.display = 'block';
+    document.getElementById('model-list').style.display = 'none';
+    selectedModel = customModelName;
+  }
+});
+
+document.getElementById('custom-model-input').addEventListener('input', function(event) {
+  selectedModel = event.target.value.trim();
 });
 
 const ENDPOINT = apiEndpoint || 'https://api.openai.com/v1/chat/completions';
@@ -63,7 +112,7 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   aiThinkingMsg.style.display = 'flex';
 
   const data = {
-    model: selectedModel,
+    model: selectedModel || document.getElementById('custom-model-input').value.trim(),
     messages: messages,
   };
 
@@ -271,7 +320,15 @@ function saveInputsAndRefresh() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
   systemRole = systemRoleInput.value.trim();
+  const isCustomModelActive = document.getElementById('custom-model-switch').checked;
+  const customModelName = document.getElementById('custom-model-input').value.trim();
+  
+  if (isCustomModelActive) {
+    selectedModel = customModelName;
+  }
 
+  localStorage.setItem('isCustomModelActive', isCustomModelActive);
+  localStorage.setItem('customModelName', customModelName);
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
   localStorage.setItem('systemRole', systemRole);
