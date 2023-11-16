@@ -136,6 +136,7 @@ textarea:focus, input[type="password"]:focus, #api-endpoint-input:focus {
   border-radius: 15px;
   background-color: hsl(0, 0%, 9.520000000000003%);
   box-shadow: 0 1px 3px rgba(255, 255, 255, 0.1);
+  color: #fff;
 }
 
 .message.user {
