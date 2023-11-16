@@ -23,19 +23,38 @@ selectModel(selectedModel);
 
 document.getElementById('send-button').addEventListener('click', sendMessage);
 
+document.getElementById('custom-model-switch').addEventListener('change', function() {
+  const customModelSwitch = document.getElementById('custom-model-switch');
+  const customModelInput = document.getElementById('custom-model-input');
+  const modelListDiv = document.getElementById('model-list');
+  
+  if (customModelSwitch.checked) {
+    customModelInput.style.display = 'block';
+    modelListDiv.style.display = 'none';
+  } else {
+    customModelInput.style.display = 'none';
+    modelListDiv.style.display = 'block';
+  }
+});
+
 function selectModel(model) {
   const modelOptions = document.querySelectorAll('#model-list div');
   modelOptions.forEach((option) => option.classList.remove('selected'));
 
-  const selectedModelOption = document.querySelector(`#model-list div[data-model="${model}"]`);
-  if (selectedModelOption) {
-    selectedModelOption.classList.add('selected');
+  if (model !== 'custom') {
+    const selectedModelOption = document.querySelector(`#model-list div[data-model="${model}"]`);
+    if (selectedModelOption) {
+      selectedModelOption.classList.add('selected');
+    }
+
+    selectedModel = model;
+    localStorage.setItem('selectedModel', selectedModel);
   }
-
-  selectedModel = model;
-  localStorage.setItem('selectedModel', selectedModel);
-
-  toggleModelMenu();
+  
+  const customModelSwitch = document.getElementById('custom-model-switch');
+  if (!customModelSwitch.checked) {
+    toggleModelMenu();
+  }
 }
 
 function toggleModelMenu() {
@@ -54,6 +73,12 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
   };
+
+  const customModelSwitch = document.getElementById('custom-model-switch');
+  if (customModelSwitch.checked) {
+    const customModelInput = document.getElementById('custom-model-input');
+    selectedModel = customModelInput.value || 'gpt-3.5-turbo'; // Use a default model name if the input is empty
+  }
 
   messages.push({
     role: 'user',
@@ -218,8 +243,21 @@ async function sendMessage() {
     return;
   }
 
+  const customModelSwitch = document.getElementById('custom-model-switch');
+  if (customModelSwitch.checked) {
+    const customModelInput = document.getElementById('custom-model-input');
+    selectedModel = customModelInput.value.trim();
+    if (!selectedModel) {
+      alert('Please enter a custom model name.');
+      return;
+    }
+  } else {
+    selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
+  }
+
   localStorage.setItem('apiKey', apiKey);
   localStorage.setItem('apiEndpoint', apiEndpoint);
+  localStorage.setItem('selectedModel', selectedModel);
 
   createAndAppendMessage(message, 'user');
   messageInput.value = '';
@@ -235,6 +273,8 @@ async function sendMessage() {
 
   createAndAppendMessage(botResponse, 'bot');
 }
+
+selectModel(selectedModel);
 
 function copyToClipboard(text) {
   const textarea = document.createElement('textarea');
