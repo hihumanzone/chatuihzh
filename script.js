@@ -78,10 +78,8 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
   return response.json();
 }
 
-// Global variable to track the element of the last bot message
 let lastBotMessageElement = null;
 
-// Full createAndAppendMessage function with "Regenerate" button logic
 function createAndAppendMessage(content, owner) {
   const message = document.createElement('div');
   message.classList.add('message', owner);
@@ -136,7 +134,6 @@ function createAndAppendMessage(content, owner) {
   actionButtons.appendChild(copyButton);
   actionButtons.appendChild(deleteButton);
 
-  // Remove the "Regenerate" button from the last bot message
   if (lastBotMessageElement && owner === 'bot') {
     const lastRegenButton = lastBotMessageElement.querySelector('.action-button-regen');
     if (lastRegenButton) {
@@ -144,7 +141,6 @@ function createAndAppendMessage(content, owner) {
     }
   }
 
-  // If the owner is 'bot', we need to add the "Regenerate" button and update the lastBotMessageElement
   if (owner === 'bot') {
     const regenButton = document.createElement('button');
     regenButton.textContent = 'Regen';
@@ -152,7 +148,7 @@ function createAndAppendMessage(content, owner) {
     regenButton.addEventListener('click', () => regenerateMessage(message, owner));
 
     actionButtons.appendChild(regenButton);
-    lastBotMessageElement = message; // Save the current bot message as the last one
+    lastBotMessageElement = message;
   }
 
   message.appendChild(actionButtons);
@@ -162,7 +158,6 @@ function createAndAppendMessage(content, owner) {
 }
 
 function addRegenerateButton(messageElement) {
-  // Check for an existing "Regenerate" button to avoid duplicates
   if (!messageElement.querySelector('.action-button-regen')) {
     const regenButton = document.createElement('button');
     regenButton.textContent = 'Regen';
@@ -187,16 +182,14 @@ function deleteMessage(messageElement, content) {
   chatHistory.removeChild(messageElement);
   messages = messages.filter((msg) => msg.content !== content);
 
-  // Check if the deleted message was the last bot message
   if (lastBotMessageElement === messageElement) {
-    lastBotMessageElement = null; // Clear the reference to the last bot message
+    lastBotMessageElement = null;
 
-    // Find the last bot message in the chat history
     const botMessages = chatHistory.querySelectorAll('.message.bot');
     if (botMessages.length > 0) {
-      const lastBotMsgElement = botMessages[botMessages.length - 1]; // Get the actual last bot message element
-      addRegenerateButton(lastBotMsgElement); // Append the "Regenerate" button
-      lastBotMessageElement = lastBotMsgElement; // Update the reference to the last bot message
+      const lastBotMsgElement = botMessages[botMessages.length - 1];
+      addRegenerateButton(lastBotMsgElement);
+      lastBotMessageElement = lastBotMsgElement;
     }
   }
 }
