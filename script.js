@@ -256,6 +256,21 @@ function clearChatHistory() {
   }];
 }
 
+document.addEventListener('click', function(event) {
+  const target = event.target;
+
+  if (target.id === 'settings') {
+    toggleModelMenu();
+  } else if (target.tagName === 'DIV' && target.parentElement.id === 'model-list') {
+    const model = target.dataset.model;
+    selectModel(model);
+  } else if (target.id === 'clear-button') {
+    clearChatHistory();
+  } else if (target.id === 'refresh-button') {
+    saveInputsAndRefresh();
+  }
+});
+
 systemRoleInput.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && !event.shiftKey) {
     event.preventDefault();
