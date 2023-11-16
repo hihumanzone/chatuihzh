@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" href="logo2.png" type="image/png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Chat with GPT Models">
+  <meta name="keywords" content="Chat, OpenAI, GPT, AI">
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  <link rel="manifest" href="/manifest.json">
+  <title>GPT Models</title>
+</head>
+<body>
+  <div id="chat-container">
+    <div class="button-container">
+    <button id="settings" class="settings">Settings</button>
+    <button id="clear-button">Clear Chat History</button>
+    </div>
+        <div id="model-menu">
+ <div class="options">Switch Models:</div>
+ <div id="model-list">
+ <div data-model="gpt-3.5-turbo">GPT-3.5 Turbo</div>
+ <div data-model="gpt-3.5-turbo-0314">GPT-3.5 0314</div>
+ <div data-model="gpt-3.5-turbo-0613">GPT-3.5 0613</div>
+ <div data-model="gpt-3.5-turbo-1106">GPT-3.5 1106</div>
+ <div data-model="gpt-3.5-turbo-16k">GPT-3.5 16k</div>
+ <div data-model="gpt-3.5-turbo-16k-0314">GPT-3.5 16k 0314</div>
+ <div data-model="gpt-3.5-turbo-16k-0613">GPT-3.5 16k 0613</div>
+ <div data-model="gpt-4">GPT-4</div>
+ <div data-model="gpt-4-0314">GPT-4 0314</div>
+ <div data-model="gpt-4-0613">GPT-4 0613</div>
+ <div data-model="gpt-4-1106-preview">GPT-4 1106</div>
+ <div data-model="gpt-4-32k">GPT-4 32k</div>
+ <div data-model="gpt-4-32k-0314">GPT-4 32k 0314</div>
+ <div data-model="gpt-4-32k-0613">GPT-4 32k 0613</div>
+</div>
+      <div class="options">API Endpoint:</div>
+      <input id="api-endpoint-input" placeholder="Enter the API endpoint">
+      <div class="options">API Key:</div>
+      <input type="password" id="api-key-input" placeholder="Enter your API key">
+      <div class="options">System Role:</div>
+      <textarea id="system-role-input" placeholder="Enter the system role" style="display: block;"></textarea>
+      <br> <br>
+      <div class="button-container">
+      <button id="refresh-button">Apply Changes</button>
+      <button id="about" onclick='window.open("https://chatuihzh.vercel.app/about")'>About</button>
+      </div>
+        </div>
+    <div id="chat-history">
+    <div id="ai-thinking" style="display: none;">
+    <div class="generating">--Generating--</div>
+    </div>
+    </div>
+<div class="send-container">
+  <textarea id="message-input" placeholder="Type your message"></textarea>
+    <button id="send-button">Send➤️</button>
+</div>
+  </div>
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS_HTML"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+  <script type="text/javascript" src="script.js"></script>
+  <script>
+    if (navigator.serviceWorker) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js');
+      });
+    }
+  </script>
+<script>
+  document.addEventListener('click', function(event) {
+    const target = event.target;
+    if (target.id === 'settings') {
+      const modelMenu = document.getElementById('model-menu');
+      if (modelMenu.style.display === 'none') {
+        modelMenu.style.display = 'block';
+      } else {
+        modelMenu.style.display = 'none';
+      }
+    } else if (target.tagName === 'DIV' && target.parentElement.id === 'model-list') {
+      const model = target.dataset.model;
+      selectModel(model);
+    } else if (target.id === 'clear-button') {
+      clearChatHistory();
+    } else if (target.id === 'refresh-button') {
+      saveInputsAndRefresh();
+    }
+  });
+</script>
+</body>
+</html>
