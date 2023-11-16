@@ -162,15 +162,16 @@ function createAndAppendMessage(content, owner) {
 }
 
 function addRegenerateButton(messageElement) {
-  const regenButton = document.createElement('button');
-  regenButton.textContent = 'Regen';
-  regenButton.classList.add('action-button-regen');
-  regenButton.addEventListener('click', () => {
-    regenerateMessage(messageElement, 'bot');
-  });
+  // Check for an existing "Regenerate" button to avoid duplicates
+  if (!messageElement.querySelector('.action-button-regen')) {
+    const regenButton = document.createElement('button');
+    regenButton.textContent = 'Regen';
+    regenButton.classList.add('action-button-regen');
+    regenButton.addEventListener('click', () => regenerateMessage(messageElement, 'bot'));
 
-  const actionButtons = messageElement.querySelector('.action-buttons');
-  actionButtons.appendChild(regenButton);
+    const actionButtons = messageElement.querySelector('.action-buttons');
+    actionButtons.appendChild(regenButton);
+  }
 }
                            
 function copyMessage(content) {
@@ -185,11 +186,20 @@ function copyMessage(content) {
 function deleteMessage(messageElement, content) {
   chatHistory.removeChild(messageElement);
   messages = messages.filter((msg) => msg.content !== content);
+
+  // Check if the deleted message was the last bot message
   if (lastBotMessageElement === messageElement) {
-    lastBotMessageElement = null;
+    lastBotMessageElement = null; // Clear the reference to the last bot message
+
+    // Find the last bot message in the chat history
+    const botMessages = chatHistory.querySelectorAll('.message.bot');
+    if (botMessages.length > 0) {
+      const lastBotMsgElement = botMessages[botMessages.length - 1]; // Get the actual last bot message element
+      addRegenerateButton(lastBotMsgElement); // Append the "Regenerate" button
+      lastBotMessageElement = lastBotMsgElement; // Update the reference to the last bot message
+    }
   }
 }
-
 
 async function regenerateMessage(messageElement, owner) {
   const messageIdx = messages.findIndex((msg) => msg.content === messageElement.dataset.raw && msg.role === owner);
