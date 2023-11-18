@@ -158,20 +158,14 @@ function createAndAppendMessage(content, owner) {
 }
 
 function addRegenerateButton(messageElement) {
-  const existingRegenButton = messageElement.querySelector('.action-button-regen');
-  if (!existingRegenButton) {
-    const regenButton = createActionButton('Regen', 'action-button-regen', () => {
-      regenerateMessage(messageElement, 'bot');
-    });
+  if (!messageElement.querySelector('.action-button-regen')) {
+    const regenButton = document.createElement('button');
+    regenButton.textContent = 'Regen';
+    regenButton.classList.add('action-button-regen');
+    regenButton.addEventListener('click', () => regenerateMessage(messageElement, 'bot'));
+
     const actionButtons = messageElement.querySelector('.action-buttons');
     actionButtons.appendChild(regenButton);
-  }
-}
-
-function removeRegenerateButton(messageElement) {
-  const regenButton = messageElement.querySelector('.action-button-regen');
-  if (regenButton) {
-    regenButton.remove();
   }
 }
                            
