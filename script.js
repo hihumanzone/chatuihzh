@@ -1,45 +1,29 @@
-class ChatBot {
-  constructor() {
-    this.config = {
-      apiKey: localStorage.getItem('apiKey') || '',
-      apiEndpoint: localStorage.getItem('apiEndpoint') || '',
-      selectedModel: localStorage.getItem('selectedModel') || 'gpt-3.5-turbo',
-      systemRole: localStorage.getItem('systemRole') || ''
-    };
+const chatHistory = document.getElementById('chat-history');
+const apiKeyInput = document.getElementById('api-key-input');
+const apiEndpointInput = document.getElementById('api-endpoint-input');
+const messageInput = document.getElementById('message-input');
+const modelMenu = document.getElementById('model-menu');
+const aiThinkingMsg = document.getElementById('ai-thinking');
+const systemRoleInput = document.getElementById('system-role-input');
 
-    this.domElements = {
-      chatHistory: document.getElementById('chat-history'),
-      apiKeyInput: document.getElementById('api-key-input'),
-      apiEndpointInput: document.getElementById('api-endpoint-input'),
-      messageInput: document.getElementById('message-input'),
-      modelMenu: document.getElementById('model-menu'),
-      aiThinkingMsg: document.getElementById('ai-thinking'),
-      systemRoleInput: document.getElementById('system-role-input')
-    };
+let messages = [{
+  role: 'system',
+  content: localStorage.getItem('systemRole') || '',
+}];
 
-    this.messages = [{
-      role: 'system',
-      content: this.config.systemRole
-    }];
+let apiKey = localStorage.getItem('apiKey') || '';
+let apiEndpoint = localStorage.getItem('apiEndpoint') || '';
+let selectedModel = localStorage.getItem('selectedModel') || 'gpt-3.5-turbo';
+let systemRole = localStorage.getItem('systemRole') || '';
 
-    this.ENDPOINT = this.config.apiEndpoint || 'https://api.openai.com/v1/chat/completions';
-    this.lastBotMessageElement = null;
-  }
+apiKeyInput.value = apiKey;
+apiEndpointInput.value = apiEndpoint;
+systemRoleInput.value = systemRole;
+selectModel(selectedModel);
 
-  init() {
-    this.domElements.apiKeyInput.value = this.config.apiKey;
-    this.domElements.apiEndpointInput.value = this.config.apiEndpoint;
-    this.domElements.systemRoleInput.value = this.config.systemRole;
-    this.selectModel(this.config.selectedModel);
+document.getElementById('send-button').addEventListener('click', sendMessage);
 
-    document.getElementById('send-button').addEventListener('click', () => this.sendMessage());
-    this.domElements.messageInput.addEventListener('input', () => this.autoResizeInput());
-
-    document.addEventListener('click', event => this.handleDocumentClick(event));
-    document.getElementById('refresh-button').addEventListener('click', () => this.saveInputsAndRefresh());
-  }
-
-  function selectModel(model) {
+function selectModel(model) {
   const modelOptions = document.querySelectorAll('#model-list div');
   modelOptions.forEach((option) => option.classList.remove('selected'));
 
@@ -54,16 +38,18 @@ class ChatBot {
   toggleModelMenu();
 }
 
-  function toggleModelMenu() {
+function toggleModelMenu() {
   modelMenu.style.display = modelMenu.style.display === 'none' ? 'block' : 'none';
-  }
+}
 
-  messageInput.addEventListener('input', () => {
+messageInput.addEventListener('input', () => {
   messageInput.style.height = 'auto';
   messageInput.style.height = `${messageInput.scrollHeight}px`;
 });
 
-  async function getBotResponse(apiKey, apiEndpoint, message) {
+const ENDPOINT = apiEndpoint || 'https://api.openai.com/v1/chat/completions';
+
+async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
@@ -90,9 +76,88 @@ class ChatBot {
   aiThinkingMsg.style.display = 'none';
 
   return response.json();
+}
+
+let lastBotMessageElement = null;
+
+function createAndAppendMessage(content, owner) {
+  const message = document.createElement('div');
+  message.classList.add('message', owner);
+  message.dataset.raw = content;
+
+  const messageText = document.createElement('div');
+  messageText.classList.add('message-text');
+  message.appendChild(messageText);
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [
+        ['$', '$'],
+        ['\\(', '\\)'],
+      ],
+      processEscapes: true,
+    },
+  });
+
+  const md = window.markdownit();
+  const displayedText = md.render(content);
+  messageText.innerHTML = displayedText;
+
+  const codeBlocks = message.querySelectorAll('pre code');
+  codeBlocks.forEach((code) => {
+    const copyCodeButton = document.createElement('button');
+    copyCodeButton.classList.add('copy-code-button');
+    copyCodeButton.textContent = 'Copy Code';
+    copyCodeButton.addEventListener('click', () => {
+      copyToClipboard(code.innerText || code.textContent);
+      alert('Code copied to clipboard');
+    });
+    const codeBlockContainer = code.parentNode;
+    codeBlockContainer.appendChild(copyCodeButton);
+  });
+
+  const actionButtons = document.createElement('div');
+  actionButtons.classList.add('action-buttons');
+
+  const copyButton = document.createElement('button');
+  copyButton.textContent = 'Copy';
+  copyButton.classList.add('action-button-copy');
+  copyButton.addEventListener('click', () => copyMessage(content));
+
+  const deleteButton = document.createElement('button');
+  deleteButton.textContent = 'Delete';
+  deleteButton.classList.add('action-button-delete');
+  deleteButton.addEventListener('click', () => {
+    deleteMessage(message, content);
+  });
+
+  actionButtons.appendChild(copyButton);
+  actionButtons.appendChild(deleteButton);
+
+  if (lastBotMessageElement && owner === 'bot') {
+    const lastRegenButton = lastBotMessageElement.querySelector('.action-button-regen');
+    if (lastRegenButton) {
+      lastRegenButton.remove();
+    }
   }
 
-  function addRegenerateButton(messageElement) {
+  if (owner === 'bot') {
+    const regenButton = document.createElement('button');
+    regenButton.textContent = 'Regen';
+    regenButton.classList.add('action-button-regen');
+    regenButton.addEventListener('click', () => regenerateMessage(message, owner));
+
+    actionButtons.appendChild(regenButton);
+    lastBotMessageElement = message;
+  }
+
+  message.appendChild(actionButtons);
+  chatHistory.insertBefore(message, aiThinkingMsg);
+  chatHistory.scrollTop = chatHistory.scrollHeight;
+  MathJax.Hub.Queue(['Typeset', MathJax.Hub, messageText]);
+}
+
+function addRegenerateButton(messageElement) {
   if (!messageElement.querySelector('.action-button-regen')) {
     const regenButton = document.createElement('button');
     regenButton.textContent = 'Regen';
@@ -102,18 +167,18 @@ class ChatBot {
     const actionButtons = messageElement.querySelector('.action-buttons');
     actionButtons.appendChild(regenButton);
   }
-  }
-
-  function copyMessage(content) {
+}
+                           
+function copyMessage(content) {
   if (content) {
     copyToClipboard(content);
     alert('Text copied to clipboard');
   } else {
     alert('No text to copy');
   }
-  }
+}
 
-  function deleteMessage(messageElement, content) {
+function deleteMessage(messageElement, content) {
   chatHistory.removeChild(messageElement);
   messages = messages.filter((msg) => msg.content !== content);
 
@@ -127,9 +192,9 @@ class ChatBot {
       lastBotMessageElement = lastBotMsgElement;
     }
   }
-  }
+}
 
-  async function regenerateMessage(messageElement, owner) {
+async function regenerateMessage(messageElement, owner) {
   const messageIdx = messages.findIndex((msg) => msg.content === messageElement.dataset.raw && msg.role === owner);
   messages.splice(messageIdx, 1);
   chatHistory.removeChild(messageElement);
@@ -141,9 +206,9 @@ class ChatBot {
     content: botResponse,
   });
   createAndAppendMessage(botResponse, 'bot');
-  }
+}
 
-  async function sendMessage() {
+async function sendMessage() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
   const message = messageInput.value;
@@ -169,18 +234,18 @@ class ChatBot {
   });
 
   createAndAppendMessage(botResponse, 'bot');
-  }
+}
 
-  function copyToClipboard(text) {
+function copyToClipboard(text) {
   const textarea = document.createElement('textarea');
   textarea.value = text;
   document.body.appendChild(textarea);
   textarea.select();
   document.execCommand('copy');
   document.body.removeChild(textarea);
-  }
+}
 
-  function clearChatHistory() {
+function clearChatHistory() {
   Array.from(chatHistory.getElementsByClassName('message')).forEach((message) => {
     chatHistory.removeChild(message);
   });
@@ -189,9 +254,35 @@ class ChatBot {
     role: 'system',
     content: localStorage.getItem('systemRole') || '',
   }];
-  }
+}
 
-  function saveInputsAndRefresh() {
+document.addEventListener('click', function(event) {
+  const target = event.target;
+
+  if (target.id === 'settings') {
+    toggleModelMenu();
+  } else if (target.tagName === 'DIV' && target.parentElement.id === 'model-list') {
+    const model = target.dataset.model;
+    selectModel(model);
+  } else if (target.id === 'clear-button') {
+    clearChatHistory();
+  } else if (target.id === 'refresh-button') {
+    saveInputsAndRefresh();
+  }
+});
+
+systemRoleInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    let caret = systemRoleInput.selectionStart;
+    systemRoleInput.value = systemRoleInput.value.substring(0, caret) + '\n' + systemRoleInput.value.substring(caret);
+    systemRoleInput.selectionEnd = caret + 1;
+    localStorage.setItem('systemRole', systemRoleInput.value);
+    messages[0].content = systemRoleInput.value;
+  }
+});
+
+function saveInputsAndRefresh() {
   apiKey = apiKeyInput.value.trim();
   apiEndpoint = apiEndpointInput.value.trim();
   systemRole = systemRoleInput.value.trim();
@@ -201,8 +292,6 @@ class ChatBot {
   localStorage.setItem('systemRole', systemRole);
 
   location.reload();
-  }
 }
 
-const bot = new ChatBot();
-bot.init();
+document.getElementById('refresh-button').addEventListener('click', saveInputsAndRefresh);
