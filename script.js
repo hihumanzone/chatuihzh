@@ -49,85 +49,33 @@ messageInput.addEventListener('input', () => {
 
 const ENDPOINT = apiEndpoint || 'https://api.openai.com/v1/chat/completions';
 
-// Add abort controller to handle stop/cancellation of streaming
-let controller = null;
-
 async function getBotResponse(apiKey, apiEndpoint, message) {
-  // Define the headers and request payload
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
   };
 
-  const data = {
-    model: selectedModel,
-    messages: messages,
-    stream: true, // Enable streaming functionality
-  };
-
-  // Create a new AbortController instance
-  controller = new AbortController();
-  const signal = controller.signal;
+  messages.push({
+    role: 'user',
+    content: message,
+  });
 
   aiThinkingMsg.style.display = 'flex';
 
-  try {
-    const response = await fetch(apiEndpoint || ENDPOINT, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(data),
-      signal,
-    });
+  const data = {
+    model: selectedModel,
+    messages: messages,
+  };
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder('utf-8');
+  const response = await fetch(apiEndpoint || ENDPOINT, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify(data),
+  });
 
-    // Loop to process streamed content
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+  aiThinkingMsg.style.display = 'none';
 
-      // Decode and handle the chunks received
-      const chunk = decoder.decode(value);
-      const lines = chunk.split('\n');
-      const parsedLines = lines
-        .map(line => line.trim())
-        .filter(line => line !== '' && line !== '[DONE]')
-        .map(line => JSON.parse(line));
-
-      for (const parsedLine of parsedLines) {
-        const { choices } = parsedLine;
-        const { delta } = choices[0];
-        const { content } = delta;
-
-        // Update chat GUI with the new content if it exists
-        if (content) {
-          messages.push({
-            role: 'assistant',
-            content: content,
-          });
-          createAndAppendMessage(content, 'bot');
-        }
-      }
-    }
-  } catch (error) {
-    if (signal.aborted) {
-      console.log('Request aborted by the user.');
-    } else {
-      console.error('Error:', error);
-    }
-  } finally {
-    aiThinkingMsg.style.display = 'none';
-    controller = null;
-  }
-}
-
-// Stop streaming function
-function stopStreaming() {
-  if (controller) {
-    controller.abort();
-    aiThinkingMsg.style.display = 'none';
-  }
+  return response.json();
 }
 
 let lastBotMessageElement = null;
