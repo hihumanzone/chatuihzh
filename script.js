@@ -49,72 +49,86 @@ messageInput.addEventListener('input', () => {
 
 const ENDPOINT = apiEndpoint || 'https://api.openai.com/v1/chat/completions';
 
-// Assume the rest of your code is unchanged up to this point
+// Add abort controller to handle stop/cancellation of streaming
+let controller = null;
 
-// The following should replace your existing getBotResponse function
 async function getBotResponse(apiKey, apiEndpoint, message) {
+  // Define the headers and request payload
   const headers = {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${apiKey}`,
   };
 
-  messages.push({
-    role: 'user',
-    content: message,
-  });
-
-  aiThinkingMsg.style.display = 'flex';
-
   const data = {
     model: selectedModel,
     messages: messages,
+    stream: true, // Enable streaming functionality
   };
 
-  // Create a new AbortController for this request, so we can cancel streaming if needed.
-  const controller = new AbortController();
+  // Create a new AbortController instance
+  controller = new AbortController();
   const signal = controller.signal;
+
+  aiThinkingMsg.style.display = 'flex';
 
   try {
     const response = await fetch(apiEndpoint || ENDPOINT, {
       method: 'POST',
       headers: headers,
-      body: JSON.stringify({...data, stream: true}), // Enable streaming
-      signal: signal,
+      body: JSON.stringify(data),
+      signal,
     });
 
-    // Read the response as a stream of data
     const reader = response.body.getReader();
     const decoder = new TextDecoder('utf-8');
 
-    // This is where you handle streamed content.
-    // You should adjust this logic to fit how you want to process and display streaming data
+    // Loop to process streamed content
     while (true) {
       const { done, value } = await reader.read();
-      if (done) {
-        break;
+      if (done) break;
+
+      // Decode and handle the chunks received
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n');
+      const parsedLines = lines
+        .map(line => line.trim())
+        .filter(line => line !== '' && line !== '[DONE]')
+        .map(line => JSON.parse(line));
+
+      for (const parsedLine of parsedLines) {
+        const { choices } = parsedLine;
+        const { delta } = choices[0];
+        const { content } = delta;
+
+        // Update chat GUI with the new content if it exists
+        if (content) {
+          messages.push({
+            role: 'assistant',
+            content: content,
+          });
+          createAndAppendMessage(content, 'bot');
+        }
       }
-      const chunk = decoder.decode(value, { stream: true });
-      // Handle each chunk, you can do JSON.parse depending on how response is formatted
-      // Here I'm simply appending the text to display it.
-      createAndAppendMessage(chunk, 'bot');
     }
   } catch (error) {
     if (signal.aborted) {
-      console.log('Stream was aborted');
+      console.log('Request aborted by the user.');
     } else {
-      console.error('Stream reading error:', error);
+      console.error('Error:', error);
     }
   } finally {
     aiThinkingMsg.style.display = 'none';
-    // If using an abort button, enable it here
+    controller = null;
   }
-  
-  // There's no single JSON response at the end of streaming, so nothing to return
 }
 
-// You will want to expose the AbortController to other functions if you wish to provide the user an option to stop the stream
-
-// Rest of your code remains the same...
+// Stop streaming function
+function stopStreaming() {
+  if (controller) {
+    controller.abort();
+    aiThinkingMsg.style.display = 'none';
+  }
+}
 
 let lastBotMessageElement = null;
 
