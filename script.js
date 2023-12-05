@@ -49,6 +49,9 @@ messageInput.addEventListener('input', () => {
 
 const ENDPOINT = apiEndpoint || 'https://api.openai.com/v1/chat/completions';
 
+// Assume the rest of your code is unchanged up to this point
+
+// The following should replace your existing getBotResponse function
 async function getBotResponse(apiKey, apiEndpoint, message) {
   const headers = {
     'Content-Type': 'application/json',
@@ -67,16 +70,51 @@ async function getBotResponse(apiKey, apiEndpoint, message) {
     messages: messages,
   };
 
-  const response = await fetch(apiEndpoint || ENDPOINT, {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify(data),
-  });
+  // Create a new AbortController for this request, so we can cancel streaming if needed.
+  const controller = new AbortController();
+  const signal = controller.signal;
 
-  aiThinkingMsg.style.display = 'none';
+  try {
+    const response = await fetch(apiEndpoint || ENDPOINT, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({...data, stream: true}), // Enable streaming
+      signal: signal,
+    });
 
-  return response.json();
+    // Read the response as a stream of data
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+
+    // This is where you handle streamed content.
+    // You should adjust this logic to fit how you want to process and display streaming data
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+      const chunk = decoder.decode(value, { stream: true });
+      // Handle each chunk, you can do JSON.parse depending on how response is formatted
+      // Here I'm simply appending the text to display it.
+      createAndAppendMessage(chunk, 'bot');
+    }
+  } catch (error) {
+    if (signal.aborted) {
+      console.log('Stream was aborted');
+    } else {
+      console.error('Stream reading error:', error);
+    }
+  } finally {
+    aiThinkingMsg.style.display = 'none';
+    // If using an abort button, enable it here
+  }
+  
+  // There's no single JSON response at the end of streaming, so nothing to return
 }
+
+// You will want to expose the AbortController to other functions if you wish to provide the user an option to stop the stream
+
+// Rest of your code remains the same...
 
 let lastBotMessageElement = null;
 
